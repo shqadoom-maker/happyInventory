@@ -1,0 +1,223 @@
+{
+  "brand": {
+    "name": "Happy Inventory",
+    "subtitle": "إدارة المستودعات"
+  },
+  "shell": {
+    "eyebrow": "شركة هابي",
+    "title": "إدارة المخزون",
+    "stack": "SQLite · EF Core 6",
+    "api": "واجهة البرمجة: ASP.NET Core .NET 6"
+  },
+  "language": {
+    "label": "اللغة",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "warehouses": "المستودعات",
+    "products": "المنتجات",
+    "inventory": "المخزون",
+    "stockMovements": "حركات المخزون",
+    "locations": "المواقع"
+  },
+  "titles": {
+    "dashboard": "لوحة التحكم",
+    "warehouses": "المستودعات",
+    "products": "المنتجات",
+    "inventory": "المخزون",
+    "stockMovements": "حركات المخزون",
+    "locations": "المواقع"
+  },
+  "common": {
+    "refresh": "تحديث",
+    "loading": "جارٍ التحميل…",
+    "cancel": "إلغاء",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "add": "إضافة",
+    "search": "بحث",
+    "backToList": "العودة إلى القائمة",
+    "actions": "الإجراءات",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "notAvailable": "—"
+  },
+  "dashboard": {
+    "eyebrow": "شركة هابي",
+    "title": "مخزون مستودعات متعدد الدول",
+    "intro": "تتبّع المخزون عبر مستودعات في دول ومدن مختلفة. تتواصل واجهة Angular مع ASP.NET Core Web API، الذي يحفظ كل شيء في SQLite عبر EF Core. كما ترسل الأنظمة الخارجية، مثل متجر التجارة الإلكترونية، تحديثاتها إلى واجهة البرمجة نفسها.",
+    "cards": {
+      "warehouses": "سجّل المستودعات في كل دولة ومدينة، وحافظ على تحديث بياناتها.",
+      "products": "حافظ على كتالوج المنتجات مع رمز SKU والسعر وحالة التوفّر.",
+      "inventory": "تحقّق من مستويات المخزون لكل مستودع، وعدّل الكميات وحدّد حدود إعادة الطلب.",
+      "stockMovements": "راجع كل عمليات الإدخال والإخراج والتعديل اليدوي مع مصدرها.",
+      "locations": "أدر الدول والمدن التي تنتمي إليها المستودعات."
+    },
+    "flow": {
+      "title": "كيف تنتقل عملية التحديث",
+      "step1": "تستدعي واجهة Angular أو أي نظام خارجي إحدى نقاط نهاية واجهة البرمجة.",
+      "step2": "تتحقق الخدمة من الطلب وتطبّق تغيير المخزون.",
+      "step3": "يكتب EF Core سجل المخزون وسجل حركة المخزون في SQLite.",
+      "step4": "تحتفظ كل عملية تغيير بالمصدر والمرجع، لذا يوضّح سجل المخزون دائمًا مصدر كل رقم."
+    }
+  },
+  "warehouses": {
+    "title": "المستودعات",
+    "subtitle": "كل مستودع ينتمي إلى مدينة، والمدينة تنتمي إلى دولة.",
+    "new": "+ مستودع جديد",
+    "searchPlaceholder": "الاسم أو الرمز أو المدينة أو الدولة",
+    "emptyTitle": "لا توجد مستودعات بعد",
+    "emptyHint": "أنشئ أول مستودع أو عدّل كلمة البحث.",
+    "columns": {
+      "name": "الاسم",
+      "code": "الرمز",
+      "city": "المدينة",
+      "country": "الدولة",
+      "capacity": "السعة",
+      "status": "الحالة"
+    },
+    "confirmDelete": "هل تريد حذف المستودع \"{{name}}\"؟",
+    "form": {
+      "titleNew": "مستودع جديد",
+      "titleEdit": "تعديل مستودع",
+      "subtitle": "يُسنَد المستودع إلى مدينة، والمدن تنتمي إلى دول.",
+      "name": "الاسم",
+      "namePlaceholder": "المستودع المركزي بالقاهرة",
+      "nameRequired": "الاسم مطلوب.",
+      "code": "الرمز",
+      "codePlaceholder": "CAI-01",
+      "codeRequired": "الرمز مطلوب.",
+      "city": "المدينة",
+      "selectCity": "اختر مدينة",
+      "cityRequired": "اختر مدينة.",
+      "capacity": "السعة (وحدة)",
+      "capacityRequired": "يجب أن تكون السعة صفرًا أو أكثر.",
+      "address": "العنوان",
+      "addressPlaceholder": "الشارع، الحي",
+      "active": "نشط",
+      "create": "إنشاء مستودع",
+      "save": "حفظ التغييرات",
+      "noCitiesPrefix": "لا توجد مدن بعد.",
+      "addLocations": "أضف دولة ومدينة",
+      "noCitiesSuffix": "قبل إنشاء مستودع."
+    }
+  },
+  "products": {
+    "title": "المنتجات",
+    "subtitle": "الكتالوج المشترك بين جميع المستودعات.",
+    "new": "+ منتج جديد",
+    "searchPlaceholder": "رمز SKU أو الاسم أو الوصف",
+    "emptyTitle": "لا توجد منتجات بعد",
+    "emptyHint": "أضف أول منتج لبدء تتبّع المخزون.",
+    "columns": {
+      "sku": "رمز SKU",
+      "name": "الاسم",
+      "description": "الوصف",
+      "price": "سعر الوحدة",
+      "status": "الحالة"
+    },
+    "confirmDelete": "هل تريد حذف المنتج \"{{name}}\"؟",
+    "form": {
+      "titleNew": "منتج جديد",
+      "titleEdit": "تعديل منتج",
+      "subtitle": "المنتجات مشتركة عالميًا، أما مستويات المخزون فتُتبَّع لكل مستودع.",
+      "sku": "رمز SKU",
+      "skuPlaceholder": "SKU-1001",
+      "skuRequired": "رمز SKU مطلوب.",
+      "name": "الاسم",
+      "namePlaceholder": "فأرة لاسلكية",
+      "nameRequired": "الاسم مطلوب.",
+      "price": "سعر الوحدة",
+      "priceRequired": "يجب أن يكون السعر صفرًا أو أكثر.",
+      "active": "نشط",
+      "description": "الوصف",
+      "descriptionPlaceholder": "تفاصيل اختيارية",
+      "create": "إنشاء منتج",
+      "save": "حفظ التغييرات"
+    }
+  },
+  "inventory": {
+    "title": "المخزون",
+    "subtitle": "تحقّق من مستويات المخزون لمستودع واحد وسجّل حركة عند تغيّر الكمية.",
+    "warehouse": "المستودع",
+    "selectWarehouse": "اختر مستودعًا",
+    "emptyTitle": "لا يوجد مخزون مسجّل",
+    "emptyHint": "لا توجد سجلات مخزون لهذا المستودع بعد. ستُنشئها الحركات.",
+    "noWarehousesTitle": "لا توجد مستودعات",
+    "noWarehousesHint": "أنشئ مستودعًا قبل تتبّع المخزون.",
+    "columns": {
+      "sku": "رمز SKU",
+      "product": "المنتج",
+      "quantity": "الكمية",
+      "reorderLevel": "حد إعادة الطلب",
+      "status": "الحالة",
+      "lastUpdated": "آخر تحديث (UTC)"
+    },
+    "lowStock": "مخزون منخفض",
+    "inStock": "متوفر",
+    "adjust": "تعديل",
+    "adjustTitle": "تعديل المخزون — {{name}}",
+    "currentQuantity": "الكمية الحالية:",
+    "hint": "الإدخال موجب والإخراج سالب، ويمكن أن يكون التعديل بأي إشارة.",
+    "movementType": "نوع الحركة",
+    "quantityChange": "تغيير الكمية",
+    "quantityRequired": "الكمية مطلوبة.",
+    "reference": "المرجع",
+    "referencePlaceholder": "رقم الطلب أو إشعار التسليم أو السبب…",
+    "apply": "تطبيق الحركة",
+    "zeroError": "أدخل تغيير كمية غير الصفر."
+  },
+  "movementTypes": {
+    "inbound": "إدخال",
+    "outbound": "إخراج",
+    "adjustment": "تعديل"
+  },
+  "stockMovements": {
+    "title": "حركات المخزون",
+    "subtitle": "سجل تدقيق لكل عمليات الإدخال والإخراج والتعديل اليدوي، أيًا كان المصدر.",
+    "warehouse": "المستودع",
+    "allWarehouses": "كل المستودعات",
+    "emptyTitle": "لا توجد حركات مسجّلة",
+    "emptyHint": "ستظهر تغييرات المخزون هنا فور حدوثها.",
+    "columns": {
+      "when": "الوقت (UTC)",
+      "warehouse": "المستودع",
+      "product": "المنتج",
+      "type": "النوع",
+      "change": "التغيير",
+      "source": "المصدر",
+      "reference": "المرجع"
+    }
+  },
+  "locations": {
+    "title": "المواقع",
+    "subtitle": "الدول والمدن التي تُسنَد إليها المستودعات.",
+    "countries": "الدول",
+    "cities": "المدن",
+    "name": "الاسم",
+    "code": "الرمز",
+    "country": "الدولة",
+    "add": "إضافة",
+    "countryPlaceholder": "مصر",
+    "cityPlaceholder": "القاهرة",
+    "selectCountry": "اختر دولة",
+    "nameRequired": "الاسم مطلوب.",
+    "codeRequired": "الرمز مطلوب.",
+    "countryRequired": "اختر دولة.",
+    "noCountriesTitle": "لا توجد دول",
+    "noCountriesHint": "أضف دولة للبدء.",
+    "noCitiesTitle": "لا توجد مدن",
+    "noCitiesHint": "أضف مدينة داخل دولة.",
+    "confirmDeleteCountry": "هل تريد حذف الدولة \"{{name}}\"؟",
+    "confirmDeleteCity": "هل تريد حذف المدينة \"{{name}}\"؟"
+  },
+  "errors": {
+    "unreachable": "تعذّر الوصول إلى واجهة البرمجة. تأكد من تشغيل الخادم.",
+    "forbidden": "غير مسموح لك بتنفيذ هذا الإجراء.",
+    "notFound": "المورد المطلوب غير موجود.",
+    "genericStatus": "فشل الطلب بالحالة {{status}}.",
+    "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+  }
+}

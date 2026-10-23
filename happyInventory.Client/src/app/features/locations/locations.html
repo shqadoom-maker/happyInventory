@@ -1,0 +1,155 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>{{ 'locations.title' | translate }}</h2>
+      <p>{{ 'locations.subtitle' | translate }}</p>
+    </div>
+    <button class="btn secondary" type="button" (click)="load()">
+      {{ 'common.refresh' | translate }}
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <div class="grid-2">
+    <section class="card">
+      <h3>{{ 'locations.countries' | translate }}</h3>
+
+      <form [formGroup]="countryForm" (ngSubmit)="addCountry()" class="inline-form">
+        <div class="field">
+          <label for="country-name">{{ 'locations.name' | translate }}</label>
+          <input
+            id="country-name"
+            formControlName="name"
+            [placeholder]="'locations.countryPlaceholder' | translate"
+          />
+          @if (countryForm.controls.name.touched && countryForm.controls.name.invalid) {
+            <span class="error">{{ 'locations.nameRequired' | translate }}</span>
+          }
+        </div>
+
+        <div class="field code">
+          <label for="country-code">{{ 'locations.code' | translate }}</label>
+          <input
+            id="country-code"
+            formControlName="code"
+            maxlength="3"
+            [placeholder]="'locations.code' | translate"
+          />
+          @if (countryForm.controls.code.touched && countryForm.controls.code.invalid) {
+            <span class="error">{{ 'locations.codeRequired' | translate }}</span>
+          }
+        </div>
+
+        <button class="btn" type="submit" [disabled]="savingCountry()">
+          {{ 'locations.add' | translate }}
+        </button>
+      </form>
+
+      @if (countries().length === 0) {
+        <div class="empty">
+          <strong>{{ 'locations.noCountriesTitle' | translate }}</strong>
+          {{ 'locations.noCountriesHint' | translate }}
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'locations.name' | translate }}</th>
+                <th>{{ 'locations.code' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (country of countries(); track country.id) {
+                <tr>
+                  <td>{{ country.name }}</td>
+                  <td class="muted">{{ country.code }}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn danger small" type="button" (click)="removeCountry(country)">
+                        {{ 'common.delete' | translate }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="card">
+      <h3>{{ 'locations.cities' | translate }}</h3>
+
+      <form [formGroup]="cityForm" (ngSubmit)="addCity()" class="inline-form">
+        <div class="field">
+          <label for="city-name">{{ 'locations.name' | translate }}</label>
+          <input
+            id="city-name"
+            formControlName="name"
+            [placeholder]="'locations.cityPlaceholder' | translate"
+          />
+          @if (cityForm.controls.name.touched && cityForm.controls.name.invalid) {
+            <span class="error">{{ 'locations.nameRequired' | translate }}</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="city-country">{{ 'locations.country' | translate }}</label>
+          <select id="city-country" formControlName="countryId">
+            <option [ngValue]="0" disabled>{{ 'locations.selectCountry' | translate }}</option>
+            @for (country of countries(); track country.id) {
+              <option [ngValue]="country.id">{{ country.name }}</option>
+            }
+          </select>
+          @if (cityForm.controls.countryId.touched && cityForm.controls.countryId.invalid) {
+            <span class="error">{{ 'locations.countryRequired' | translate }}</span>
+          }
+        </div>
+
+        <button class="btn" type="submit" [disabled]="savingCity()">
+          {{ 'locations.add' | translate }}
+        </button>
+      </form>
+
+      @if (cities().length === 0) {
+        <div class="empty">
+          <strong>{{ 'locations.noCitiesTitle' | translate }}</strong>
+          {{ 'locations.noCitiesHint' | translate }}
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'locations.name' | translate }}</th>
+                <th>{{ 'locations.country' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (city of cities(); track city.id) {
+                <tr>
+                  <td>{{ city.name }}</td>
+                  <td class="muted">{{ city.countryName || '—' }}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn danger small" type="button" (click)="removeCity(city)">
+                        {{ 'common.delete' | translate }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </div>
+</div>

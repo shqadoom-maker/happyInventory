@@ -1,0 +1,223 @@
+{
+  "brand": {
+    "name": "Happy Inventory",
+    "subtitle": "Warehouse management"
+  },
+  "shell": {
+    "eyebrow": "Happy Company",
+    "title": "Inventory management",
+    "stack": "SQLite · EF Core 6",
+    "api": "API: ASP.NET Core .NET 6"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "warehouses": "Warehouses",
+    "products": "Products",
+    "inventory": "Inventory",
+    "stockMovements": "Stock movements",
+    "locations": "Locations"
+  },
+  "titles": {
+    "dashboard": "Dashboard",
+    "warehouses": "Warehouses",
+    "products": "Products",
+    "inventory": "Inventory",
+    "stockMovements": "Stock movements",
+    "locations": "Locations"
+  },
+  "common": {
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "backToList": "Back to list",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "notAvailable": "—"
+  },
+  "dashboard": {
+    "eyebrow": "Happy Company",
+    "title": "Multi-country warehouse inventory",
+    "intro": "Track stock across warehouses in different countries and cities. The Angular client talks to the ASP.NET Core Web API, which persists everything in SQLite through EF Core. External systems such as the eCommerce storefront post their updates to the same API.",
+    "cards": {
+      "warehouses": "Register warehouses in each country and city, and keep their details current.",
+      "products": "Maintain the product catalogue with SKU, pricing and availability.",
+      "inventory": "Check stock levels per warehouse, adjust quantities and set reorder levels.",
+      "stockMovements": "Audit every inbound, outbound and manual adjustment with its source.",
+      "locations": "Manage the countries and cities that warehouses belong to."
+    },
+    "flow": {
+      "title": "How an update travels",
+      "step1": "The Angular UI or an external system calls a Web API endpoint.",
+      "step2": "The service validates the request and applies the stock change.",
+      "step3": "EF Core writes the inventory row and a stock movement row to SQLite.",
+      "step4": "Every change keeps its source and reference, so the stock history always explains where a number came from."
+    }
+  },
+  "warehouses": {
+    "title": "Warehouses",
+    "subtitle": "Every warehouse belongs to a city, which belongs to a country.",
+    "new": "+ New warehouse",
+    "searchPlaceholder": "Name, code, city or country",
+    "emptyTitle": "No warehouses yet",
+    "emptyHint": "Create the first warehouse, or adjust the search term.",
+    "columns": {
+      "name": "Name",
+      "code": "Code",
+      "city": "City",
+      "country": "Country",
+      "capacity": "Capacity",
+      "status": "Status"
+    },
+    "confirmDelete": "Delete warehouse \"{{name}}\"?",
+    "form": {
+      "titleNew": "New warehouse",
+      "titleEdit": "Edit warehouse",
+      "subtitle": "Warehouses are assigned to a city; cities belong to countries.",
+      "name": "Name",
+      "namePlaceholder": "Cairo central warehouse",
+      "nameRequired": "Name is required.",
+      "code": "Code",
+      "codePlaceholder": "CAI-01",
+      "codeRequired": "Code is required.",
+      "city": "City",
+      "selectCity": "Select a city",
+      "cityRequired": "Choose a city.",
+      "capacity": "Capacity (units)",
+      "capacityRequired": "Capacity must be zero or more.",
+      "address": "Address",
+      "addressPlaceholder": "Street, district",
+      "active": "Active",
+      "create": "Create warehouse",
+      "save": "Save changes",
+      "noCitiesPrefix": "No cities exist yet.",
+      "addLocations": "Add a country and a city",
+      "noCitiesSuffix": "before creating a warehouse."
+    }
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "The catalogue shared by every warehouse.",
+    "new": "+ New product",
+    "searchPlaceholder": "SKU, name or description",
+    "emptyTitle": "No products yet",
+    "emptyHint": "Add the first product to start tracking stock.",
+    "columns": {
+      "sku": "SKU",
+      "name": "Name",
+      "description": "Description",
+      "price": "Unit price",
+      "status": "Status"
+    },
+    "confirmDelete": "Delete product \"{{name}}\"?",
+    "form": {
+      "titleNew": "New product",
+      "titleEdit": "Edit product",
+      "subtitle": "Products are global; stock levels are tracked per warehouse.",
+      "sku": "SKU",
+      "skuPlaceholder": "SKU-1001",
+      "skuRequired": "SKU is required.",
+      "name": "Name",
+      "namePlaceholder": "Wireless mouse",
+      "nameRequired": "Name is required.",
+      "price": "Unit price",
+      "priceRequired": "Price must be zero or more.",
+      "active": "Active",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional details",
+      "create": "Create product",
+      "save": "Save changes"
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Check stock levels for one warehouse and apply a movement when stock changes.",
+    "warehouse": "Warehouse",
+    "selectWarehouse": "Select a warehouse",
+    "emptyTitle": "No stock recorded",
+    "emptyHint": "This warehouse has no inventory rows yet. Movements will create them.",
+    "noWarehousesTitle": "No warehouses",
+    "noWarehousesHint": "Create a warehouse before tracking inventory.",
+    "columns": {
+      "sku": "SKU",
+      "product": "Product",
+      "quantity": "Quantity",
+      "reorderLevel": "Reorder level",
+      "status": "Status",
+      "lastUpdated": "Last updated (UTC)"
+    },
+    "lowStock": "Low stock",
+    "inStock": "In stock",
+    "adjust": "Adjust",
+    "adjustTitle": "Adjust stock — {{name}}",
+    "currentQuantity": "Current quantity:",
+    "hint": "Inbound is positive, outbound negative; adjustments can be either.",
+    "movementType": "Movement type",
+    "quantityChange": "Quantity change",
+    "quantityRequired": "A quantity is required.",
+    "reference": "Reference",
+    "referencePlaceholder": "Order number, delivery note, reason…",
+    "apply": "Apply movement",
+    "zeroError": "Enter a quantity change other than zero."
+  },
+  "movementTypes": {
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "adjustment": "Adjustment"
+  },
+  "stockMovements": {
+    "title": "Stock movements",
+    "subtitle": "Audit trail of every inbound, outbound and manual adjustment, whatever the source.",
+    "warehouse": "Warehouse",
+    "allWarehouses": "All warehouses",
+    "emptyTitle": "No movements recorded",
+    "emptyHint": "Stock changes will appear here as soon as they happen.",
+    "columns": {
+      "when": "When (UTC)",
+      "warehouse": "Warehouse",
+      "product": "Product",
+      "type": "Type",
+      "change": "Change",
+      "source": "Source",
+      "reference": "Reference"
+    }
+  },
+  "locations": {
+    "title": "Locations",
+    "subtitle": "Countries and cities that warehouses are assigned to.",
+    "countries": "Countries",
+    "cities": "Cities",
+    "name": "Name",
+    "code": "Code",
+    "country": "Country",
+    "add": "Add",
+    "countryPlaceholder": "Egypt",
+    "cityPlaceholder": "Cairo",
+    "selectCountry": "Select a country",
+    "nameRequired": "Name is required.",
+    "codeRequired": "Code is required.",
+    "countryRequired": "Choose a country.",
+    "noCountriesTitle": "No countries",
+    "noCountriesHint": "Add a country to get started.",
+    "noCitiesTitle": "No cities",
+    "noCitiesHint": "Add a city inside a country.",
+    "confirmDeleteCountry": "Delete country \"{{name}}\"?",
+    "confirmDeleteCity": "Delete city \"{{name}}\"?"
+  },
+  "errors": {
+    "unreachable": "The API is unreachable. Make sure the backend is running.",
+    "forbidden": "You are not allowed to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "genericStatus": "Request failed with status {{status}}.",
+    "generic": "Something went wrong. Please try again."
+  }
+}

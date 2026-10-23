@@ -1,0 +1,27 @@
+<div class="page">
+  <section class="card intro">
+    <span class="eyebrow">{{ 'dashboard.eyebrow' | translate }}</span>
+    <h2>{{ 'dashboard.title' | translate }}</h2>
+    <p>{{ 'dashboard.intro' | translate }}</p>
+  </section>
+
+  <section class="stat-grid">
+    @for (card of cards; track card.path) {
+      <a class="stat" [routerLink]="card.path">
+        <span class="icon" aria-hidden="true">{{ card.icon }}</span>
+        <h3>{{ card.titleKey | translate }}</h3>
+        <p>{{ card.descriptionKey | translate }}</p>
+      </a>
+    }
+  </section>
+
+  <section class="card flow">
+    <h3>{{ 'dashboard.flow.title' | translate }}</h3>
+    <ol>
+      <li>{{ 'dashboard.flow.step1' | translate }}</li>
+      <li>{{ 'dashboard.flow.step2' | translate }}</li>
+      <li>{{ 'dashboard.flow.step3' | translate }}</li>
+      <li>{{ 'dashboard.flow.step4' | translate }}</li>
+    </ol>
+  </section>
+</div>

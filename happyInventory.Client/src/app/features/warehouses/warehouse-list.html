@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>{{ 'warehouses.title' | translate }}</h2>
+      <p>{{ 'warehouses.subtitle' | translate }}</p>
+    </div>
+    <a class="btn" routerLink="new">{{ 'warehouses.new' | translate }}</a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="field">
+        <label for="warehouse-search">{{ 'common.search' | translate }}</label>
+        <input
+          id="warehouse-search"
+          type="search"
+          [placeholder]="'warehouses.searchPlaceholder' | translate"
+          [value]="search()"
+          (input)="updateSearch($any($event.target).value)"
+        />
+      </div>
+      <div class="spacer"></div>
+      <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+        {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    } @else if (filtered().length === 0) {
+      <div class="empty">
+        <strong>{{ 'warehouses.emptyTitle' | translate }}</strong>
+        {{ 'warehouses.emptyHint' | translate }}
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ 'warehouses.columns.name' | translate }}</th>
+              <th>{{ 'warehouses.columns.code' | translate }}</th>
+              <th>{{ 'warehouses.columns.city' | translate }}</th>
+              <th>{{ 'warehouses.columns.country' | translate }}</th>
+              <th class="numeric">{{ 'warehouses.columns.capacity' | translate }}</th>
+              <th>{{ 'warehouses.columns.status' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (warehouse of filtered(); track warehouse.id) {
+              <tr>
+                <td>{{ warehouse.name }}</td>
+                <td class="muted">{{ warehouse.code }}</td>
+                <td>{{ warehouse.cityName || '—' }}</td>
+                <td>{{ warehouse.countryName || '—' }}</td>
+                <td class="numeric">{{ warehouse.capacity }}</td>
+                <td>
+                  <span class="badge" [class.ok]="warehouse.isActive" [class.off]="!warehouse.isActive">
+                    {{ (warehouse.isActive ? 'common.active' : 'common.inactive') | translate }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn secondary small" [routerLink]="[warehouse.id, 'edit']">
+                      {{ 'common.edit' | translate }}
+                    </a>
+                    <button class="btn danger small" type="button" (click)="remove(warehouse)">
+                      {{ 'common.delete' | translate }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

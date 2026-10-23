@@ -1,0 +1,77 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>{{ 'stockMovements.title' | translate }}</h2>
+      <p>{{ 'stockMovements.subtitle' | translate }}</p>
+    </div>
+    <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+      {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="field">
+        <label for="movement-warehouse">{{ 'stockMovements.warehouse' | translate }}</label>
+        <select
+          id="movement-warehouse"
+          [value]="selectedWarehouseId() ?? ''"
+          (change)="onWarehouseChange($event)"
+        >
+          <option value="">{{ 'stockMovements.allWarehouses' | translate }}</option>
+          @for (warehouse of warehouses(); track warehouse.id) {
+            <option [value]="warehouse.id">{{ warehouse.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    } @else if (movements().length === 0) {
+      <div class="empty">
+        <strong>{{ 'stockMovements.emptyTitle' | translate }}</strong>
+        {{ 'stockMovements.emptyHint' | translate }}
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ 'stockMovements.columns.when' | translate }}</th>
+              <th>{{ 'stockMovements.columns.warehouse' | translate }}</th>
+              <th>{{ 'stockMovements.columns.product' | translate }}</th>
+              <th>{{ 'stockMovements.columns.type' | translate }}</th>
+              <th class="numeric">{{ 'stockMovements.columns.change' | translate }}</th>
+              <th>{{ 'stockMovements.columns.source' | translate }}</th>
+              <th>{{ 'stockMovements.columns.reference' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (movement of movements(); track movement.id) {
+              <tr>
+                <td class="muted">{{ movement.occurredUtc | date: 'medium' }}</td>
+                <td>{{ movement.warehouseName || movement.warehouseId }}</td>
+                <td>{{ movement.productName || movement.productId }}</td>
+                <td>
+                  <span class="badge {{ movementClass(movement.type) }}">
+                    {{ movementTypeKey(movement.type) | translate }}
+                  </span>
+                </td>
+                <td class="numeric">{{ signedQuantity(movement) }}</td>
+                <td class="muted">{{ movement.source }}</td>
+                <td>{{ movement.reference || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

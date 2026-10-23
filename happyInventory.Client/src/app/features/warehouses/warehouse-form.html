@@ -1,0 +1,104 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        {{ (isEdit() ? 'warehouses.form.titleEdit' : 'warehouses.form.titleNew') | translate }}
+      </h2>
+      <p>{{ 'warehouses.form.subtitle' | translate }}</p>
+    </div>
+    <a class="btn secondary" routerLink="/warehouses">{{ 'common.backToList' | translate }}</a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  @if (cities().length === 0) {
+    <div class="alert">
+      {{ 'warehouses.form.noCitiesPrefix' | translate }}
+      <a routerLink="/locations">{{ 'warehouses.form.addLocations' | translate }}</a>
+      {{ 'warehouses.form.noCitiesSuffix' | translate }}
+    </div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="warehouse-name">{{ 'warehouses.form.name' | translate }}</label>
+        <input
+          id="warehouse-name"
+          formControlName="name"
+          [placeholder]="'warehouses.form.namePlaceholder' | translate"
+        />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="error">{{ 'warehouses.form.nameRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="warehouse-code">{{ 'warehouses.form.code' | translate }}</label>
+        <input
+          id="warehouse-code"
+          formControlName="code"
+          [placeholder]="'warehouses.form.codePlaceholder' | translate"
+        />
+        @if (form.controls.code.touched && form.controls.code.invalid) {
+          <span class="error">{{ 'warehouses.form.codeRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="warehouse-city">{{ 'warehouses.form.city' | translate }}</label>
+        <select id="warehouse-city" formControlName="cityId">
+          <option [ngValue]="0" disabled>{{ 'warehouses.form.selectCity' | translate }}</option>
+          @for (city of cities(); track city.id) {
+            <option [ngValue]="city.id">
+              {{ city.name }}{{ city.countryName ? ' — ' + city.countryName : '' }}
+            </option>
+          }
+        </select>
+        @if (form.controls.cityId.touched && form.controls.cityId.invalid) {
+          <span class="error">{{ 'warehouses.form.cityRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="warehouse-capacity">{{ 'warehouses.form.capacity' | translate }}</label>
+        <input id="warehouse-capacity" type="number" min="0" formControlName="capacity" />
+        @if (form.controls.capacity.touched && form.controls.capacity.invalid) {
+          <span class="error">{{ 'warehouses.form.capacityRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field full">
+        <label for="warehouse-address">{{ 'warehouses.form.address' | translate }}</label>
+        <input
+          id="warehouse-address"
+          formControlName="address"
+          [placeholder]="'warehouses.form.addressPlaceholder' | translate"
+        />
+      </div>
+
+      <div class="field full">
+        <label>
+          <input type="checkbox" formControlName="isActive" />
+          {{ 'warehouses.form.active' | translate }}
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" routerLink="/warehouses">{{ 'common.cancel' | translate }}</a>
+      <button class="btn" type="submit" [disabled]="saving()">
+        @if (saving()) {
+          <span class="spinner"></span>
+        }
+        {{ (isEdit() ? 'warehouses.form.save' : 'warehouses.form.create') | translate }}
+      </button>
+    </div>
+  </form>
+</div>

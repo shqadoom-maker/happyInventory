@@ -1,0 +1,80 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>{{ (isEdit() ? 'products.form.titleEdit' : 'products.form.titleNew') | translate }}</h2>
+      <p>{{ 'products.form.subtitle' | translate }}</p>
+    </div>
+    <a class="btn secondary" routerLink="/products">{{ 'common.backToList' | translate }}</a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="product-sku">{{ 'products.form.sku' | translate }}</label>
+        <input
+          id="product-sku"
+          formControlName="sku"
+          [placeholder]="'products.form.skuPlaceholder' | translate"
+        />
+        @if (form.controls.sku.touched && form.controls.sku.invalid) {
+          <span class="error">{{ 'products.form.skuRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="product-name">{{ 'products.form.name' | translate }}</label>
+        <input
+          id="product-name"
+          formControlName="name"
+          [placeholder]="'products.form.namePlaceholder' | translate"
+        />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="error">{{ 'products.form.nameRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="product-price">{{ 'products.form.price' | translate }}</label>
+        <input id="product-price" type="number" min="0" step="0.01" formControlName="unitPrice" />
+        @if (form.controls.unitPrice.touched && form.controls.unitPrice.invalid) {
+          <span class="error">{{ 'products.form.priceRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label>
+          <input type="checkbox" formControlName="isActive" />
+          {{ 'products.form.active' | translate }}
+        </label>
+      </div>
+
+      <div class="field full">
+        <label for="product-description">{{ 'products.form.description' | translate }}</label>
+        <textarea
+          id="product-description"
+          rows="3"
+          formControlName="description"
+          [placeholder]="'products.form.descriptionPlaceholder' | translate"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" routerLink="/products">{{ 'common.cancel' | translate }}</a>
+      <button class="btn" type="submit" [disabled]="saving()">
+        @if (saving()) {
+          <span class="spinner"></span>
+        }
+        {{ (isEdit() ? 'products.form.save' : 'products.form.create') | translate }}
+      </button>
+    </div>
+  </form>
+</div>
