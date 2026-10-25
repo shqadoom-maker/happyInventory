@@ -6,8 +6,16 @@
 }
 
 .grid-2 h3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0 0 16px;
   font-size: 1rem;
+}
+
+.grid-2 h3 .material-icons-round {
+  color: var(--primary);
+  font-size: 1.15rem;
 }
 
 .inline-form {

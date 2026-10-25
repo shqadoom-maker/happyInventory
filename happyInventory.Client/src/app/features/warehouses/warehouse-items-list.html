@@ -1,0 +1,112 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">inventory_2</span>
+        {{ 'warehouseItems.title' | translate }} - {{ warehouseName() }}
+      </h2>
+      <p>{{ 'warehouseItems.subtitle' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn secondary" routerLink="/warehouses">
+        <span class="material-icons-round icon-back" aria-hidden="true">arrow_back</span>
+        {{ 'common.backToList' | translate }}
+      </a>
+      <a class="btn" [routerLink]="['new']">
+        <span class="material-icons-round" aria-hidden="true">add</span>
+        {{ 'warehouseItems.new' | translate }}
+      </a>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="field">
+        <label for="item-search">{{ 'common.search' | translate }}</label>
+        <div class="search-input">
+          <span class="material-icons-round" aria-hidden="true">search</span>
+          <input
+            id="item-search"
+            type="search"
+            [placeholder]="'warehouseItems.searchPlaceholder' | translate"
+            [value]="search()"
+            (input)="updateSearch($any($event.target).value)"
+          />
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+        <span class="material-icons-round" aria-hidden="true">refresh</span>
+        {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (loading() && items().length === 0) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    }
+
+    @if (!loading() && items().length === 0) {
+      <p class="empty">{{ 'warehouseItems.empty' | translate }}</p>
+    }
+
+    @if (items().length > 0) {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ 'warehouseItems.table.name' | translate }}</th>
+              <th>{{ 'warehouseItems.table.sku' | translate }}</th>
+              <th class="numeric">{{ 'warehouseItems.table.qty' | translate }}</th>
+              <th class="numeric">{{ 'warehouseItems.table.costPrice' | translate }}</th>
+              <th class="numeric">{{ 'warehouseItems.table.msrp' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id) {
+              <tr>
+                <td>{{ item.itemName }}</td>
+                <td>{{ item.skuCode || '-' }}</td>
+                <td class="numeric">{{ item.qty }}</td>
+                <td class="numeric">{{ item.costPrice }}</td>
+                <td class="numeric">{{ item.msrpPrice ?? '-' }}</td>
+                <td class="row-actions">
+                  <a class="link" [routerLink]="[item.id, 'edit']">
+                    <span class="material-icons-round" aria-hidden="true">edit</span>
+                    {{ 'common.edit' | translate }}
+                  </a>
+                  <button class="link danger" type="button" (click)="delete(item)">
+                    <span class="material-icons-round" aria-hidden="true">delete</span>
+                    {{ 'common.delete' | translate }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button class="btn secondary" type="button" (click)="prevPage()" [disabled]="page() === 1 || loading()">
+          <span class="material-icons-round icon-prev" aria-hidden="true">chevron_left</span>
+          {{ 'common.previous' | translate }}
+        </button>
+        <span class="pagination-info">
+          {{ 'common.pageOf' | translate: { page: page(), totalPages: totalPages(), totalCount: totalCount() } }}
+        </span>
+        <button class="btn secondary" type="button" (click)="nextPage()" [disabled]="page() === totalPages() || loading()">
+          {{ 'common.next' | translate }}
+          <span class="material-icons-round icon-next" aria-hidden="true">chevron_right</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

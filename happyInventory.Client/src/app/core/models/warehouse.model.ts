@@ -1,20 +1,17 @@
 export interface Warehouse {
   id: number;
   name: string;
-  code: string;
-  cityId: number;
-  cityName?: string;
-  countryName?: string;
   address: string;
-  capacity: number;
-  isActive: boolean;
+  cityId: number;
+  cityName: string;
+  countryId: number;
+  countryName: string;
+  itemCount: number;
 }
 
 export interface WarehouseRequest {
   name: string;
-  code: string;
-  cityId: number;
   address: string;
-  capacity: number;
-  isActive: boolean;
+  cityId: number;
+  countryId: number;
 }

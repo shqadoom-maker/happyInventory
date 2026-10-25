@@ -1,0 +1,232 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">group</span>
+        {{ 'users.title' | translate }}
+      </h2>
+      <p>{{ 'users.subtitle' | translate }}</p>
+    </div>
+    <a class="btn" routerLink="new">
+      <span class="material-icons-round" aria-hidden="true">person_add</span>
+      {{ 'users.new' | translate }}
+    </a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  @if (notice()) {
+    <div class="alert success" role="status">{{ notice() }}</div>
+  }
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="field">
+        <label for="user-search">{{ 'common.search' | translate }}</label>
+        <div class="search-input">
+          <span class="material-icons-round" aria-hidden="true">search</span>
+          <input
+            id="user-search"
+            type="search"
+            [placeholder]="'users.searchPlaceholder' | translate"
+            [value]="search()"
+            (input)="updateSearch($any($event.target).value)"
+          />
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+        <span class="material-icons-round" aria-hidden="true">refresh</span>
+        {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    } @else if (filtered().length === 0) {
+      <div class="empty">
+        <strong>{{ 'users.emptyTitle' | translate }}</strong>
+        {{ 'users.emptyHint' | translate }}
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ 'users.columns.username' | translate }}</th>
+              <th class="col-full-name">{{ 'users.columns.fullName' | translate }}</th>
+              <th>{{ 'users.columns.role' | translate }}</th>
+              <th>{{ 'users.columns.status' | translate }}</th>
+              <th class="col-last-login">{{ 'users.columns.lastLogin' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filtered(); track user.id) {
+              <tr [class.inactive-row]="!user.isActive">
+                <td>
+                  {{ user.username }}
+                  @if (user.id === currentUserId()) {
+                    <span class="badge ok">
+                      <span class="material-icons-round" aria-hidden="true">person</span>
+                      {{ 'users.you' | translate }}
+                    </span>
+                  }
+                </td>
+                <td class="col-full-name">{{ user.fullName }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [class.ok]="user.role === 'Admin'"
+                    [class.off]="user.role !== 'Admin'"
+                  >
+                    <span class="material-icons-round" aria-hidden="true">
+                      {{ user.role === 'Admin' ? 'admin_panel_settings' : 'badge' }}
+                    </span>
+                    {{ roleKey(user.role) | translate }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [class.ok]="user.isActive" [class.off]="!user.isActive">
+                    <span class="material-icons-round" aria-hidden="true">
+                      {{ user.isActive ? 'check_circle' : 'block' }}
+                    </span>
+                    {{ (user.isActive ? 'common.active' : 'common.inactive') | translate }}
+                  </span>
+                </td>
+                <td class="muted col-last-login">
+                  {{
+                    user.lastLoginUtc
+                      ? (user.lastLoginUtc | date: 'yyyy-MM-dd HH:mm')
+                      : ('common.notAvailable' | translate)
+                  }}
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn secondary small" [routerLink]="[user.id, 'edit']">
+                      <span class="material-icons-round" aria-hidden="true">edit</span>
+                      {{ 'common.edit' | translate }}
+                    </a>
+                    <button
+                      class="btn secondary small"
+                      type="button"
+                      (click)="openChangePassword(user)"
+                    >
+                      <span class="material-icons-round" aria-hidden="true">lock_reset</span>
+                      {{ 'users.changePassword.action' | translate }}
+                    </button>
+                    @if (canDelete(user)) {
+                      <button class="btn danger small" type="button" (click)="remove(user)">
+                        <span class="material-icons-round" aria-hidden="true">delete</span>
+                        {{ 'common.delete' | translate }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (passwordUser(); as user) {
+    <div class="modal-backdrop" (click)="cancelChangePassword()">
+      <section
+        class="card modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="change-password-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h3 id="change-password-title">
+          <span class="material-icons-round" aria-hidden="true">lock_reset</span>
+          {{ 'users.changePassword.title' | translate }}
+        </h3>
+        <p class="muted">
+          {{ 'users.changePassword.subtitle' | translate: { name: user.fullName } }}
+        </p>
+
+        @if (passwordError()) {
+          <div class="alert" role="alert">{{ passwordError() }}</div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="submitChangePassword()">
+          <div class="field">
+            <label for="new-password">{{ 'users.changePassword.newPassword' | translate }}</label>
+            <input
+              id="new-password"
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+              [placeholder]="'users.changePassword.passwordHint' | translate"
+            />
+            @if (
+              passwordForm.controls.newPassword.touched &&
+              passwordForm.controls.newPassword.invalid
+            ) {
+              <span class="error">
+                {{
+                  (passwordForm.controls.newPassword.hasError('minlength')
+                    ? 'users.changePassword.tooShort'
+                    : 'users.form.passwordRequired'
+                  ) | translate
+                }}
+              </span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="confirm-password">
+              {{ 'users.changePassword.confirmPassword' | translate }}
+            </label>
+            <input
+              id="confirm-password"
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+            />
+            @if (
+              passwordForm.controls.confirmPassword.touched &&
+              passwordForm.controls.confirmPassword.invalid
+            ) {
+              <span class="error">{{ 'users.form.passwordRequired' | translate }}</span>
+            }
+            @if (
+              passwordForm.controls.confirmPassword.touched &&
+              passwordForm.controls.confirmPassword.value &&
+              passwordForm.hasError('mismatch')
+            ) {
+              <span class="error">{{ 'users.changePassword.mismatch' | translate }}</span>
+            }
+          </div>
+
+          <div class="actions">
+            <button
+              class="btn secondary"
+              type="button"
+              (click)="cancelChangePassword()"
+              [disabled]="passwordSaving()"
+            >
+              <span class="material-icons-round" aria-hidden="true">close</span>
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button class="btn" type="submit" [disabled]="passwordSaving()">
+              @if (passwordSaving()) {
+                <span class="spinner"></span>
+              } @else {
+                <span class="material-icons-round" aria-hidden="true">save</span>
+              }
+              {{ 'users.changePassword.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+</div>

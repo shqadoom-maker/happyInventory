@@ -1,27 +1,177 @@
 <div class="page">
   <section class="card intro">
-    <span class="eyebrow">{{ 'dashboard.eyebrow' | translate }}</span>
-    <h2>{{ 'dashboard.title' | translate }}</h2>
-    <p>{{ 'dashboard.intro' | translate }}</p>
+    <span class="eyebrow">{{ 'dashboard.welcomeEyebrow' | translate }}</span>
+    <h2>
+      <span class="material-icons-round" aria-hidden="true">waving_hand</span>
+      {{ 'dashboard.welcome' | translate: { name: displayName() } }}
+    </h2>
+    <p>{{ 'dashboard.analytics.subtitle' | translate }}</p>
   </section>
 
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
   <section class="stat-grid">
-    @for (card of cards; track card.path) {
-      <a class="stat" [routerLink]="card.path">
-        <span class="icon" aria-hidden="true">{{ card.icon }}</span>
-        <h3>{{ card.titleKey | translate }}</h3>
-        <p>{{ card.descriptionKey | translate }}</p>
-      </a>
+    <article class="stat summary">
+      <span class="icon material-icons-round" aria-hidden="true">warehouse</span>
+      <span class="summary-label">{{ 'dashboard.analytics.summaryWarehouses' | translate }}</span>
+      <strong class="summary-value">{{ (data()?.warehouseCount ?? 0) | number }}</strong>
+    </article>
+    <article class="stat summary">
+      <span class="icon material-icons-round" aria-hidden="true">inventory_2</span>
+      <span class="summary-label">{{ 'dashboard.analytics.summaryItems' | translate }}</span>
+      <strong class="summary-value">{{ (data()?.itemCount ?? 0) | number }}</strong>
+    </article>
+    <article class="stat summary">
+      <span class="icon material-icons-round" aria-hidden="true">inventory</span>
+      <span class="summary-label">{{ 'dashboard.analytics.summaryQuantity' | translate }}</span>
+      <strong class="summary-value">{{ (data()?.totalQuantity ?? 0) | number }}</strong>
+    </article>
+  </section>
+
+  <section class="card chart-card">
+    <header class="chart-header">
+      <div>
+        <h3>{{ 'dashboard.analytics.warehouseStatusTitle' | translate }}</h3>
+        <p>{{ 'dashboard.analytics.warehouseStatusSubtitle' | translate }}</p>
+      </div>
+      <span class="legend">
+        <span class="legend-dot items" aria-hidden="true"></span>
+        {{ 'dashboard.analytics.chartItems' | translate }}
+      </span>
+    </header>
+
+    @if (loading()) {
+      <div class="empty">{{ 'common.loading' | translate }}</div>
+    } @else if (warehouses().length === 0) {
+      <div class="empty">
+        <strong>{{ 'dashboard.analytics.warehouseStatusTitle' | translate }}</strong>
+        {{ 'dashboard.analytics.warehouseEmpty' | translate }}
+      </div>
+    } @else {
+      <div
+        class="column-chart"
+        role="img"
+        [attr.aria-label]="'dashboard.analytics.warehouseStatusTitle' | translate"
+      >
+        @for (warehouse of warehouses(); track warehouse.warehouseId) {
+          <div class="column">
+            <span class="column-value">{{ warehouse.itemCount | number }}</span>
+            <div class="column-track">
+              <div
+                class="column-fill"
+                [style.height.%]="warehouseHeight(warehouse.itemCount)"
+              ></div>
+            </div>
+            <span class="column-label" [title]="warehouse.name">{{ warehouse.name }}</span>
+            <span class="column-meta">
+              {{ warehouse.cityName }}@if (warehouse.countryName) { · {{ warehouse.countryName }} }
+            </span>
+            <span class="column-meta">
+              {{
+                'dashboard.analytics.totalQuantity'
+                  | translate: { count: warehouse.totalQuantity }
+              }}
+            </span>
+          </div>
+        }
+      </div>
     }
   </section>
 
-  <section class="card flow">
-    <h3>{{ 'dashboard.flow.title' | translate }}</h3>
-    <ol>
-      <li>{{ 'dashboard.flow.step1' | translate }}</li>
-      <li>{{ 'dashboard.flow.step2' | translate }}</li>
-      <li>{{ 'dashboard.flow.step3' | translate }}</li>
-      <li>{{ 'dashboard.flow.step4' | translate }}</li>
-    </ol>
+  <div class="chart-grid">
+    <section class="card chart-card">
+      <header class="chart-header">
+        <div>
+          <h3>{{ 'dashboard.analytics.topTitle' | translate }}</h3>
+          <p>{{ 'dashboard.analytics.topSubtitle' | translate }}</p>
+        </div>
+        <span class="legend">
+          <span class="legend-dot high" aria-hidden="true"></span>
+          {{ 'dashboard.analytics.chartUnits' | translate }}
+        </span>
+      </header>
+
+      @if (loading()) {
+        <div class="empty">{{ 'common.loading' | translate }}</div>
+      } @else if (topItems().length === 0) {
+        <div class="empty">
+          <strong>{{ 'dashboard.analytics.topTitle' | translate }}</strong>
+          {{ 'dashboard.analytics.itemsEmpty' | translate }}
+        </div>
+      } @else {
+        <div class="hbar-chart">
+          @for (item of topItems(); track item.itemName) {
+            <div class="hbar-row">
+              <div class="hbar-label">
+                <span class="hbar-name" [title]="item.itemName">{{ item.itemName }}</span>
+                <span class="hbar-meta">{{ itemDetails(item) }}</span>
+              </div>
+              <div class="hbar-track">
+                <div
+                  class="hbar-fill high"
+                  [style.width.%]="barWidth(item.totalQuantity, maxHighQuantity())"
+                ></div>
+              </div>
+              <span class="hbar-value">{{ item.totalQuantity | number }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="card chart-card">
+      <header class="chart-header">
+        <div>
+          <h3>{{ 'dashboard.analytics.lowTitle' | translate }}</h3>
+          <p>{{ 'dashboard.analytics.lowSubtitle' | translate }}</p>
+        </div>
+        <span class="legend">
+          <span class="legend-dot low" aria-hidden="true"></span>
+          {{ 'dashboard.analytics.chartUnits' | translate }}
+        </span>
+      </header>
+
+      @if (loading()) {
+        <div class="empty">{{ 'common.loading' | translate }}</div>
+      } @else if (lowItems().length === 0) {
+        <div class="empty">
+          <strong>{{ 'dashboard.analytics.lowTitle' | translate }}</strong>
+          {{ 'dashboard.analytics.itemsEmpty' | translate }}
+        </div>
+      } @else {
+        <div class="hbar-chart">
+          @for (item of lowItems(); track item.itemName) {
+            <div class="hbar-row">
+              <div class="hbar-label">
+                <span class="hbar-name" [title]="item.itemName">{{ item.itemName }}</span>
+                <span class="hbar-meta">{{ itemDetails(item) }}</span>
+              </div>
+              <div class="hbar-track">
+                <div
+                  class="hbar-fill low"
+                  [style.width.%]="barWidth(item.totalQuantity, maxLowQuantity())"
+                ></div>
+              </div>
+              <span class="hbar-value">{{ item.totalQuantity | number }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+
+  <section class="quick-links">
+    <h3>{{ 'dashboard.analytics.quickLinks' | translate }}</h3>
+    <div class="stat-grid">
+      @for (card of cards; track card.path) {
+        <a class="stat" [routerLink]="card.path">
+          <span class="icon material-icons-round" aria-hidden="true">{{ card.icon }}</span>
+          <h3>{{ card.titleKey | translate }}</h3>
+          <p>{{ card.descriptionKey | translate }}</p>
+        </a>
+      }
+    </div>
   </section>
 </div>

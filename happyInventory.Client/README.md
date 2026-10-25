@@ -23,8 +23,8 @@ src/app/
 │  ├─ interceptors/   HTTP error normalisation (ApiError)
 │  ├─ models/         API contracts mirrored from the backend DTOs
 │  └─ services/       One typed HttpClient service per resource
-├─ features/          Lazy-loaded screens (dashboard, warehouses, products,
-│                     inventory, stock movements, locations)
+├─ features/          Lazy-loaded screens (dashboard, warehouses,
+│                     stock movements, locations)
 ├─ app.routes.ts      Top-level routes
 ├─ app.config.ts      Router + HttpClient providers
 └─ styles.scss        Shared design tokens and UI classes

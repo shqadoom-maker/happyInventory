@@ -25,7 +25,7 @@ export class StockMovementList implements OnInit {
   protected readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.warehouseService.list().subscribe({
+    this.warehouseService.listAll().subscribe({
       next: (warehouses) => this.warehouses.set(warehouses),
       error: (error) => this.error.set(errorMessage(error, this.translate)),
     });
@@ -68,6 +68,17 @@ export class StockMovementList implements OnInit {
 
   protected movementTypeKey(type: StockMovement['type']): string {
     return `movementTypes.${type.toLowerCase()}`;
+  }
+
+  protected movementIcon(type: StockMovement['type']): string {
+    switch (type) {
+      case 'Inbound':
+        return 'south';
+      case 'Outbound':
+        return 'north';
+      default:
+        return 'tune';
+    }
   }
 
   protected signedQuantity(movement: StockMovement): string {

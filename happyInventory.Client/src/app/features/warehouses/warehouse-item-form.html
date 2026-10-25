@@ -1,0 +1,72 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">inventory_2</span>
+        {{ (isEdit() ? 'warehouseItems.form.titleEdit' : 'warehouseItems.form.titleNew') | translate }}
+      </h2>
+      <p>{{ warehouseName() }}</p>
+    </div>
+    <a class="btn secondary" [routerLink]="['/warehouses', warehouseId(), 'items']">
+      <span class="material-icons-round icon-back" aria-hidden="true">arrow_back</span>
+      {{ 'common.backToList' | translate }}
+    </a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    @if (loading() && isEdit()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    }
+
+    <div class="form-grid">
+      <div class="field full">
+        <label for="item-name">{{ 'warehouseItems.form.name' | translate }}</label>
+        <input id="item-name" type="text" formControlName="itemName" />
+        @if (form.controls.itemName.touched && form.controls.itemName.invalid) {
+          <p class="error">{{ 'warehouseItems.form.nameRequired' | translate }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="item-sku">{{ 'warehouseItems.form.sku' | translate }}</label>
+        <input id="item-sku" type="text" formControlName="skuCode" />
+      </div>
+
+      <div class="field">
+        <label for="item-qty">{{ 'warehouseItems.form.qty' | translate }}</label>
+        <input id="item-qty" type="number" min="1" formControlName="qty" />
+        @if (form.controls.qty.touched && form.controls.qty.invalid) {
+          <p class="error">{{ 'warehouseItems.form.qtyRequired' | translate }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="item-cost">{{ 'warehouseItems.form.costPrice' | translate }}</label>
+        <input id="item-cost" type="number" min="0" step="0.01" formControlName="costPrice" />
+        @if (form.controls.costPrice.touched && form.controls.costPrice.invalid) {
+          <p class="error">{{ 'warehouseItems.form.costRequired' | translate }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="item-msrp">{{ 'warehouseItems.form.msrp' | translate }}</label>
+        <input id="item-msrp" type="number" min="0" step="0.01" formControlName="msrpPrice" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit" [disabled]="loading()">
+        <span class="material-icons-round" aria-hidden="true">save</span>
+        {{ (loading() ? 'common.saving' : 'common.save') | translate }}
+      </button>
+      <a class="btn secondary" [routerLink]="['/warehouses', warehouseId(), 'items']">
+        <span class="material-icons-round" aria-hidden="true">close</span>
+        {{ 'common.cancel' | translate }}
+      </a>
+    </div>
+  </form>
+</div>

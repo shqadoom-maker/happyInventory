@@ -1,0 +1,108 @@
+<div class="shell">
+  <div
+    class="menu-backdrop"
+    [class.visible]="menuOpen()"
+    (click)="closeMenu()"
+    aria-hidden="true"
+  ></div>
+
+  <aside
+    id="app-drawer"
+    class="drawer"
+    [class.open]="menuOpen()"
+    [attr.aria-hidden]="!menuOpen()"
+    [attr.inert]="menuOpen() ? null : ''"
+  >
+    <div class="drawer-header">
+      <div class="brand">
+        <app-brand-mark />
+        <div>
+          <strong>{{ 'brand.name' | translate }}</strong>
+          <small>{{ 'brand.subtitle' | translate }}</small>
+        </div>
+      </div>
+
+      <button
+        class="drawer-close"
+        type="button"
+        (click)="closeMenu()"
+        [attr.aria-label]="'shell.closeMenu' | translate"
+      >
+        <span class="material-icons-round" aria-hidden="true">close</span>
+      </button>
+    </div>
+
+    <nav class="nav" [attr.aria-label]="'shell.navigation' | translate">
+      @for (item of navItems(); track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="nav-link"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          (click)="closeMenu()"
+        >
+          <span class="material-icons-round nav-icon" aria-hidden="true">{{ item.icon }}</span>
+          {{ item.labelKey | translate }}
+        </a>
+      }
+    </nav>
+
+    <div class="drawer-footer">
+      <button class="drawer-logout" type="button" (click)="logout()">
+        <span class="material-icons-round drawer-logout-icon" aria-hidden="true">logout</span>
+        {{ 'shell.logout' | translate }}
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-start">
+        <div class="topbar-title">
+          <span class="eyebrow">{{ 'shell.eyebrow' | translate }}</span>
+          <h1>{{ 'shell.title' | translate }}</h1>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="lang-switch" role="group" [attr.aria-label]="'language.label' | translate">
+          <span class="material-icons-round lang-switch-icon" aria-hidden="true">language</span>
+          @for (language of languages; track language.code) {
+            <button
+              type="button"
+              class="lang-btn"
+              [class.active]="currentLanguage() === language.code"
+              [attr.aria-pressed]="currentLanguage() === language.code"
+              (click)="changeLanguage(language.code)"
+            >
+              {{ language.label }}
+            </button>
+          }
+        </div>
+
+        <div class="user-box">
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+          <div class="user-meta">
+            <strong>{{ user()?.fullName || user()?.username }}</strong>
+            <small>{{ 'shell.signedInAs' | translate }} · {{ roleKey() | translate }}</small>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="app-drawer"
+        [attr.aria-label]="(menuOpen() ? 'shell.closeMenu' : 'shell.openMenu') | translate"
+      >
+        <span class="material-icons-round" aria-hidden="true">{{ menuOpen() ? 'close' : 'menu' }}</span>
+      </button>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

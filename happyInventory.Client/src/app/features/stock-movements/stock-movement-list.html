@@ -1,10 +1,14 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>{{ 'stockMovements.title' | translate }}</h2>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">swap_vert</span>
+        {{ 'stockMovements.title' | translate }}
+      </h2>
       <p>{{ 'stockMovements.subtitle' | translate }}</p>
     </div>
     <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+      <span class="material-icons-round" aria-hidden="true">refresh</span>
       {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
     </button>
   </div>
@@ -46,7 +50,6 @@
             <tr>
               <th>{{ 'stockMovements.columns.when' | translate }}</th>
               <th>{{ 'stockMovements.columns.warehouse' | translate }}</th>
-              <th>{{ 'stockMovements.columns.product' | translate }}</th>
               <th>{{ 'stockMovements.columns.type' | translate }}</th>
               <th class="numeric">{{ 'stockMovements.columns.change' | translate }}</th>
               <th>{{ 'stockMovements.columns.source' | translate }}</th>
@@ -58,9 +61,11 @@
               <tr>
                 <td class="muted">{{ movement.occurredUtc | date: 'medium' }}</td>
                 <td>{{ movement.warehouseName || movement.warehouseId }}</td>
-                <td>{{ movement.productName || movement.productId }}</td>
                 <td>
                   <span class="badge {{ movementClass(movement.type) }}">
+                    <span class="material-icons-round" aria-hidden="true">
+                      {{ movementIcon(movement.type) }}
+                    </span>
                     {{ movementTypeKey(movement.type) | translate }}
                   </span>
                 </td>

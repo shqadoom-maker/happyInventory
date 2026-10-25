@@ -1,36 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 
 import { App } from './app';
-
-const english = {
-  brand: { name: 'Happy Inventory', subtitle: 'Warehouse management' },
-  shell: {
-    eyebrow: 'Happy Company',
-    title: 'Inventory management',
-    stack: 'SQLite · EF Core 6',
-    api: 'API: ASP.NET Core .NET 6',
-  },
-  language: { label: 'Language' },
-  nav: {
-    dashboard: 'Dashboard',
-    warehouses: 'Warehouses',
-    products: 'Products',
-    inventory: 'Inventory',
-    stockMovements: 'Stock movements',
-    locations: 'Locations',
-  },
-};
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([]), provideTranslateService({ lang: 'en' })],
+      providers: [provideRouter([])],
     }).compileComponents();
-
-    TestBed.inject(TranslateService).setTranslation('en', english);
   });
 
   it('should create the app', () => {
@@ -38,10 +16,10 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the shell title', async () => {
+  it('should render the router outlet', () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Inventory management');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

@@ -1,10 +1,14 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>{{ 'locations.title' | translate }}</h2>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">location_on</span>
+        {{ 'locations.title' | translate }}
+      </h2>
       <p>{{ 'locations.subtitle' | translate }}</p>
     </div>
     <button class="btn secondary" type="button" (click)="load()">
+      <span class="material-icons-round" aria-hidden="true">refresh</span>
       {{ 'common.refresh' | translate }}
     </button>
   </div>
@@ -15,7 +19,10 @@
 
   <div class="grid-2">
     <section class="card">
-      <h3>{{ 'locations.countries' | translate }}</h3>
+      <h3>
+        <span class="material-icons-round" aria-hidden="true">public</span>
+        {{ 'locations.countries' | translate }}
+      </h3>
 
       <form [formGroup]="countryForm" (ngSubmit)="addCountry()" class="inline-form">
         <div class="field">
@@ -44,6 +51,7 @@
         </div>
 
         <button class="btn" type="submit" [disabled]="savingCountry()">
+          <span class="material-icons-round" aria-hidden="true">add</span>
           {{ 'locations.add' | translate }}
         </button>
       </form>
@@ -71,6 +79,7 @@
                   <td>
                     <div class="row-actions">
                       <button class="btn danger small" type="button" (click)="removeCountry(country)">
+                        <span class="material-icons-round" aria-hidden="true">delete</span>
                         {{ 'common.delete' | translate }}
                       </button>
                     </div>
@@ -84,7 +93,10 @@
     </section>
 
     <section class="card">
-      <h3>{{ 'locations.cities' | translate }}</h3>
+      <h3>
+        <span class="material-icons-round" aria-hidden="true">location_city</span>
+        {{ 'locations.cities' | translate }}
+      </h3>
 
       <form [formGroup]="cityForm" (ngSubmit)="addCity()" class="inline-form">
         <div class="field">
@@ -113,6 +125,7 @@
         </div>
 
         <button class="btn" type="submit" [disabled]="savingCity()">
+          <span class="material-icons-round" aria-hidden="true">add</span>
           {{ 'locations.add' | translate }}
         </button>
       </form>
@@ -140,6 +153,7 @@
                   <td>
                     <div class="row-actions">
                       <button class="btn danger small" type="button" (click)="removeCity(city)">
+                        <span class="material-icons-round" aria-hidden="true">delete</span>
                         {{ 'common.delete' | translate }}
                       </button>
                     </div>

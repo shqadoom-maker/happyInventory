@@ -1,10 +1,16 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h2>{{ 'warehouses.title' | translate }}</h2>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">warehouse</span>
+        {{ 'warehouses.title' | translate }}
+      </h2>
       <p>{{ 'warehouses.subtitle' | translate }}</p>
     </div>
-    <a class="btn" routerLink="new">{{ 'warehouses.new' | translate }}</a>
+    <a class="btn" routerLink="new">
+      <span class="material-icons-round" aria-hidden="true">add</span>
+      {{ 'warehouses.new' | translate }}
+    </a>
   </div>
 
   @if (error()) {
@@ -15,70 +21,89 @@
     <div class="toolbar">
       <div class="field">
         <label for="warehouse-search">{{ 'common.search' | translate }}</label>
-        <input
-          id="warehouse-search"
-          type="search"
-          [placeholder]="'warehouses.searchPlaceholder' | translate"
-          [value]="search()"
-          (input)="updateSearch($any($event.target).value)"
-        />
+        <div class="search-input">
+          <span class="material-icons-round" aria-hidden="true">search</span>
+          <input
+            id="warehouse-search"
+            type="search"
+            [placeholder]="'warehouses.searchPlaceholder' | translate"
+            [value]="search()"
+            (input)="updateSearch($any($event.target).value)"
+          />
+        </div>
       </div>
       <div class="spacer"></div>
       <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+        <span class="material-icons-round" aria-hidden="true">refresh</span>
         {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
       </button>
     </div>
   </div>
 
   <div class="card">
-    @if (loading()) {
+    @if (loading() && warehouses().length === 0) {
       <p class="muted">{{ 'common.loading' | translate }}</p>
-    } @else if (filtered().length === 0) {
-      <div class="empty">
-        <strong>{{ 'warehouses.emptyTitle' | translate }}</strong>
-        {{ 'warehouses.emptyHint' | translate }}
-      </div>
-    } @else {
+    }
+
+    @if (!loading() && warehouses().length === 0) {
+      <p class="empty">{{ 'warehouses.empty' | translate }}</p>
+    }
+
+    @if (warehouses().length > 0) {
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
               <th>{{ 'warehouses.columns.name' | translate }}</th>
-              <th>{{ 'warehouses.columns.code' | translate }}</th>
+              <th>{{ 'warehouses.columns.address' | translate }}</th>
               <th>{{ 'warehouses.columns.city' | translate }}</th>
               <th>{{ 'warehouses.columns.country' | translate }}</th>
-              <th class="numeric">{{ 'warehouses.columns.capacity' | translate }}</th>
-              <th>{{ 'warehouses.columns.status' | translate }}</th>
-              <th></th>
+              <th class="numeric">{{ 'warehouses.columns.items' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
-            @for (warehouse of filtered(); track warehouse.id) {
+            @for (warehouse of warehouses(); track warehouse.id) {
               <tr>
                 <td>{{ warehouse.name }}</td>
-                <td class="muted">{{ warehouse.code }}</td>
-                <td>{{ warehouse.cityName || '—' }}</td>
-                <td>{{ warehouse.countryName || '—' }}</td>
-                <td class="numeric">{{ warehouse.capacity }}</td>
-                <td>
-                  <span class="badge" [class.ok]="warehouse.isActive" [class.off]="!warehouse.isActive">
-                    {{ (warehouse.isActive ? 'common.active' : 'common.inactive') | translate }}
-                  </span>
-                </td>
-                <td>
-                  <div class="row-actions">
-                    <a class="btn secondary small" [routerLink]="[warehouse.id, 'edit']">
-                      {{ 'common.edit' | translate }}
-                    </a>
-                    <button class="btn danger small" type="button" (click)="remove(warehouse)">
-                      {{ 'common.delete' | translate }}
-                    </button>
-                  </div>
+                <td>{{ warehouse.address }}</td>
+                <td>{{ warehouse.cityName }}</td>
+                <td>{{ warehouse.countryName }}</td>
+                <td class="numeric">{{ warehouse.itemCount }}</td>
+                <td class="row-actions">
+                  <a class="link" [routerLink]="[warehouse.id, 'items']">
+                    <span class="material-icons-round" aria-hidden="true">inventory_2</span>
+                    {{ 'warehouses.viewItems' | translate }}
+                  </a>
+                  <a class="link" [routerLink]="[warehouse.id, 'edit']">
+                    <span class="material-icons-round" aria-hidden="true">edit</span>
+                    {{ 'common.edit' | translate }}
+                  </a>
+                  <button class="link danger" type="button" (click)="delete(warehouse)">
+                    <span class="material-icons-round" aria-hidden="true">delete</span>
+                    {{ 'common.delete' | translate }}
+                  </button>
                 </td>
               </tr>
             }
           </tbody>
         </table>
+      </div>
+    }
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button class="btn secondary" type="button" (click)="prevPage()" [disabled]="page() === 1 || loading()">
+          <span class="material-icons-round icon-prev" aria-hidden="true">chevron_left</span>
+          {{ 'common.previous' | translate }}
+        </button>
+        <span class="pagination-info">
+          {{ 'common.pageOf' | translate: { page: page(), totalPages: totalPages(), totalCount: totalCount() } }}
+        </span>
+        <button class="btn secondary" type="button" (click)="nextPage()" [disabled]="page() === totalPages() || loading()">
+          {{ 'common.next' | translate }}
+          <span class="material-icons-round icon-next" aria-hidden="true">chevron_right</span>
+        </button>
       </div>
     }
   </div>

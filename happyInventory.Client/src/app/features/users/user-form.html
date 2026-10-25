@@ -1,0 +1,104 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">person</span>
+        {{ (isEdit() ? 'users.form.titleEdit' : 'users.form.titleNew') | translate }}
+      </h2>
+      <p>{{ 'users.form.subtitle' | translate }}</p>
+    </div>
+    <a class="btn secondary" routerLink="/users">
+      <span class="material-icons-round icon-back" aria-hidden="true">arrow_back</span>
+      {{ 'common.backToList' | translate }}
+    </a>
+  </div>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    @if (loading()) {
+      <p class="muted">{{ 'common.loading' | translate }}</p>
+    }
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="user-username">{{ 'users.form.username' | translate }}</label>
+        <input
+          id="user-username"
+          formControlName="username"
+          autocomplete="off"
+          [placeholder]="'users.form.usernamePlaceholder' | translate"
+        />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <span class="error">{{ 'users.form.usernameRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="user-full-name">{{ 'users.form.fullName' | translate }}</label>
+        <input
+          id="user-full-name"
+          formControlName="fullName"
+          autocomplete="off"
+          [placeholder]="'users.form.fullNamePlaceholder' | translate"
+        />
+        @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+          <span class="error">{{ 'users.form.fullNameRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="user-role">{{ 'users.form.role' | translate }}</label>
+        <select id="user-role" formControlName="role">
+          @for (role of roles; track role) {
+            <option [value]="role">{{ roleKey(role) | translate }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="user-password">{{ 'users.form.password' | translate }}</label>
+        <input
+          id="user-password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [placeholder]="(isEdit() ? 'users.form.passwordPlaceholderEdit' : 'users.form.passwordPlaceholderNew') | translate"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="error">{{ 'users.form.passwordRequired' | translate }}</span>
+        }
+      </div>
+
+      <div class="field full">
+        <label class="toggle-row" for="user-active">
+          <span class="toggle-text">
+            <span class="material-icons-round" aria-hidden="true">check_circle</span>
+            {{ 'users.form.active' | translate }}
+          </span>
+          <span class="toggle-control">
+            <input id="user-active" type="checkbox" formControlName="isActive" />
+            <span class="toggle-track" aria-hidden="true"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" routerLink="/users">
+        <span class="material-icons-round" aria-hidden="true">close</span>
+        {{ 'common.cancel' | translate }}
+      </a>
+      <button class="btn" type="submit" [disabled]="saving()">
+        @if (saving()) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons-round" aria-hidden="true">save</span>
+        }
+        {{ (isEdit() ? 'users.form.save' : 'users.form.create') | translate }}
+      </button>
+    </div>
+  </form>
+</div>

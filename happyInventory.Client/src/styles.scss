@@ -31,6 +31,30 @@ body {
   line-height: 1.5;
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
+.material-icons-round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 h1,
 h2,
 h3 {
@@ -57,8 +81,16 @@ a {
 }
 
 .page-header h2 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0;
   font-size: 1.2rem;
+}
+
+.page-header h2 .material-icons-round {
+  color: var(--primary);
+  font-size: 1.3rem;
 }
 
 .page-header p {
@@ -130,6 +162,24 @@ a {
   border-color: var(--danger);
 }
 
+.search-input {
+  position: relative;
+}
+
+.search-input > .material-icons-round {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 12px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.search-input input {
+  padding-inline-start: 38px;
+}
+
 .field .hint {
   color: var(--muted);
   font-size: 0.75rem;
@@ -148,6 +198,92 @@ a {
 
 .form-grid .full {
   grid-column: 1 / -1;
+}
+
+.toggle-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.toggle-row:hover {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.toggle-text {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.toggle-text .material-icons-round {
+  color: var(--success);
+  font-size: 1.2rem;
+}
+
+.toggle-control {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.toggle-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+}
+
+.toggle-track {
+  position: relative;
+  display: block;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background 0.15s ease;
+}
+
+.toggle-track::after {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+  content: '';
+  transition: inset-inline-start 0.15s ease;
+}
+
+.toggle-control input:checked + .toggle-track {
+  background: var(--success);
+}
+
+.toggle-control input:checked + .toggle-track::after {
+  inset-inline-start: 23px;
+}
+
+.toggle-control input:focus-visible + .toggle-track {
+  outline: 3px solid rgba(21, 128, 61, 0.25);
+  outline-offset: 2px;
 }
 
 .actions {
@@ -214,6 +350,58 @@ a {
   font-size: 0.78rem;
 }
 
+.btn .material-icons-round {
+  font-size: 1.1rem;
+}
+
+.btn.small .material-icons-round {
+  font-size: 1rem;
+}
+
+.link {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link.danger {
+  color: var(--danger);
+}
+
+.link.danger:hover {
+  color: #b91c1c;
+}
+
+.link:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+.link.danger:focus-visible {
+  outline-color: rgba(220, 38, 38, 0.35);
+}
+
+.link .material-icons-round {
+  font-size: 1.05rem;
+}
+
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);
@@ -265,11 +453,16 @@ table.table {
 
 .badge {
   display: inline-flex;
+  gap: 4px;
   align-items: center;
   padding: 3px 9px;
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
+}
+
+.badge .material-icons-round {
+  font-size: 0.95rem;
 }
 
 .badge.ok {
@@ -361,7 +554,7 @@ table.table {
   border-radius: 10px;
   background: #eff6ff;
   color: #1d4ed8;
-  font-size: 1.05rem;
+  font-size: 1.35rem;
 }
 
 .stat h3 {
@@ -420,4 +613,12 @@ html[dir='rtl'] .table .numeric {
 html[dir='rtl'] .field input[type='number'] {
   direction: ltr;
   text-align: right;
+}
+
+/* Directional icons point toward the reading direction. */
+html[dir='rtl'] .icon-back,
+html[dir='rtl'] .icon-prev,
+html[dir='rtl'] .icon-next,
+html[dir='rtl'] .icon-login {
+  transform: scaleX(-1);
 }

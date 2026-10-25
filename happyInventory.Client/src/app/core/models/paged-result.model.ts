@@ -3,10 +3,5 @@ export interface PagedResult<T> {
   page: number;
   pageSize: number;
   totalCount: number;
-}
-
-export interface PageQuery {
-  page?: number;
-  pageSize?: number;
-  search?: string;
+  totalPages: number;
 }

@@ -1,6 +1,14 @@
 .intro h2 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
   margin: 6px 0 8px;
   font-size: 1.4rem;
+}
+
+.intro h2 .material-icons-round {
+  color: var(--primary);
+  font-size: 1.45rem;
 }
 
 .intro p {
@@ -9,18 +17,236 @@
   color: var(--muted);
 }
 
-.flow h3 {
-  margin-top: 0;
+.summary {
+  gap: 6px;
+}
+
+.summary .icon {
+  margin-bottom: 4px;
+}
+
+.summary-label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.summary-value {
+  font-size: 1.7rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chart-header h3 {
+  margin: 0;
   font-size: 1rem;
 }
 
-.flow ol {
-  margin: 0;
-  padding-left: 20px;
+.chart-header p {
+  margin: 4px 0 0;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
-.flow li {
-  margin-bottom: 6px;
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legend-dot.items {
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+}
+
+.legend-dot.high {
+  background: #16a34a;
+}
+
+.legend-dot.low {
+  background: #dc2626;
+}
+
+.column-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: safe center;
+  gap: 14px;
+  min-height: 250px;
+  padding: 8px 4px 0;
+  overflow-x: auto;
+}
+
+.column {
+  display: flex;
+  flex: 1 0 88px;
+  min-width: 88px;
+  max-width: 160px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.column-value {
+  color: #1e293b;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.column-track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 170px;
+  border-radius: 8px 8px 4px 4px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.column-fill {
+  width: 100%;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  transition: height 0.35s ease;
+}
+
+.column-label,
+.column-meta {
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.column-label {
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.column-meta {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.hbar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hbar-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 160px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.hbar-label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.hbar-name,
+.hbar-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hbar-name {
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.hbar-meta {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.hbar-track {
+  height: 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.hbar-fill {
+  height: 100%;
+  border-radius: 999px;
+  /* Keep the bar anchored to the inline start, including RTL layouts. */
+  margin-inline-end: auto;
+  transition: width 0.35s ease;
+}
+
+.hbar-fill.high {
+  background: linear-gradient(90deg, #22c55e, #15803d);
+}
+
+.hbar-fill.low {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+}
+
+.hbar-value {
+  min-width: 44px;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-links h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+:host-context(html[dir='rtl']) .summary-label {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (max-width: 640px) {
+  .hbar-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .hbar-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }

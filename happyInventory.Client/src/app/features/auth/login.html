@@ -1,0 +1,114 @@
+<div class="login">
+  <section class="login-aside">
+    <div class="login-brand">
+      <app-brand-mark />
+      <strong>{{ 'brand.name' | translate }}</strong>
+    </div>
+
+    <div class="aside-copy">
+      <span class="eyebrow">{{ 'auth.eyebrow' | translate }}</span>
+      <h1>{{ 'auth.asideTitle' | translate }}</h1>
+      <p>{{ 'auth.asideBody' | translate }}</p>
+
+      <ul class="aside-points">
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'auth.point1' | translate }}
+        </li>
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'auth.point2' | translate }}
+        </li>
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'auth.point3' | translate }}
+        </li>
+      </ul>
+    </div>
+
+    <span class="aside-foot">
+      <span class="material-icons-round" aria-hidden="true">dns</span>
+      {{ 'shell.api' | translate }}
+    </span>
+  </section>
+
+  <section class="login-main">
+    <div class="login-lang" role="group" [attr.aria-label]="'language.label' | translate">
+      <span class="material-icons-round lang-switch-icon" aria-hidden="true">language</span>
+      @for (language of languages; track language.code) {
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="currentLanguage() === language.code"
+          [attr.aria-pressed]="currentLanguage() === language.code"
+          (click)="changeLanguage(language.code)"
+        >
+          {{ language.label }}
+        </button>
+      }
+    </div>
+
+    <div class="login-card">
+      <span class="eyebrow">{{ 'auth.eyebrow' | translate }}</span>
+      <h2>{{ 'auth.title' | translate }}</h2>
+      <p class="login-subtitle">{{ 'auth.subtitle' | translate }}</p>
+
+      @if (error()) {
+        <div class="alert" role="alert">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="login-username">{{ 'auth.username' | translate }}</label>
+          <input
+            id="login-username"
+            formControlName="username"
+            autocomplete="username"
+            autofocus
+            [placeholder]="'auth.usernamePlaceholder' | translate"
+          />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <span class="error">{{ 'auth.usernameRequired' | translate }}</span>
+          }
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="login-password">{{ 'auth.password' | translate }}</label>
+            <button
+              type="button"
+              class="show-password"
+              (click)="showPassword.set(!showPassword())"
+            >
+              <span class="material-icons-round" aria-hidden="true">
+                {{ showPassword() ? 'visibility_off' : 'visibility' }}
+              </span>
+              {{ (showPassword() ? 'auth.hidePassword' : 'auth.showPassword') | translate }}
+            </button>
+          </div>
+          <input
+            id="login-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            [placeholder]="'auth.passwordPlaceholder' | translate"
+          />
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <span class="error">{{ 'auth.passwordRequired' | translate }}</span>
+          }
+        </div>
+
+        <button class="btn login-submit" type="submit" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+          } @else {
+            <span class="material-icons-round icon-login" aria-hidden="true">login</span>
+          }
+          {{ (loading() ? 'auth.signingIn' : 'auth.signIn') | translate }}
+        </button>
+      </form>
+
+      <p class="login-note">{{ 'auth.accountsManaged' | translate }}</p>
+    </div>
+  </section>
+</div>

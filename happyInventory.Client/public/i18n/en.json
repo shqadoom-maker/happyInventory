@@ -3,11 +3,39 @@
     "name": "Happy Inventory",
     "subtitle": "Warehouse management"
   },
+  "auth": {
+    "eyebrow": "Happy Company",
+    "title": "Sign in",
+    "subtitle": "Use your warehouse account to continue.",
+    "username": "Username",
+    "usernamePlaceholder": "admin",
+    "usernameRequired": "Username is required.",
+    "password": "Password",
+    "passwordPlaceholder": "Your password",
+    "passwordRequired": "Password is required.",
+    "showPassword": "Show",
+    "hidePassword": "Hide",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "invalidCredentials": "Invalid username or password.",
+    "accountDisabled": "Your account is disabled. Please contact support.",
+    "accountsManaged": "Accounts are created and managed by an administrator.",
+    "asideTitle": "Warehouse inventory, in one place.",
+    "asideBody": "Sign in to manage warehouses, check stock and keep the catalogue current across countries and cities.",
+    "point1": "JWT-protected API for every request",
+    "point2": "One role per user, managed by administrators",
+    "point3": "Arabic and English, with full right-to-left support"
+  },
   "shell": {
     "eyebrow": "Happy Company",
     "title": "Inventory management",
     "stack": "SQLite · EF Core 6",
-    "api": "API: ASP.NET Core .NET 6"
+    "api": "API: ASP.NET Core .NET 6",
+    "signedInAs": "Signed in as",
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigation": "Navigation"
   },
   "language": {
     "label": "Language",
@@ -17,18 +45,17 @@
   "nav": {
     "dashboard": "Dashboard",
     "warehouses": "Warehouses",
-    "products": "Products",
-    "inventory": "Inventory",
     "stockMovements": "Stock movements",
-    "locations": "Locations"
+    "locations": "Locations",
+    "users": "Users"
   },
   "titles": {
+    "login": "Sign in",
     "dashboard": "Dashboard",
     "warehouses": "Warehouses",
-    "products": "Products",
-    "inventory": "Inventory",
     "stockMovements": "Stock movements",
-    "locations": "Locations"
+    "locations": "Locations",
+    "users": "Users"
   },
   "common": {
     "refresh": "Refresh",
@@ -40,18 +67,23 @@
     "search": "Search",
     "backToList": "Back to list",
     "actions": "Actions",
+    "save": "Save",
+    "saving": "Saving…",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{totalPages}} · {{totalCount}} total",
     "active": "Active",
     "inactive": "Inactive",
     "notAvailable": "—"
   },
   "dashboard": {
     "eyebrow": "Happy Company",
+    "welcomeEyebrow": "Signed in",
+    "welcome": "Welcome back, {{name}}",
     "title": "Multi-country warehouse inventory",
     "intro": "Track stock across warehouses in different countries and cities. The Angular client talks to the ASP.NET Core Web API, which persists everything in SQLite through EF Core. External systems such as the eCommerce storefront post their updates to the same API.",
     "cards": {
       "warehouses": "Register warehouses in each country and city, and keep their details current.",
-      "products": "Maintain the product catalogue with SKU, pricing and availability.",
-      "inventory": "Check stock levels per warehouse, adjust quantities and set reorder levels.",
       "stockMovements": "Audit every inbound, outbound and manual adjustment with its source.",
       "locations": "Manage the countries and cities that warehouses belong to."
     },
@@ -61,20 +93,45 @@
       "step2": "The service validates the request and applies the stock change.",
       "step3": "EF Core writes the inventory row and a stock movement row to SQLite.",
       "step4": "Every change keeps its source and reference, so the stock history always explains where a number came from."
+    },
+    "analytics": {
+      "subtitle": "A live picture of the stock held across every warehouse, with the highest and lowest available quantities.",
+      "warehouseStatusTitle": "Warehouse status",
+      "warehouseStatusSubtitle": "Number of inventory items stored in each warehouse.",
+      "warehouseEmpty": "No warehouses have been defined yet.",
+      "topTitle": "Top 10 items",
+      "topSubtitle": "Highest available quantities across all warehouses.",
+      "lowTitle": "Bottom 10 items",
+      "lowSubtitle": "Lowest available quantities across all warehouses.",
+      "itemsEmpty": "No warehouse items have been recorded yet.",
+      "summaryWarehouses": "Warehouses",
+      "summaryItems": "Distinct items",
+      "summaryQuantity": "Total units",
+      "chartItems": "Items",
+      "chartUnits": "Units",
+      "itemsCount": "{{count}} items",
+      "totalQuantity": "{{count}} units",
+      "warehouseCount": "{{count}} warehouses",
+      "warehouseCountOne": "{{count}} warehouse",
+      "quickLinks": "Quick links"
     }
   },
   "warehouses": {
     "title": "Warehouses",
     "subtitle": "Every warehouse belongs to a city, which belongs to a country.",
     "new": "+ New warehouse",
+    "viewItems": "View items",
     "searchPlaceholder": "Name, code, city or country",
     "emptyTitle": "No warehouses yet",
     "emptyHint": "Create the first warehouse, or adjust the search term.",
+    "empty": "No warehouses found.",
     "columns": {
       "name": "Name",
       "code": "Code",
+      "address": "Address",
       "city": "City",
       "country": "Country",
+      "items": "Items",
       "capacity": "Capacity",
       "status": "Status"
     },
@@ -89,6 +146,9 @@
       "code": "Code",
       "codePlaceholder": "CAI-01",
       "codeRequired": "Code is required.",
+      "country": "Country",
+      "selectCountry": "Select a country",
+      "countryRequired": "Choose a country.",
       "city": "City",
       "selectCity": "Select a city",
       "cityRequired": "Choose a city.",
@@ -96,78 +156,41 @@
       "capacityRequired": "Capacity must be zero or more.",
       "address": "Address",
       "addressPlaceholder": "Street, district",
+      "addressRequired": "Address is required.",
       "active": "Active",
       "create": "Create warehouse",
       "save": "Save changes",
-      "noCitiesPrefix": "No cities exist yet.",
+      "noLocationsPrefix": "No countries or cities exist yet.",
       "addLocations": "Add a country and a city",
-      "noCitiesSuffix": "before creating a warehouse."
+      "noLocationsSuffix": "before creating a warehouse."
     }
   },
-  "products": {
-    "title": "Products",
-    "subtitle": "The catalogue shared by every warehouse.",
-    "new": "+ New product",
-    "searchPlaceholder": "SKU, name or description",
-    "emptyTitle": "No products yet",
-    "emptyHint": "Add the first product to start tracking stock.",
-    "columns": {
+  "warehouseItems": {
+    "title": "Warehouse items",
+    "subtitle": "Items stored in this warehouse.",
+    "new": "+ New item",
+    "searchPlaceholder": "Name or SKU",
+    "empty": "No items in this warehouse yet.",
+    "confirmDelete": "Delete item \"{{name}}\"?",
+    "table": {
+      "name": "Item",
       "sku": "SKU",
-      "name": "Name",
-      "description": "Description",
-      "price": "Unit price",
-      "status": "Status"
+      "qty": "Quantity",
+      "costPrice": "Cost price",
+      "msrp": "MSRP"
     },
-    "confirmDelete": "Delete product \"{{name}}\"?",
     "form": {
-      "titleNew": "New product",
-      "titleEdit": "Edit product",
-      "subtitle": "Products are global; stock levels are tracked per warehouse.",
+      "titleNew": "New item",
+      "titleEdit": "Edit item",
+      "name": "Item name",
+      "nameRequired": "Item name is required.",
       "sku": "SKU",
-      "skuPlaceholder": "SKU-1001",
-      "skuRequired": "SKU is required.",
-      "name": "Name",
-      "namePlaceholder": "Wireless mouse",
-      "nameRequired": "Name is required.",
-      "price": "Unit price",
-      "priceRequired": "Price must be zero or more.",
-      "active": "Active",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional details",
-      "create": "Create product",
-      "save": "Save changes"
+      "qty": "Quantity",
+      "qtyRequired": "Quantity must be at least 1.",
+      "costPrice": "Cost price",
+      "costRequired": "Cost price must be zero or more.",
+      "msrp": "MSRP"
     }
-  },
-  "inventory": {
-    "title": "Inventory",
-    "subtitle": "Check stock levels for one warehouse and apply a movement when stock changes.",
-    "warehouse": "Warehouse",
-    "selectWarehouse": "Select a warehouse",
-    "emptyTitle": "No stock recorded",
-    "emptyHint": "This warehouse has no inventory rows yet. Movements will create them.",
-    "noWarehousesTitle": "No warehouses",
-    "noWarehousesHint": "Create a warehouse before tracking inventory.",
-    "columns": {
-      "sku": "SKU",
-      "product": "Product",
-      "quantity": "Quantity",
-      "reorderLevel": "Reorder level",
-      "status": "Status",
-      "lastUpdated": "Last updated (UTC)"
-    },
-    "lowStock": "Low stock",
-    "inStock": "In stock",
-    "adjust": "Adjust",
-    "adjustTitle": "Adjust stock — {{name}}",
-    "currentQuantity": "Current quantity:",
-    "hint": "Inbound is positive, outbound negative; adjustments can be either.",
-    "movementType": "Movement type",
-    "quantityChange": "Quantity change",
-    "quantityRequired": "A quantity is required.",
-    "reference": "Reference",
-    "referencePlaceholder": "Order number, delivery note, reason…",
-    "apply": "Apply movement",
-    "zeroError": "Enter a quantity change other than zero."
   },
   "movementTypes": {
     "inbound": "Inbound",
@@ -184,7 +207,6 @@
     "columns": {
       "when": "When (UTC)",
       "warehouse": "Warehouse",
-      "product": "Product",
       "type": "Type",
       "change": "Change",
       "source": "Source",
@@ -212,6 +234,60 @@
     "noCitiesHint": "Add a city inside a country.",
     "confirmDeleteCountry": "Delete country \"{{name}}\"?",
     "confirmDeleteCity": "Delete city \"{{name}}\"?"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Accounts that can sign in to the system. Each user has exactly one role.",
+    "new": "+ New user",
+    "searchPlaceholder": "Username, full name or role",
+    "emptyTitle": "No users yet",
+    "emptyHint": "Create the first account to let someone sign in.",
+    "you": "you",
+    "columns": {
+      "username": "Username",
+      "fullName": "Full name",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Last sign-in (UTC)"
+    },
+    "confirmDelete": "Delete user \"{{name}}\"?",
+    "changePassword": {
+      "action": "Change password",
+      "title": "Change password",
+      "subtitle": "Set a new password for {{name}}.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "passwordHint": "At least 8 characters",
+      "tooShort": "Use at least 8 characters.",
+      "mismatch": "Passwords do not match.",
+      "save": "Change password",
+      "success": "Password changed for {{name}}."
+    },
+    "form": {
+      "titleNew": "New user",
+      "titleEdit": "Edit user",
+      "subtitle": "A user has exactly one role. Passwords must be at least 8 characters.",
+      "username": "Username",
+      "usernamePlaceholder": "jane.doe",
+      "usernameRequired": "Username is required.",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Jane Doe",
+      "fullNameRequired": "Full name is required.",
+      "role": "Role",
+      "roleRequired": "Choose a role.",
+      "password": "Password",
+      "passwordPlaceholderNew": "At least 8 characters",
+      "passwordPlaceholderEdit": "Leave blank to keep the current password",
+      "passwordRequired": "Password must be at least 8 characters.",
+      "active": "Active",
+      "create": "Create user",
+      "save": "Save changes"
+    }
+  },
+  "roles": {
+    "admin": "Administrator",
+    "management": "Management",
+    "auditor": "Auditor"
   },
   "errors": {
     "unreachable": "The API is unreachable. Make sure the backend is running.",

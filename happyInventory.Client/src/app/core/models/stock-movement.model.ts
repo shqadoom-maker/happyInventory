@@ -1,11 +1,9 @@
-import { StockMovementType } from './inventory.model';
+export type StockMovementType = 'Inbound' | 'Outbound' | 'Adjustment';
 
 export interface StockMovement {
   id: number;
   warehouseId: number;
   warehouseName?: string;
-  productId: number;
-  productName?: string;
   quantityChange: number;
   type: StockMovementType;
   source: string;

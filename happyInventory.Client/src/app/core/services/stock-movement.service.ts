@@ -10,15 +10,11 @@ export class StockMovementService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/stock-movements`;
 
-  list(warehouseId?: number, productId?: number): Observable<StockMovement[]> {
+  list(warehouseId?: number): Observable<StockMovement[]> {
     let params = new HttpParams();
 
     if (warehouseId) {
       params = params.set('warehouseId', warehouseId);
-    }
-
-    if (productId) {
-      params = params.set('productId', productId);
     }
 
     return this.http.get<StockMovement[]>(this.baseUrl, { params });
