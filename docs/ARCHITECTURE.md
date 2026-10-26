@@ -13,6 +13,7 @@ internal users (Angular UI) or by external systems (eCommerce, ERP, etc.).
 | Database | SQLite (`HappyInventory.Api/happyInventory.db`) |
 | ORM | EF Core 6 with migrations |
 | Authentication | JWT Bearer (HS256), PBKDF2-SHA256 password hashing |
+| Logging | Serilog (console, rolling file and asynchronous SQLite sink) |
 | Localization | `@ngx-translate/core` + `@ngx-translate/http-loader` |
 
 ## Projects and dependency direction
@@ -22,18 +23,21 @@ happyInventory/
 ├─ happyInventory.slnx                 Solution (N-tier projects only)
 ├─ docs/                               Design notes
 ├─ HappyInventory.Core/                Domain layer
-│  ├─ Entities/                        User, Country, City, Warehouse, WarehouseItem
+│  ├─ Entities/                        User, Country, City, Warehouse, WarehouseItem,
+│  │                                   SystemLog
 │  └─ Enums/                           UserRoles
 ├─ HappyInventory.Application/         Application layer
 │  ├─ Common/                          JwtOptions, AdminPolicyOptions, PagedResult,
 │  │                                   ConflictException
 │  ├─ DTOs/                            Auth, Users, Countries, Cities, Warehouses,
-│  │                                   WarehouseItems, Dashboard, Integrations
+│  │                                   WarehouseItems, Dashboard, Integrations,
+│  │                                   SystemLogs
 │  ├─ Interfaces/Repositories/         Persistence contracts
 │  ├─ Interfaces/Services/             Use-case contracts
 │  ├─ Models/                          UserAuthState, DashboardSnapshot
 │  ├─ Services/                        User, country, city, warehouse, item,
-│  │                                   dashboard and inventory-update use cases
+│  │                                   dashboard, inventory-update and system-log
+│  │                                   use cases
 │  └─ DependencyInjection.cs           AddApplication()
 ├─ HappyInventory.Infrastructure/      Infrastructure layer
 │  ├─ Data/                            AppDbContext, DbSeeder, configurations
@@ -43,12 +47,17 @@ happyInventory/
 │  └─ DependencyInjection.cs           AddInfrastructure()
 ├─ HappyInventory.Api/                 Presentation/composition layer
 │  ├─ Controllers/                     Auth, Users, Dashboard, Countries, Cities,
-│  │                                   Warehouses, WarehouseItems, InventoryUpdates
-│  ├─ Middleware/                      ExceptionHandlingMiddleware
+│  │                                   Warehouses, WarehouseItems, InventoryUpdates,
+│  │                                   SystemLogs
+│  ├─ Logging/                         Serilog queue, sink, writer and retention
+│  ├─ Middleware/                      ExceptionHandlingMiddleware,
+│  │                                   LogContextMiddleware
 │  ├─ Properties/launchSettings.json   Local ports and Swagger launch profile
-│  ├─ Program.cs                       DI composition, auth, CORS, Swagger, startup seed
-│  └─ appsettings.json                 Connection string, JWT, seed credentials
-├─ HappyInventory.Tests/               Unit tests for the integration use case
+│  ├─ Program.cs                       DI composition, auth, CORS, Swagger, Serilog,
+│  │                                   startup seed
+│  └─ appsettings.json                 Connection string, JWT, seed and logging
+│                                      settings
+├─ HappyInventory.Tests/               Unit tests for integration and security
 ├─ happyInventory.Client/              Angular application
 ├─ happyInventory/                     Legacy monolith, not in the solution
 └─ docs/ARCHITECTURE.md                This document
@@ -106,6 +115,8 @@ Infrastructure. Application exceptions are translated to HTTP problem responses 
 - A fallback policy requires an authenticated user for every endpoint that does
   not opt out.
 - `/api/users` uses the `Admin` role (`AdminOnly` policy / `[Authorize(Roles=...)]`).
+- `/api/system-logs` is also admin-only, because stored entries can include user
+  names, request paths and stack traces.
 - Each user has exactly one role, `Admin`, `Management` or `Auditor`, stored as a
   string.
 - Administrator accounts cannot be deleted. Administrators cannot deactivate,
@@ -145,6 +156,9 @@ JWT key for any real deployment.
 | PUT | `/api/users/{id}` | Admin |
 | POST | `/api/users/{id}/change-password` | Admin |
 | DELETE | `/api/users/{id}` | Admin |
+| GET | `/api/system-logs` | Admin |
+| GET | `/api/system-logs/{id}` | Admin |
+| DELETE | `/api/system-logs?olderThanDays=30` | Admin |
 | CRUD | `/api/countries`, `/api/cities` | Authenticated |
 | CRUD | `/api/warehouses` | Authenticated |
 | GET | `/api/warehouses/{id}/items` | Authenticated |
@@ -154,6 +168,13 @@ JWT key for any real deployment.
 `PUT /api/users/{id}` accepts `password: null` to keep the current password.
 `POST /api/users/{id}/change-password` accepts `{ "newPassword": "..." }`.
 Swagger is enabled in Development at `/swagger` and includes a Bearer scheme.
+
+The authenticated CRUD routes are not limited to the Angular UI. External
+eCommerce/ERP systems, scripts and services can call `POST /api/auth/login`,
+send the returned bearer token and use the same JSON endpoints. They do not use
+cookies or the browser CORS policy. The API must be bound to a reachable address
+(for example with `--urls`) or placed behind a reverse proxy when it is consumed
+from another machine.
 
 ## Warehouse domain
 
@@ -280,6 +301,64 @@ unimplemented. Order creation and outbound eCommerce calls remain the eCommerce
 system's responsibility; this endpoint only applies the inventory deduction
 idempotently.
 
+## System logging
+
+The API uses Serilog as its logging provider. `Program.cs` configures three
+sinks:
+
+- console output;
+- a daily rolling file at `logs/happy-inventory-.log` (30 files retained);
+- an optional SQLite sink, enabled by `Logging:Database:Enabled` (default true).
+
+The SQLite path is asynchronous and does not use `DbContext` from the request
+thread:
+
+```text
+ILogger / Serilog
+  → SystemLogSink (redact + truncate)
+  → SystemLogQueue (bounded channel)
+  → SystemLogWriterService (BackgroundService, batches of 100)
+  → ISystemLogRepository (scoped)
+  → SystemLogs table
+```
+
+`SystemLogSink` maps `SourceContext`, `UserId`, `UserName`, `RequestPath`,
+`RequestMethod`, `StatusCode` and `TraceId` to columns, serializes the remaining
+structured properties to JSON, redacts secret-bearing property names, truncates
+long values and never throws. `SystemLogWriterService` drains the queue, writes
+batches, and flushes remaining entries during graceful shutdown. A persistence
+failure is reported to standard error rather than logged, so it cannot recurse.
+`SystemLogRetentionService` deletes rows older than
+`Logging:Database:RetentionDays` (default 30; 0 disables) after a one-minute
+delay and every six hours.
+
+`UseSerilogRequestLogging` writes one request event per HTTP request. 4xx
+responses are warnings and 5xx responses are errors; the message template uses
+`:l` for method and path so they render without JSON quotes.
+`LogContextMiddleware` runs after authentication and pushes `UserId`, `UserName`
+and `TraceId` into the logical context, so service and controller logs correlate
+with the request event.
+
+`SystemLogsController` exposes the admin-only surface. `SystemLogService` clamps
+page size to 1-100 (default 25), validates levels and date order, normalizes
+timestamps to UTC, and maps entities to DTOs. `SystemLogRepository` performs
+newest-first paged queries with level, user, text and inclusive UTC date filters;
+cleanup is a set-based delete with a 1-3650 day range and no delete-all mode.
+The migration `20261026174335_AddSystemLogs` creates `SystemLogs` and indexes
+timestamp, level + timestamp, user id and source context.
+
+Database logging settings:
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `Enabled` | `true` | Enables the SQLite sink, writer and retention service. |
+| `MinimumLevel` | `Information` | Minimum level persisted to SQLite. |
+| `QueueCapacity` | `10000` | Bounded queue; overflow drops events instead of blocking. |
+| `RetentionDays` | `30` | Automatic cleanup age; `0` disables it. |
+
+The log table is operational data, not an audit substitute: it is pruned
+automatically and should not be used for regulatory record keeping.
+
 ## Frontend structure and routing
 
 - `/login` is the first route and is wrapped in `guestGuard`; a signed-in user is
@@ -287,13 +366,18 @@ idempotently.
 - All other routes are children of the protected `Shell` component
   (`authGuard`), which renders the language-aware navigation drawer (left in
   English, right in Arabic), top bar, signed-in user and language switcher.
-- `/users` has its own lazy route tree and an additional `adminGuard`; the
-  navigation drawer only shows the Users item for admins. The list shows role and
-  active status and offers Edit, Change Password and Delete; Delete is hidden for
-  administrator accounts and for the signed-in user.
+- `/users` and `/system-logs` have their own lazy route trees and an additional
+  `adminGuard`; the navigation drawer only shows the Users and System logs items
+  for admins. The Users list shows role and active status and offers Edit, Change
+  Password and Delete; Delete is hidden for administrator accounts and for the
+  signed-in user.
+- The Log Viewer loads `/api/system-logs`, filters by level, user, free text and
+  UTC dates, pages newest-first, expands structured details and prunes entries
+  older than the selected age after confirmation. It renders timestamps in UTC.
 - The Dashboard loads `/api/dashboard` and renders summary cards plus
   dependency-free CSS bar charts for warehouse status and top/bottom items.
-- `App` is a thin host containing only `<router-outlet />`.
+- `App` is a thin host containing the router outlet and the global toast
+  container.
 - `AuthService` exposes the session as signals, persists the JWT in
   `localStorage`, restores it until expiry, and logs out on demand.
 - `authInterceptor` adds the bearer token to `/api` calls. A `401` (except from
@@ -336,7 +420,10 @@ API process working directory. When the API is started from
 is git-ignored (`*.db`).
 
 The migrations were moved to `HappyInventory.Infrastructure/Migrations` with the
-same migration IDs, so an existing database keeps its migration history.
+same migration IDs, so an existing database keeps its migration history. The
+`SystemLogs` table is created by `20261026174335_AddSystemLogs` and pruned by the
+retention service described above. Serilog's rolling file output lives under
+`logs/`, which is git-ignored.
 
 ```sh
 dotnet ef migrations add <Name> -p HappyInventory.Infrastructure -s HappyInventory.Api

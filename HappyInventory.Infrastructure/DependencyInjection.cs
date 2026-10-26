@@ -41,6 +41,9 @@ public static class DependencyInjection
         services.AddScoped<DashboardRepository>();
         services.AddScoped<IDashboardRepository>(provider => provider.GetRequiredService<DashboardRepository>());
 
+        services.AddScoped<SystemLogRepository>();
+        services.AddScoped<ISystemLogRepository>(provider => provider.GetRequiredService<SystemLogRepository>());
+
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
 

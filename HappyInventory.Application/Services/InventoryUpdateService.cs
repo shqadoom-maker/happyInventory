@@ -146,6 +146,7 @@ public class InventoryUpdateService : IInventoryUpdateService
             ItemName = record.ItemName,
             PreviousQuantity = record.PreviousQuantity,
             RemainingQuantity = record.RemainingQuantity,
+            Replayed = true,
         };
     }
 }

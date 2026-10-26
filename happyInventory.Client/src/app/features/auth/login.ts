@@ -28,13 +28,19 @@ export class Login {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly showPassword = signal(false);
+  protected readonly showPasswordHelp = signal(false);
+  protected readonly submitted = signal(false);
+  protected readonly currentYear = new Date().getFullYear();
 
   protected readonly form = this.formBuilder.nonNullable.group({
     username: ['', [Validators.required, Validators.maxLength(50)]],
     password: ['', [Validators.required]],
+    rememberMe: [true],
   });
 
   protected submit(): void {
+    this.submitted.set(true);
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -42,8 +48,11 @@ export class Login {
 
     this.loading.set(true);
     this.error.set(null);
+    this.showPasswordHelp.set(false);
 
-    this.auth.login(this.form.getRawValue()).subscribe({
+    const { username, password, rememberMe } = this.form.getRawValue();
+
+    this.auth.login({ username, password }, rememberMe).subscribe({
       next: () => {
         void this.router.navigateByUrl(this.returnUrl());
       },
@@ -66,6 +75,16 @@ export class Login {
         this.error.set(errorMessage(error, this.translate));
       },
     });
+  }
+
+  protected showError(field: 'username' | 'password'): boolean {
+    const control = this.form.controls[field];
+
+    return control.invalid && (this.submitted() || (control.dirty && control.touched));
+  }
+
+  protected togglePasswordHelp(): void {
+    this.showPasswordHelp.update((visible) => !visible);
   }
 
   protected changeLanguage(code: LanguageCode): void {

@@ -2,10 +2,10 @@
   <div class="page-header">
     <div>
       <h2>
-        <span class="material-icons-round" aria-hidden="true">swap_vert</span>
-        {{ 'stockMovements.title' | translate }}
+        <span class="material-icons-round" aria-hidden="true">integration_instructions</span>
+        {{ 'integration.title' | translate }}
       </h2>
-      <p>{{ 'stockMovements.subtitle' | translate }}</p>
+      <p>{{ 'integration.subtitle' | translate }}</p>
     </div>
     <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
       <span class="material-icons-round" aria-hidden="true">refresh</span>
@@ -20,13 +20,13 @@
   <div class="card">
     <div class="toolbar">
       <div class="field">
-        <label for="movement-warehouse">{{ 'stockMovements.warehouse' | translate }}</label>
+        <label for="integration-warehouse">{{ 'integration.warehouse' | translate }}</label>
         <select
-          id="movement-warehouse"
+          id="integration-warehouse"
           [value]="selectedWarehouseId() ?? ''"
           (change)="onWarehouseChange($event)"
         >
-          <option value="">{{ 'stockMovements.allWarehouses' | translate }}</option>
+          <option value="">{{ 'integration.allWarehouses' | translate }}</option>
           @for (warehouse of warehouses(); track warehouse.id) {
             <option [value]="warehouse.id">{{ warehouse.name }}</option>
           }
@@ -38,44 +38,63 @@
   <div class="card">
     @if (loading()) {
       <p class="muted">{{ 'common.loading' | translate }}</p>
-    } @else if (movements().length === 0) {
+    } @else if (records().length === 0) {
       <div class="empty">
-        <strong>{{ 'stockMovements.emptyTitle' | translate }}</strong>
-        {{ 'stockMovements.emptyHint' | translate }}
+        <strong>{{ 'integration.emptyTitle' | translate }}</strong>
+        {{ 'integration.emptyHint' | translate }}
       </div>
     } @else {
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
-              <th>{{ 'stockMovements.columns.when' | translate }}</th>
-              <th>{{ 'stockMovements.columns.warehouse' | translate }}</th>
-              <th>{{ 'stockMovements.columns.type' | translate }}</th>
-              <th class="numeric">{{ 'stockMovements.columns.change' | translate }}</th>
-              <th>{{ 'stockMovements.columns.source' | translate }}</th>
-              <th>{{ 'stockMovements.columns.reference' | translate }}</th>
+              <th>{{ 'integration.columns.key' | translate }}</th>
+              <th>{{ 'integration.columns.warehouse' | translate }}</th>
+              <th>{{ 'integration.columns.sku' | translate }}</th>
+              <th>{{ 'integration.columns.item' | translate }}</th>
+              <th class="numeric">{{ 'integration.columns.quantity' | translate }}</th>
+              <th class="numeric">{{ 'integration.columns.previous' | translate }}</th>
+              <th class="numeric">{{ 'integration.columns.remaining' | translate }}</th>
+              <th>{{ 'integration.columns.when' | translate }}</th>
             </tr>
           </thead>
           <tbody>
-            @for (movement of movements(); track movement.id) {
+            @for (record of records(); track record.idempotencyKey) {
               <tr>
-                <td class="muted">{{ movement.occurredUtc | date: 'medium' }}</td>
-                <td>{{ movement.warehouseName || movement.warehouseId }}</td>
-                <td>
-                  <span class="badge {{ movementClass(movement.type) }}">
-                    <span class="material-icons-round" aria-hidden="true">
-                      {{ movementIcon(movement.type) }}
-                    </span>
-                    {{ movementTypeKey(movement.type) | translate }}
-                  </span>
-                </td>
-                <td class="numeric">{{ signedQuantity(movement) }}</td>
-                <td class="muted">{{ movement.source }}</td>
-                <td>{{ movement.reference || '—' }}</td>
+                <td class="muted code">{{ record.idempotencyKey }}</td>
+                <td>{{ record.warehouseName }}</td>
+                <td class="muted code">{{ record.skuCode }}</td>
+                <td>{{ record.itemName }}</td>
+                <td class="numeric">{{ record.quantity }}</td>
+                <td class="numeric">{{ record.previousQuantity }}</td>
+                <td class="numeric">{{ record.remainingQuantity }}</td>
+                <td class="muted">{{ record.createdUtc | date: 'medium' }}</td>
               </tr>
             }
           </tbody>
         </table>
+      </div>
+
+      <div class="pagination">
+        <span>{{ 'common.pageOf' | translate: { page: page(), totalPages: totalPages(), totalCount: totalCount() } }}</span>
+        <div class="controls">
+          <button
+            class="btn secondary"
+            type="button"
+            (click)="onPageChange(page() - 1)"
+            [disabled]="page() <= 1"
+          >
+            {{ 'common.previous' | translate }}
+          </button>
+          <button
+            class="btn secondary"
+            type="button"
+            (click)="onPageChange(page() + 1)"
+            [disabled]="page() >= totalPages()"
+          >
+            {{ 'common.next' | translate }}
+          </button>
+        </div>
       </div>
     }
   </div>

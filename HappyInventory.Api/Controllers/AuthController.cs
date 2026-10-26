@@ -13,11 +13,16 @@ public class AuthController : ControllerBase
 {
     private readonly IUserService _users;
     private readonly ITokenService _tokens;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IUserService users, ITokenService tokens)
+    public AuthController(
+        IUserService users,
+        ITokenService tokens,
+        ILogger<AuthController> logger)
     {
         _users = users;
         _tokens = tokens;
+        _logger = logger;
     }
 
     /// <summary>Exchanges credentials for a JWT. The only anonymous endpoint.</summary>
@@ -40,6 +45,10 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(
+                "Login rejected for {Username}: account disabled.",
+                request.Username);
+
             var problem = new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,
@@ -53,6 +62,10 @@ public class AuthController : ControllerBase
 
         if (user is null)
         {
+            _logger.LogWarning(
+                "Login failed for {Username}: invalid credentials.",
+                request.Username);
+
             var problem = new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,
@@ -65,6 +78,12 @@ public class AuthController : ControllerBase
         }
 
         var (token, expiresUtc) = _tokens.CreateToken(user);
+
+        _logger.LogInformation(
+            "User {UserId} ({Username}) signed in with role {Role}.",
+            user.Id,
+            user.Username,
+            user.Role);
 
         return Ok(new LoginResponse
         {
@@ -88,5 +107,33 @@ public class AuthController : ControllerBase
         }
 
         return Ok(await _users.GetByIdAsync(userId, cancellationToken));
+    }
+
+    /// <summary>
+    /// Changes the current user's password. Required at first login when
+    /// <see cref="User.MustChangePassword"/> is true.
+    /// </summary>
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var idValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(idValue, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        await _users.ChangePasswordAsync(userId, request, cancellationToken);
+
+        _logger.LogInformation(
+            "User {UserId} changed their password.",
+            userId);
+
+        return NoContent();
     }
 }

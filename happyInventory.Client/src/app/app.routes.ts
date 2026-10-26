@@ -53,6 +53,13 @@ export const routes: Routes = [
         loadChildren: () => import('./features/users/users.routes').then((m) => m.USER_ROUTES),
       },
       {
+        path: 'system-logs',
+        title: 'titles.systemLogs',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/system-logs/system-log-list').then((m) => m.SystemLogList),
+      },
+      {
         path: '**',
         redirectTo: 'dashboard',
       },

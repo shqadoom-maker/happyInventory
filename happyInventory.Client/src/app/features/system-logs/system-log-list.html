@@ -1,0 +1,307 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>
+        <span class="material-icons-round" aria-hidden="true">receipt_long</span>
+        {{ 'systemLogs.title' | translate }}
+      </h2>
+      <p>{{ 'systemLogs.subtitle' | translate }}</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn secondary" type="button" (click)="load()" [disabled]="loading()">
+        <span class="material-icons-round" aria-hidden="true">refresh</span>
+        {{ (loading() ? 'common.loading' : 'common.refresh') | translate }}
+      </button>
+
+      <div class="cleanup">
+        <select
+          id="cleanup-days"
+          (change)="onCleanupDaysChange($event)"
+          [disabled]="cleaningUp()"
+          [attr.aria-label]="'systemLogs.cleanup.label' | translate"
+        >
+          <option value="7" [selected]="cleanupDays() === 7">
+            {{ 'systemLogs.cleanup.days7' | translate }}
+          </option>
+          <option value="30" [selected]="cleanupDays() === 30">
+            {{ 'systemLogs.cleanup.days30' | translate }}
+          </option>
+          <option value="90" [selected]="cleanupDays() === 90">
+            {{ 'systemLogs.cleanup.days90' | translate }}
+          </option>
+          <option value="180" [selected]="cleanupDays() === 180">
+            {{ 'systemLogs.cleanup.days180' | translate }}
+          </option>
+          <option value="365" [selected]="cleanupDays() === 365">
+            {{ 'systemLogs.cleanup.days365' | translate }}
+          </option>
+        </select>
+
+        <button class="btn danger" type="button" (click)="cleanup()" [disabled]="cleaningUp()">
+          <span class="material-icons-round" aria-hidden="true">delete_sweep</span>
+          {{ 'systemLogs.cleanup.action' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert" role="alert">{{ error() }}</div>
+  }
+
+  <div class="card filters-card">
+    <div class="toolbar log-filters">
+      <div class="field search-field">
+        <label for="log-search">{{ 'systemLogs.filters.search' | translate }}</label>
+        <div class="search-input">
+          <span class="material-icons-round" aria-hidden="true">search</span>
+          <input
+            id="log-search"
+            type="search"
+            [placeholder]="'systemLogs.filters.searchPlaceholder' | translate"
+            [value]="search()"
+            (input)="onSearchInput($event)"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="log-level">{{ 'systemLogs.filters.level' | translate }}</label>
+        <select id="log-level" [value]="level()" (change)="onLevelChange($event)">
+          <option value="">{{ 'systemLogs.filters.allLevels' | translate }}</option>
+          @for (option of levelOptions; track option) {
+            <option [value]="option">{{ levelKey(option) | translate }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="log-user">{{ 'systemLogs.filters.user' | translate }}</label>
+        <select id="log-user" [value]="userId()" (change)="onUserChange($event)">
+          <option value="">{{ 'systemLogs.filters.allUsers' | translate }}</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.username }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="log-from">{{ 'systemLogs.filters.from' | translate }}</label>
+        <input
+          id="log-from"
+          type="date"
+          [value]="fromDate()"
+          (change)="onFromChange($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="log-to">{{ 'systemLogs.filters.to' | translate }}</label>
+        <input id="log-to" type="date" [value]="toDate()" (change)="onToChange($event)" />
+      </div>
+
+      <div class="field filter-actions">
+        <button class="btn secondary" type="button" (click)="resetFilters()" [disabled]="loading()">
+          <span class="material-icons-round" aria-hidden="true">filter_alt_off</span>
+          {{ 'systemLogs.filters.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="log-summary">
+      <span>{{ 'systemLogs.showing' | translate: { count: items().length, total: totalCount() } }}</span>
+      @if (totalPages() > 0) {
+        <span>
+          {{
+            'common.pageOf'
+              | translate: { page: page(), totalPages: totalPages(), totalCount: totalCount() }
+          }}
+        </span>
+      }
+    </div>
+
+    @if (loading() && !result()) {
+      <div class="empty">
+        <span class="material-icons-round spin" aria-hidden="true">sync</span>
+        <p>{{ 'common.loading' | translate }}</p>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="empty">
+        <span class="material-icons-round" aria-hidden="true">receipt_long</span>
+        <h3>{{ 'systemLogs.emptyTitle' | translate }}</h3>
+        <p>{{ 'systemLogs.emptyHint' | translate }}</p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="table log-table">
+          <thead>
+            <tr>
+              <th>{{ 'systemLogs.columns.timestamp' | translate }}</th>
+              <th>{{ 'systemLogs.columns.level' | translate }}</th>
+              <th>{{ 'systemLogs.columns.message' | translate }}</th>
+              <th class="col-user">{{ 'systemLogs.columns.user' | translate }}</th>
+              <th class="col-request">{{ 'systemLogs.columns.request' | translate }}</th>
+              <th class="col-actions">{{ 'common.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of items(); track log.id) {
+              <tr [class.expanded]="expandedId() === log.id">
+                <td class="timestamp">
+                  <time [attr.datetime]="log.timestampUtc">
+                    {{ log.timestampUtc | date: 'yyyy-MM-dd HH:mm:ss' : 'UTC' }}
+                  </time>
+                </td>
+
+                <td>
+                  <span [class]="'level-badge ' + levelClass(log.level)">
+                    {{ levelKey(log.level) | translate }}
+                  </span>
+                </td>
+
+                <td class="message-cell">
+                  <button
+                    type="button"
+                    class="message-button"
+                    (click)="toggleDetails(log.id)"
+                    [attr.aria-expanded]="expandedId() === log.id"
+                  >
+                    <span class="message-text">{{ log.message }}</span>
+                    @if (log.sourceContext) {
+                      <span class="source">{{ log.sourceContext }}</span>
+                    }
+                  </button>
+                </td>
+
+                <td class="col-user">
+                  {{ log.userName || log.userId || ('common.notAvailable' | translate) }}
+                </td>
+
+                <td class="col-request">
+                  @if (log.requestPath) {
+                    <span class="request">
+                      <span class="method">{{ log.requestMethod || 'HTTP' }}</span>
+                      <span class="path" [title]="log.requestPath">{{ log.requestPath }}</span>
+                      @if (log.statusCode) {
+                        <span [class]="'status ' + statusClass(log.statusCode)">
+                          {{ log.statusCode }}
+                        </span>
+                      }
+                    </span>
+                  } @else {
+                    <span class="muted">—</span>
+                  }
+                </td>
+
+                <td class="col-actions">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    (click)="toggleDetails(log.id)"
+                    [attr.aria-label]="'systemLogs.details.title' | translate"
+                    [attr.aria-expanded]="expandedId() === log.id"
+                  >
+                    <span class="material-icons-round" aria-hidden="true">
+                      {{ expandedId() === log.id ? 'expand_less' : 'expand_more' }}
+                    </span>
+                  </button>
+                </td>
+              </tr>
+
+              @if (expandedId() === log.id) {
+                <tr class="details-row">
+                  <td colspan="6">
+                    <div class="details">
+                      <div class="details-grid">
+                        <div>
+                          <span class="label">{{ 'systemLogs.details.source' | translate }}</span>
+                          <span class="value">{{ log.sourceContext || '—' }}</span>
+                        </div>
+                        <div>
+                          <span class="label">{{ 'systemLogs.details.user' | translate }}</span>
+                          <span class="value">
+                            {{ log.userName || '—' }}
+                            @if (log.userId) {
+                              <span class="muted">(#{{ log.userId }})</span>
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <span class="label">{{ 'systemLogs.details.request' | translate }}</span>
+                          <span class="value mono">
+                            {{ log.requestMethod || '' }} {{ log.requestPath || '—' }}
+                          </span>
+                        </div>
+                        <div>
+                          <span class="label">{{ 'systemLogs.details.status' | translate }}</span>
+                          <span class="value">{{ log.statusCode ?? '—' }}</span>
+                        </div>
+                        <div>
+                          <span class="label">{{ 'systemLogs.details.traceId' | translate }}</span>
+                          <span class="value mono">{{ log.traceId || '—' }}</span>
+                        </div>
+                      </div>
+
+                      @if (log.messageTemplate) {
+                        <div class="detail-block">
+                          <span class="label">{{ 'systemLogs.details.messageTemplate' | translate }}</span>
+                          <pre class="mono">{{ log.messageTemplate }}</pre>
+                        </div>
+                      }
+
+                      @if (log.exception) {
+                        <div class="detail-block">
+                          <span class="label">{{ 'systemLogs.details.exception' | translate }}</span>
+                          <pre class="mono exception">{{ log.exception }}</pre>
+                        </div>
+                      }
+
+                      @if (log.properties) {
+                        <div class="detail-block">
+                          <span class="label">{{ 'systemLogs.details.properties' | translate }}</span>
+                          <pre class="mono">{{ log.properties }}</pre>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button
+          class="btn secondary"
+          type="button"
+          (click)="prevPage()"
+          [disabled]="page() <= 1 || loading()"
+        >
+          <span class="material-icons-round" aria-hidden="true">chevron_left</span>
+          {{ 'common.previous' | translate }}
+        </button>
+
+        <span class="page-info">
+          {{
+            'common.pageOf'
+              | translate: { page: page(), totalPages: totalPages(), totalCount: totalCount() }
+          }}
+        </span>
+
+        <button
+          class="btn secondary"
+          type="button"
+          (click)="nextPage()"
+          [disabled]="page() >= totalPages() || loading()"
+        >
+          {{ 'common.next' | translate }}
+          <span class="material-icons-round" aria-hidden="true">chevron_right</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

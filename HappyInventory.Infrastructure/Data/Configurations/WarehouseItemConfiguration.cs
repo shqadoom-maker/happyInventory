@@ -9,6 +9,9 @@ public class WarehouseItemConfiguration : IEntityTypeConfiguration<WarehouseItem
     public void Configure(EntityTypeBuilder<WarehouseItem> builder)
     {
         builder.HasIndex(item => new { item.WarehouseId, item.ItemName }).IsUnique();
+        builder.HasIndex(item => item.WarehouseId);
+        builder.HasIndex(item => item.SKUCode);
+        builder.HasIndex(item => item.Qty);
 
         builder.HasOne(item => item.Warehouse)
             .WithMany(warehouse => warehouse.Items)

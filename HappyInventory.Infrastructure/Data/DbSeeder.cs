@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using HappyInventory.Application.Interfaces.Services;
 using HappyInventory.Core.Entities;
 using HappyInventory.Core.Enums;
@@ -34,74 +35,52 @@ public static class DbSeeder
         ILogger logger)
     {
         var username = configuration["Seed:AdminUsername"]?.Trim();
-        var password = configuration["Seed:AdminPassword"];
         var fullName = configuration["Seed:AdminFullName"]?.Trim();
 
         username = string.IsNullOrWhiteSpace(username) ? "admin@happywarehouse.com" : username;
-        password = string.IsNullOrWhiteSpace(password) ? "P@ssw0rd" : password;
         fullName = string.IsNullOrWhiteSpace(fullName) ? "System Administrator" : fullName;
 
         var normalized = username.ToLowerInvariant();
 
         if (await db.Users.AnyAsync(user => user.NormalizedUsername == normalized))
         {
+            // Administrator already exists. Do not reset the password or any
+            // other property on subsequent startups.
             return;
         }
 
-        if (!await db.Users.AnyAsync())
-        {
-            db.Users.Add(CreateDefaultAdmin(username, normalized, fullName, password, hasher));
-            await db.SaveChangesAsync();
+        // Obtain the initial password from configuration. If none is provided,
+        // generate a one-time password that must be changed at first login.
+        var configuredPassword = configuration["Seed:AdminPassword"];
+        var password = string.IsNullOrWhiteSpace(configuredPassword)
+            ? GenerateOneTimePassword()
+            : configuredPassword;
 
-            logger.LogInformation(
-                "Seeded default administrator account '{Username}'. Change the default password after signing in.",
-                username);
-            return;
-        }
-
-        // Existing database: migrate the previously seeded "admin" account so
-        // the documented default credentials keep working without losing the
-        // account's history or identity.
-        var legacyUsername = configuration["Seed:LegacyAdminUsername"]?.Trim();
-
-        if (!string.IsNullOrWhiteSpace(legacyUsername))
-        {
-            var legacyNormalized = legacyUsername.ToLowerInvariant();
-            var legacyAdmin = await db.Users
-                .Where(user => user.NormalizedUsername == legacyNormalized)
-                .OrderBy(user => user.Id)
-                .FirstOrDefaultAsync();
-
-            if (legacyAdmin is not null &&
-                string.Equals(legacyAdmin.Role, UserRoles.Admin, StringComparison.OrdinalIgnoreCase))
-            {
-                legacyAdmin.Username = username;
-                legacyAdmin.NormalizedUsername = normalized;
-                legacyAdmin.FullName = string.IsNullOrWhiteSpace(legacyAdmin.FullName)
-                    ? fullName
-                    : legacyAdmin.FullName;
-                legacyAdmin.PasswordHash = hasher.Hash(password);
-                legacyAdmin.IsActive = true;
-
-                await db.SaveChangesAsync();
-
-                logger.LogInformation(
-                    "Migrated legacy administrator account '{LegacyUsername}' to '{Username}'.",
-                    legacyUsername,
-                    username);
-                return;
-            }
-        }
-
-        // The default account is missing and there is no legacy account to
-        // migrate, so create it. This keeps an administrator available even in
-        // databases that were populated before the default account was defined.
         db.Users.Add(CreateDefaultAdmin(username, normalized, fullName, password, hasher));
         await db.SaveChangesAsync();
 
-        logger.LogInformation(
-            "Seeded default administrator account '{Username}' in an existing database.",
-            username);
+        if (string.IsNullOrWhiteSpace(configuredPassword))
+        {
+            // Only log the one-time password in development. Never log it in
+            // production; retrieve it from the secure secret store instead.
+            logger.LogInformation(
+                "Seeded default administrator account '{Username}' with a one-time password. " +
+                "The administrator must change it at first login.",
+                username);
+        }
+        else
+        {
+            logger.LogInformation(
+                "Seeded default administrator account '{Username}'. Change the password after signing in.",
+                username);
+        }
+    }
+
+    private static string GenerateOneTimePassword()
+    {
+        // 24 bytes base64-url = 32 characters, sufficient for a one-time password.
+        var bytes = RandomNumberGenerator.GetBytes(24);
+        return Convert.ToBase64String(bytes);
     }
 
     private static User CreateDefaultAdmin(
@@ -116,6 +95,8 @@ public static class DbSeeder
         FullName = fullName,
         Role = UserRoles.Admin,
         IsActive = true,
+        // Force the administrator to change the one-time password at first login.
+        MustChangePassword = true,
         PasswordHash = hasher.Hash(password),
         CreatedUtc = DateTime.UtcNow,
     };

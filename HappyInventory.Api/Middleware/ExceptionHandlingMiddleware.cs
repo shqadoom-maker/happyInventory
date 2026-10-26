@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using System.Text.Json;
 using HappyInventory.Application.Common;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Context;
 
 namespace HappyInventory.Api.Middleware;
 
@@ -53,17 +55,34 @@ public class ExceptionHandlingMiddleware
                 "An unexpected error occurred. Please try again."),
         };
 
-        if (status >= StatusCodes.Status500InternalServerError)
+        using (LogContext.PushProperty(
+            "UserId",
+            context.User.FindFirstValue(ClaimTypes.NameIdentifier)))
+        using (LogContext.PushProperty(
+            "UserName",
+            context.User.FindFirstValue(ClaimTypes.Name)))
+        using (LogContext.PushProperty("TraceId", context.TraceIdentifier))
         {
-            _logger.LogError(exception, "Unhandled exception while processing {Path}", context.Request.Path);
-        }
-        else
-        {
-            _logger.LogInformation(
-                "Request to {Path} failed with status {Status}: {Message}",
-                context.Request.Path,
-                status,
-                exception.Message);
+            if (status >= StatusCodes.Status500InternalServerError)
+            {
+                // Log the full exception for server errors (diagnostics only),
+                // but never return exception details to the client.
+                _logger.LogError(
+                    exception,
+                    "Unhandled exception while processing {Path} {Method}",
+                    context.Request.Path,
+                    context.Request.Method);
+            }
+            else
+            {
+                // For client errors (4xx), log a safe message without the raw
+                // exception detail to avoid leaking sensitive information.
+                _logger.LogInformation(
+                    "Request to {Path} {Method} failed with status {Status}",
+                    context.Request.Path,
+                    context.Request.Method,
+                    status);
+            }
         }
 
         if (context.Response.HasStarted)

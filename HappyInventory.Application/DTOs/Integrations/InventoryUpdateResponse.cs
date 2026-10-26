@@ -8,4 +8,10 @@ public class InventoryUpdateResponse
     public string ItemName { get; set; } = string.Empty;
     public int PreviousQuantity { get; set; }
     public int RemainingQuantity { get; set; }
+
+    /// <summary>
+    /// True when this response was returned from a stored idempotency record,
+    /// so the caller can tell a retry from a newly applied deduction.
+    /// </summary>
+    public bool Replayed { get; set; }
 }

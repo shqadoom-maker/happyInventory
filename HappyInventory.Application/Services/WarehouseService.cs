@@ -190,6 +190,6 @@ public class WarehouseService : IWarehouseService
         CityName = warehouse.City?.Name ?? string.Empty,
         CountryId = warehouse.CountryId,
         CountryName = warehouse.Country?.Name ?? string.Empty,
-        ItemCount = warehouse.Items.Count,
+        ItemCount = warehouse.Items?.Count ?? 0,
     };
 }

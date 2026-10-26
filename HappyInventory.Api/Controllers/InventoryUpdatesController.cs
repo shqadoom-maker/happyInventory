@@ -1,4 +1,6 @@
+using HappyInventory.Application.Common;
 using HappyInventory.Application.DTOs.Integrations;
+using HappyInventory.Application.Interfaces.Repositories;
 using HappyInventory.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +18,17 @@ namespace HappyInventory.Api.Controllers;
 public class InventoryUpdatesController : ControllerBase
 {
     private readonly IInventoryUpdateService _updates;
+    private readonly IInventoryUpdateRepository _records;
+    private readonly ILogger<InventoryUpdatesController> _logger;
 
-    public InventoryUpdatesController(IInventoryUpdateService updates)
+    public InventoryUpdatesController(
+        IInventoryUpdateService updates,
+        IInventoryUpdateRepository records,
+        ILogger<InventoryUpdatesController> logger)
     {
         _updates = updates;
+        _records = records;
+        _logger = logger;
     }
 
     /// <summary>
@@ -39,11 +48,104 @@ public class InventoryUpdatesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(idempotencyKey))
         {
+            _logger.LogWarning(
+                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: " +
+                "the Idempotency-Key header is missing.",
+                request.WarehouseId,
+                request.SKUCode);
+
             throw new InvalidOperationException(
                 "The Idempotency-Key header is required for inventory updates.");
         }
 
-        var result = await _updates.ApplyAsync(request, idempotencyKey, cancellationToken);
+        InventoryUpdateResponse result;
+
+        try
+        {
+            result = await _updates.ApplyAsync(request, idempotencyKey, cancellationToken);
+        }
+        catch (ConflictException exception)
+        {
+            _logger.LogWarning(
+                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
+                request.WarehouseId,
+                request.SKUCode,
+                exception.Message);
+            throw;
+        }
+        catch (KeyNotFoundException exception)
+        {
+            _logger.LogWarning(
+                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
+                request.WarehouseId,
+                request.SKUCode,
+                exception.Message);
+            throw;
+        }
+        catch (InvalidOperationException exception)
+        {
+            _logger.LogWarning(
+                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
+                request.WarehouseId,
+                request.SKUCode,
+                exception.Message);
+            throw;
+        }
+
+        if (result.Replayed)
+        {
+            _logger.LogInformation(
+                "Inventory update replayed for warehouse {WarehouseId}, SKU {SKUCode}: " +
+                "{PreviousQuantity} -> {RemainingQuantity} (key {IdempotencyKey}).",
+                result.WarehouseId,
+                result.SKUCode,
+                result.PreviousQuantity,
+                result.RemainingQuantity,
+                idempotencyKey);
+        }
+        else
+        {
+            _logger.LogInformation(
+                "Inventory update applied for warehouse {WarehouseId}, SKU {SKUCode}: " +
+                "{PreviousQuantity} -> {RemainingQuantity} (key {IdempotencyKey}).",
+                result.WarehouseId,
+                result.SKUCode,
+                result.PreviousQuantity,
+                result.RemainingQuantity,
+                idempotencyKey);
+        }
+
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Returns completed eCommerce inventory deduction records for monitoring
+    /// integration activity.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(PagedResult<InventoryUpdateRecordDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<PagedResult<InventoryUpdateRecordDto>>> GetPaged(
+        [FromQuery] int? warehouseId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await _records.GetPagedAsync(
+            warehouseId,
+            page,
+            pageSize,
+            search,
+            cancellationToken);
+
+        return Ok(new PagedResult<InventoryUpdateRecordDto>
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = (int)Math.Ceiling((double)totalCount / pageSize),
+        });
     }
 }

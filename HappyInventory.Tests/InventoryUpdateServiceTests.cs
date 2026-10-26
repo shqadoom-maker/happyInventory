@@ -136,6 +136,8 @@ public class InventoryUpdateServiceTests
         Assert.Equal(first.WarehouseItemId, replay.WarehouseItemId);
         Assert.Equal(first.PreviousQuantity, replay.PreviousQuantity);
         Assert.Equal(first.RemainingQuantity, replay.RemainingQuantity);
+        Assert.False(first.Replayed);
+        Assert.True(replay.Replayed);
         Assert.Equal(7, item.Qty);
         Assert.Equal(1, repository.SaveCount);
     }
@@ -223,6 +225,17 @@ public class InventoryUpdateServiceTests
                 .ToList();
 
             return Task.FromResult(matches);
+        }
+
+        public Task<(IReadOnlyList<InventoryUpdateRecordDto> Items, int TotalCount)> GetPagedAsync(
+            int? warehouseId,
+            int page,
+            int pageSize,
+            string? search,
+            CancellationToken cancellationToken = default)
+        {
+            IReadOnlyList<InventoryUpdateRecordDto> empty = Array.Empty<InventoryUpdateRecordDto>();
+            return Task.FromResult((empty, 0));
         }
 
         public void AddIdempotencyRecord(InventoryUpdateRecord record)

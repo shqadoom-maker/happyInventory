@@ -60,8 +60,16 @@ public class CityService : ICityService
         await _cities.AddAsync(city, cancellationToken);
         await _cities.SaveChangesAsync(cancellationToken);
 
-        var created = await _cities.GetByIdAsync(city.Id, cancellationToken);
-        return ToDto(created ?? city);
+        // Return the DTO directly without an extra round-trip to the database.
+        // CountryName is intentionally left empty here; callers can refresh the
+        // city list if they need the related country name.
+        return new CityDto
+        {
+            Id = city.Id,
+            Name = city.Name,
+            CountryId = city.CountryId,
+            CountryName = string.Empty,
+        };
     }
 
     public async Task<CityDto> UpdateAsync(
@@ -94,8 +102,16 @@ public class CityService : ICityService
 
         await _cities.SaveChangesAsync(cancellationToken);
 
-        var updated = await _cities.GetByIdAsync(id, cancellationToken);
-        return ToDto(updated ?? city);
+        // Return the DTO directly without an extra round-trip to the database.
+        // CountryName is intentionally left empty here; callers can refresh the
+        // city list if they need the related country name.
+        return new CityDto
+        {
+            Id = city.Id,
+            Name = city.Name,
+            CountryId = city.CountryId,
+            CountryName = string.Empty,
+        };
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)

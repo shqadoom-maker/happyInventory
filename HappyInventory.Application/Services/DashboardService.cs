@@ -18,38 +18,39 @@ public class DashboardService : IDashboardService
     {
         var snapshot = await _dashboard.GetSnapshotAsync(cancellationToken);
 
-        // Grouping is done in memory so item names compare case-insensitively
-        // across warehouses regardless of the database collation.
-        var groupedItems = snapshot.Items
-            .GroupBy(item => item.ItemName.Trim().ToLowerInvariant())
-            .Select(group => new TopItemDto
+        // The repository already groups items case-insensitively, so we only
+        // need to sort and take the top/bottom items in memory.
+        var topItems = snapshot.Items
+            .OrderByDescending(item => item.Qty)
+            .ThenBy(item => item.ItemName)
+            .Take(TopItemCount)
+            .Select(item => new TopItemDto
             {
-                ItemName = group.First().ItemName.Trim(),
-                SkuCode = group
-                    .Select(item => item.SkuCode)
-                    .FirstOrDefault(sku => !string.IsNullOrWhiteSpace(sku)),
-                TotalQuantity = group.Sum(item => item.Qty),
-                WarehouseCount = group.Select(item => item.WarehouseId).Distinct().Count(),
+                ItemName = item.ItemName,
+                SkuCode = item.SkuCode,
+                TotalQuantity = item.Qty,
+                WarehouseCount = item.WarehouseCount,
             })
             .ToList();
 
-        var topItems = groupedItems
-            .OrderByDescending(item => item.TotalQuantity)
+        var lowItems = snapshot.Items
+            .OrderBy(item => item.Qty)
             .ThenBy(item => item.ItemName)
             .Take(TopItemCount)
-            .ToList();
-
-        var lowItems = groupedItems
-            .OrderBy(item => item.TotalQuantity)
-            .ThenBy(item => item.ItemName)
-            .Take(TopItemCount)
+            .Select(item => new TopItemDto
+            {
+                ItemName = item.ItemName,
+                SkuCode = item.SkuCode,
+                TotalQuantity = item.Qty,
+                WarehouseCount = item.WarehouseCount,
+            })
             .ToList();
 
         return new DashboardDto
         {
             WarehouseCount = snapshot.Warehouses.Count,
-            ItemCount = groupedItems.Count,
-            TotalQuantity = groupedItems.Sum(item => item.TotalQuantity),
+            ItemCount = snapshot.Items.Count,
+            TotalQuantity = snapshot.Items.Sum(item => item.Qty),
             Warehouses = snapshot.Warehouses.Select(warehouse => new WarehouseStatusDto
             {
                 WarehouseId = warehouse.WarehouseId,

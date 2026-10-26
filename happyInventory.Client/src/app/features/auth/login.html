@@ -1,38 +1,171 @@
 <div class="login">
-  <section class="login-aside">
+  <div class="login-scene" aria-hidden="true">
+    <svg
+      class="login-scene-svg"
+      viewBox="0 0 1600 1000"
+      preserveAspectRatio="xMidYMid slice"
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id="wh-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#040b18" />
+          <stop offset="52%" stop-color="#0a1c33" />
+          <stop offset="100%" stop-color="#050d1c" />
+        </linearGradient>
+
+        <linearGradient id="wh-floor" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0d2440" />
+          <stop offset="100%" stop-color="#040b18" />
+        </linearGradient>
+
+        <linearGradient id="wh-rack" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#12365c" />
+          <stop offset="100%" stop-color="#07182c" />
+        </linearGradient>
+
+        <linearGradient id="wh-box" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1b4a78" />
+          <stop offset="100%" stop-color="#0c2542" />
+        </linearGradient>
+
+        <radialGradient id="wh-halo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.5" />
+          <stop offset="55%" stop-color="#2563eb" stop-opacity="0.16" />
+          <stop offset="100%" stop-color="#2563eb" stop-opacity="0" />
+        </radialGradient>
+
+        <filter id="wh-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="16" />
+        </filter>
+
+        <g id="wh-rack-unit">
+          <rect x="0" y="0" width="380" height="560" rx="6" fill="url(#wh-rack)" opacity="0.62" />
+
+          <g fill="url(#wh-box)">
+            <rect x="24" y="70" width="92" height="70" rx="4" />
+            <rect x="132" y="54" width="86" height="86" rx="4" />
+            <rect x="236" y="78" width="108" height="62" rx="4" />
+            <rect x="24" y="192" width="104" height="78" rx="4" />
+            <rect x="146" y="206" width="80" height="64" rx="4" />
+            <rect x="242" y="180" width="100" height="90" rx="4" />
+            <rect x="24" y="320" width="88" height="76" rx="4" />
+            <rect x="128" y="336" width="100" height="60" rx="4" />
+            <rect x="244" y="310" width="96" height="86" rx="4" />
+            <rect x="24" y="446" width="110" height="70" rx="4" />
+            <rect x="150" y="460" width="78" height="56" rx="4" />
+            <rect x="244" y="436" width="98" height="80" rx="4" />
+          </g>
+
+          <g fill="#4c9bcd" opacity="0.28">
+            <rect x="34" y="84" width="34" height="5" rx="2.5" />
+            <rect x="142" y="70" width="28" height="5" rx="2.5" />
+            <rect x="246" y="92" width="38" height="5" rx="2.5" />
+            <rect x="34" y="206" width="30" height="5" rx="2.5" />
+            <rect x="252" y="196" width="34" height="5" rx="2.5" />
+            <rect x="34" y="334" width="32" height="5" rx="2.5" />
+            <rect x="254" y="326" width="30" height="5" rx="2.5" />
+            <rect x="34" y="460" width="36" height="5" rx="2.5" />
+            <rect x="254" y="452" width="32" height="5" rx="2.5" />
+          </g>
+
+          <g fill="#0a2038">
+            <rect x="0" y="0" width="14" height="560" />
+            <rect x="122" y="0" width="12" height="560" />
+            <rect x="234" y="0" width="12" height="560" />
+            <rect x="366" y="0" width="14" height="560" />
+          </g>
+
+          <g fill="#1b4a73">
+            <rect x="0" y="140" width="380" height="10" rx="3" />
+            <rect x="0" y="270" width="380" height="10" rx="3" />
+            <rect x="0" y="396" width="380" height="10" rx="3" />
+            <rect x="0" y="516" width="380" height="10" rx="3" />
+          </g>
+
+          <g fill="#4c9bcd" opacity="0.5">
+            <rect x="0" y="140" width="380" height="3" rx="1.5" />
+            <rect x="0" y="270" width="380" height="3" rx="1.5" />
+            <rect x="0" y="396" width="380" height="3" rx="1.5" />
+            <rect x="0" y="516" width="380" height="3" rx="1.5" />
+          </g>
+        </g>
+      </defs>
+
+      <rect width="1600" height="1000" fill="url(#wh-sky)" />
+
+      <ellipse cx="800" cy="430" rx="620" ry="430" fill="url(#wh-halo)" opacity="0.55" />
+
+      <!-- Floor -->
+      <path d="M0 1000 L0 650 L1600 650 L1600 1000 Z" fill="url(#wh-floor)" />
+
+      <!-- Perspective aisle markings -->
+      <g stroke="#1d4a75" stroke-width="2" opacity="0.4">
+        <path d="M800 650 L-360 1000" />
+        <path d="M800 650 L-80 1000" />
+        <path d="M800 650 L240 1000" />
+        <path d="M800 650 L500 1000" />
+        <path d="M800 650 L680 1000" />
+        <path d="M800 650 L920 1000" />
+        <path d="M800 650 L1100 1000" />
+        <path d="M800 650 L1360 1000" />
+        <path d="M800 650 L1960 1000" />
+        <path d="M0 730 L1600 730" />
+        <path d="M0 810 L1600 810" />
+        <path d="M0 900 L1600 900" />
+      </g>
+
+      <!-- Distant lit doorway -->
+      <ellipse cx="800" cy="650" rx="180" ry="80" fill="url(#wh-halo)" opacity="0.75" />
+
+      <!-- Racking, left and right -->
+      <g opacity="0.95">
+        <use href="#wh-rack-unit" transform="translate(40 200)" />
+      </g>
+      <g opacity="0.8">
+        <use href="#wh-rack-unit" transform="translate(1560 236) scale(-1 1)" />
+      </g>
+
+      <!-- Ceiling light bars -->
+      <g opacity="0.8">
+        <rect x="560" y="64" width="480" height="8" rx="4" fill="#67e8f9" opacity="0.7" />
+        <rect
+          x="560"
+          y="64"
+          width="480"
+          height="8"
+          rx="4"
+          fill="#67e8f9"
+          opacity="0.45"
+          filter="url(#wh-blur)"
+        />
+        <rect x="660" y="132" width="280" height="6" rx="3" fill="#7dd3fc" opacity="0.5" />
+        <rect
+          x="660"
+          y="132"
+          width="280"
+          height="6"
+          rx="3"
+          fill="#7dd3fc"
+          opacity="0.35"
+          filter="url(#wh-blur)"
+        />
+      </g>
+    </svg>
+
+    <span class="scene-glow scene-glow-a"></span>
+    <span class="scene-glow scene-glow-b"></span>
+    <span class="scene-vignette"></span>
+  </div>
+
+  <header class="login-topbar">
     <div class="login-brand">
       <app-brand-mark />
-      <strong>{{ 'brand.name' | translate }}</strong>
+      <span class="login-brand-text">
+        <strong>{{ 'brand.name' | translate }}</strong>
+        <small>{{ 'brand.subtitle' | translate }}</small>
+      </span>
     </div>
 
-    <div class="aside-copy">
-      <span class="eyebrow">{{ 'auth.eyebrow' | translate }}</span>
-      <h1>{{ 'auth.asideTitle' | translate }}</h1>
-      <p>{{ 'auth.asideBody' | translate }}</p>
-
-      <ul class="aside-points">
-        <li>
-          <span class="material-icons-round" aria-hidden="true">check_circle</span>
-          {{ 'auth.point1' | translate }}
-        </li>
-        <li>
-          <span class="material-icons-round" aria-hidden="true">check_circle</span>
-          {{ 'auth.point2' | translate }}
-        </li>
-        <li>
-          <span class="material-icons-round" aria-hidden="true">check_circle</span>
-          {{ 'auth.point3' | translate }}
-        </li>
-      </ul>
-    </div>
-
-    <span class="aside-foot">
-      <span class="material-icons-round" aria-hidden="true">dns</span>
-      {{ 'shell.api' | translate }}
-    </span>
-  </section>
-
-  <section class="login-main">
     <div class="login-lang" role="group" [attr.aria-label]="'language.label' | translate">
       <span class="material-icons-round lang-switch-icon" aria-hidden="true">language</span>
       @for (language of languages; track language.code) {
@@ -47,68 +180,133 @@
         </button>
       }
     </div>
+  </header>
 
-    <div class="login-card">
-      <span class="eyebrow">{{ 'auth.eyebrow' | translate }}</span>
-      <h2>{{ 'auth.title' | translate }}</h2>
-      <p class="login-subtitle">{{ 'auth.subtitle' | translate }}</p>
+  <main class="login-main">
+    <section class="login-card" aria-labelledby="login-title">
+      <div class="login-card-head">
+        <span class="login-emblem" aria-hidden="true">
+          <span class="material-icons-round">inventory_2</span>
+        </span>
+        <span class="eyebrow">{{ 'auth.eyebrow' | translate }}</span>
+        <h1 id="login-title">{{ 'auth.title' | translate }}</h1>
+        <p class="login-subtitle">{{ 'auth.subtitle' | translate }}</p>
+      </div>
 
       @if (error()) {
-        <div class="alert" role="alert">{{ error() }}</div>
+        <div class="alert" role="alert">
+          <span class="material-icons-round" aria-hidden="true">error_outline</span>
+          <span>{{ error() }}</span>
+        </div>
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="field">
           <label for="login-username">{{ 'auth.username' | translate }}</label>
-          <input
-            id="login-username"
-            formControlName="username"
-            autocomplete="username"
-            autofocus
-            [placeholder]="'auth.usernamePlaceholder' | translate"
-          />
-          @if (form.controls.username.touched && form.controls.username.invalid) {
-            <span class="error">{{ 'auth.usernameRequired' | translate }}</span>
+          <div class="input-shell">
+            <span class="material-icons-round input-icon" aria-hidden="true">person_outline</span>
+            <input
+              id="login-username"
+              formControlName="username"
+              autocomplete="username"
+              autofocus
+              [placeholder]="'auth.usernamePlaceholder' | translate"
+              [attr.aria-invalid]="showError('username')"
+              [attr.aria-describedby]="showError('username') ? 'login-username-error' : null"
+            />
+          </div>
+          @if (showError('username')) {
+            <span class="error" id="login-username-error">
+              {{ 'auth.usernameRequired' | translate }}
+            </span>
           }
         </div>
 
         <div class="field">
-          <div class="label-row">
-            <label for="login-password">{{ 'auth.password' | translate }}</label>
+          <label for="login-password">{{ 'auth.password' | translate }}</label>
+          <div class="input-shell">
+            <span class="material-icons-round input-icon" aria-hidden="true">lock_outline</span>
+            <input
+              id="login-password"
+              class="has-toggle"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              [placeholder]="'auth.passwordPlaceholder' | translate"
+              [attr.aria-invalid]="showError('password')"
+              [attr.aria-describedby]="showError('password') ? 'login-password-error' : null"
+            />
             <button
               type="button"
-              class="show-password"
+              class="password-toggle"
               (click)="showPassword.set(!showPassword())"
+              [attr.aria-pressed]="showPassword()"
+              [attr.aria-label]="
+                (showPassword() ? 'auth.hidePassword' : 'auth.showPassword') | translate
+              "
             >
               <span class="material-icons-round" aria-hidden="true">
                 {{ showPassword() ? 'visibility_off' : 'visibility' }}
               </span>
-              {{ (showPassword() ? 'auth.hidePassword' : 'auth.showPassword') | translate }}
             </button>
           </div>
-          <input
-            id="login-password"
-            [type]="showPassword() ? 'text' : 'password'"
-            formControlName="password"
-            autocomplete="current-password"
-            [placeholder]="'auth.passwordPlaceholder' | translate"
-          />
-          @if (form.controls.password.touched && form.controls.password.invalid) {
-            <span class="error">{{ 'auth.passwordRequired' | translate }}</span>
+          @if (showError('password')) {
+            <span class="error" id="login-password-error">
+              {{ 'auth.passwordRequired' | translate }}
+            </span>
           }
         </div>
 
+        <div class="login-options">
+          <label class="checkbox">
+            <input type="checkbox" formControlName="rememberMe" />
+            <span class="checkbox-box" aria-hidden="true">
+              <span class="material-icons-round">check</span>
+            </span>
+            <span>{{ 'auth.rememberMe' | translate }}</span>
+          </label>
+
+          <button
+            type="button"
+            class="login-link"
+            (click)="togglePasswordHelp()"
+            [attr.aria-expanded]="showPasswordHelp()"
+            aria-controls="login-password-help"
+          >
+            {{ 'auth.forgotPassword' | translate }}
+          </button>
+        </div>
+
+        @if (showPasswordHelp()) {
+          <p class="login-help" id="login-password-help" role="status">
+            <span class="material-icons-round" aria-hidden="true">support_agent</span>
+            <span>{{ 'auth.forgotPasswordBody' | translate }}</span>
+          </p>
+        }
+
         <button class="btn login-submit" type="submit" [disabled]="loading()">
           @if (loading()) {
-            <span class="spinner"></span>
+            <span class="spinner" aria-hidden="true"></span>
+            <span>{{ 'auth.signingIn' | translate }}</span>
           } @else {
-            <span class="material-icons-round icon-login" aria-hidden="true">login</span>
+            <span>{{ 'auth.signIn' | translate }}</span>
+            <span class="material-icons-round icon-login" aria-hidden="true">arrow_forward</span>
           }
-          {{ (loading() ? 'auth.signingIn' : 'auth.signIn') | translate }}
         </button>
       </form>
 
-      <p class="login-note">{{ 'auth.accountsManaged' | translate }}</p>
-    </div>
-  </section>
+      <div class="login-divider">
+        <span>{{ 'auth.secureConnection' | translate }}</span>
+      </div>
+
+      <p class="login-note">
+        <span class="material-icons-round" aria-hidden="true">verified_user</span>
+        <span>{{ 'auth.accountsManaged' | translate }}</span>
+      </p>
+    </section>
+
+    <p class="login-copyright">
+      {{ 'auth.copyright' | translate: { year: currentYear } }}
+    </p>
+  </main>
 </div>

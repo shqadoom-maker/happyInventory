@@ -5,21 +5,26 @@
   },
   "auth": {
     "eyebrow": "شركة هابي",
-    "title": "تسجيل الدخول",
-    "subtitle": "استخدم حساب المستودع الخاص بك للمتابعة.",
+    "title": "مرحبًا بعودتك",
+    "subtitle": "سجّل الدخول لإدارة مستودعك بكفاءة.",
     "username": "اسم المستخدم",
-    "usernamePlaceholder": "admin",
+    "usernamePlaceholder": "مثال: admin",
     "usernameRequired": "اسم المستخدم مطلوب.",
     "password": "كلمة المرور",
-    "passwordPlaceholder": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
     "passwordRequired": "كلمة المرور مطلوبة.",
-    "showPassword": "إظهار",
-    "hidePassword": "إخفاء",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "forgotPasswordBody": "تتم إعادة تعيين كلمة المرور بواسطة المسؤول. تواصل مع المسؤول لاستعادة الوصول.",
     "signIn": "تسجيل الدخول",
     "signingIn": "جارٍ تسجيل الدخول…",
+    "secureConnection": "جلسة آمنة",
     "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة.",
     "accountDisabled": "حسابك معطّل. يرجى التواصل مع الدعم.",
     "accountsManaged": "تُنشأ الحسابات وتُدار بواسطة المسؤول.",
+    "copyright": "© {{year}} هابي إنفنتوري. جميع الحقوق محفوظة.",
     "asideTitle": "مخزون المستودعات في مكان واحد.",
     "asideBody": "سجّل الدخول لإدارة المستودعات والتحقق من المخزون والحفاظ على تحديث الكتالوج عبر الدول والمدن.",
     "point1": "واجهة برمجة محمية بـ JWT في كل طلب",
@@ -45,17 +50,19 @@
   "nav": {
     "dashboard": "لوحة التحكم",
     "warehouses": "المستودعات",
-    "stockMovements": "حركات المخزون",
+    "stockMovements": "تكامل التجارة الإلكترونية",
     "locations": "المواقع",
-    "users": "المستخدمون"
+    "users": "المستخدمون",
+    "systemLogs": "سجلات النظام"
   },
   "titles": {
     "login": "تسجيل الدخول",
     "dashboard": "لوحة التحكم",
     "warehouses": "المستودعات",
-    "stockMovements": "حركات المخزون",
+    "stockMovements": "تكامل التجارة الإلكترونية",
     "locations": "المواقع",
-    "users": "المستخدمون"
+    "users": "المستخدمون",
+    "systemLogs": "سجلات النظام"
   },
   "common": {
     "refresh": "تحديث",
@@ -74,7 +81,11 @@
     "pageOf": "الصفحة {{page}} من {{totalPages}} · الإجمالي {{totalCount}}",
     "active": "نشط",
     "inactive": "غير نشط",
-    "notAvailable": "—"
+    "notAvailable": "—",
+    "yes": "نعم",
+    "no": "إلغاء",
+    "confirmDeleteTitle": "تأكيد الحذف",
+    "deletedSuccessfully": "تم الحذف بنجاح"
   },
   "dashboard": {
     "eyebrow": "شركة هابي",
@@ -119,7 +130,7 @@
   "warehouses": {
     "title": "المستودعات",
     "subtitle": "كل مستودع ينتمي إلى مدينة، والمدينة تنتمي إلى دولة.",
-    "new": "+ مستودع جديد",
+    "new": "مستودع جديد",
     "viewItems": "عرض الأصناف",
     "searchPlaceholder": "الاسم أو الرمز أو المدينة أو الدولة",
     "emptyTitle": "لا توجد مستودعات بعد",
@@ -168,7 +179,7 @@
   "warehouseItems": {
     "title": "أصناف المستودع",
     "subtitle": "الأصناف المخزنة في هذا المستودع.",
-    "new": "+ صنف جديد",
+    "new": "صنف جديد",
     "searchPlaceholder": "الاسم أو رمز SKU",
     "empty": "لا توجد أصناف في هذا المستودع بعد.",
     "confirmDelete": "هل تريد حذف الصنف \"{{name}}\"؟",
@@ -197,20 +208,22 @@
     "outbound": "إخراج",
     "adjustment": "تعديل"
   },
-  "stockMovements": {
-    "title": "حركات المخزون",
-    "subtitle": "سجل تدقيق لكل عمليات الإدخال والإخراج والتعديل اليدوي، أيًا كان المصدر.",
+  "integration": {
+    "title": "تكامل التجارة الإلكترونية",
+    "subtitle": "مراقبة عمليات خصم المخزون من أنظمة التجارة الإلكترونية الخارجية. كل صف يسجل خصمًا ذريًا للمخزون مع مفتاح التجسيد الفريد الخاص به.",
     "warehouse": "المستودع",
     "allWarehouses": "كل المستودعات",
-    "emptyTitle": "لا توجد حركات مسجّلة",
-    "emptyHint": "ستظهر تغييرات المخزون هنا فور حدوثها.",
+    "emptyTitle": "لا توجد سجلات تكامل",
+    "emptyHint": "ستظهر عمليات خصم المخزون من التجارة الإلكترونية هنا عند حدوثها.",
     "columns": {
-      "when": "الوقت (UTC)",
+      "key": "مفتاح التجسيد",
       "warehouse": "المستودع",
-      "type": "النوع",
-      "change": "التغيير",
-      "source": "المصدر",
-      "reference": "المرجع"
+      "sku": "رمز SKU",
+      "item": "الصنف",
+      "quantity": "المخصوم",
+      "previous": "الكمية السابقة",
+      "remaining": "الكمية المتبقية",
+      "when": "الوقت (UTC)"
     }
   },
   "locations": {
@@ -238,7 +251,7 @@
   "users": {
     "title": "المستخدمون",
     "subtitle": "الحسابات التي يمكنها تسجيل الدخول إلى النظام. لكل مستخدم دور واحد فقط.",
-    "new": "+ مستخدم جديد",
+    "new": "مستخدم جديد",
     "searchPlaceholder": "اسم المستخدم أو الاسم الكامل أو الدور",
     "emptyTitle": "لا يوجد مستخدمون بعد",
     "emptyHint": "أنشئ أول حساب ليتمكن شخص من تسجيل الدخول.",
@@ -284,6 +297,62 @@
       "save": "حفظ التغييرات"
     }
   },
+  "systemLogs": {
+    "title": "سجلات النظام",
+    "subtitle": "أحداث التطبيق المنظمة المحفوظة في SQLite. مرئية للمسؤولين فقط.",
+    "showing": "عرض {{count}} من {{total}} سجلاً",
+    "emptyTitle": "لا توجد سجلات",
+    "emptyHint": "جرّب عامل تصفية مختلفًا أو انتظر نشاطًا جديدًا.",
+    "filters": {
+      "search": "بحث",
+      "searchPlaceholder": "الرسالة أو المصدر أو المستخدم أو المسار أو الاستثناء",
+      "level": "المستوى",
+      "allLevels": "كل المستويات",
+      "user": "المستخدم",
+      "allUsers": "كل المستخدمين",
+      "from": "من تاريخ (UTC)",
+      "to": "إلى تاريخ (UTC)",
+      "reset": "إعادة تعيين"
+    },
+    "levels": {
+      "verbose": "تفصيلي",
+      "debug": "تصحيح",
+      "information": "معلومات",
+      "warning": "تحذير",
+      "error": "خطأ",
+      "fatal": "حرج"
+    },
+    "columns": {
+      "timestamp": "الوقت (UTC)",
+      "level": "المستوى",
+      "message": "الرسالة",
+      "user": "المستخدم",
+      "request": "الطلب"
+    },
+    "details": {
+      "title": "تفاصيل السجل",
+      "source": "المصدر",
+      "user": "المستخدم",
+      "request": "الطلب",
+      "status": "الحالة",
+      "traceId": "معرّف التتبع",
+      "messageTemplate": "قالب الرسالة",
+      "exception": "الاستثناء",
+      "properties": "الخصائص المنظمة"
+    },
+    "cleanup": {
+      "label": "الاحتفاظ",
+      "action": "تنظيف",
+      "title": "حذف السجلات القديمة",
+      "confirm": "حذف السجلات الأقدم من {{days}} يومًا؟ لا يمكن التراجع عن ذلك.",
+      "success": "تم حذف {{count}} سجلاً أقدم من {{days}} يومًا.",
+      "days7": "أقدم من 7 أيام",
+      "days30": "أقدم من 30 يومًا",
+      "days90": "أقدم من 90 يومًا",
+      "days180": "أقدم من 180 يومًا",
+      "days365": "أقدم من 365 يومًا"
+    }
+  },
   "roles": {
     "admin": "مسؤول",
     "management": "الإدارة",
@@ -294,6 +363,37 @@
     "forbidden": "غير مسموح لك بتنفيذ هذا الإجراء.",
     "notFound": "المورد المطلوب غير موجود.",
     "genericStatus": "فشل الطلب بالحالة {{status}}.",
-    "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "countryInUse": "لا يمكن حذف الدولة لأنها تحتوي على مدن أو مستودعات.",
+    "cityInUse": "لا يمكن حذف المدينة لأنها تحتوي على مستودعات.",
+    "defaultAdminCannotBeDeleted": "لا يمكن حذف المسؤول الافتراضي.",
+    "administratorAccountsCannotBeDeleted": "لا يمكن حذف حسابات المسؤولين.",
+    "countryNotFound": "الدولة المطلوبة غير موجودة.",
+    "cityNotFound": "المدينة المطلوبة غير موجودة.",
+    "userNotFound": "المستخدم المطلوب غير موجود.",
+    "accountDisabled": "حسابك معطّل. يرجى التواصل مع الدعم.",
+    "usernameTaken": "اسم المستخدم '{username}' مستخدم مسبقاً.",
+    "passwordTooShort": "يجب ألا تقل كلمة المرور عن 8 أحرف.",
+    "warehouseNotFound": "المستودع المطلوب غير موجود.",
+    "warehouseItemNotFound": "عنصر المستودع المطلوب غير موجود.",
+    "fieldRequired": "الحقل {field} مطلوب.",
+    "selectedCityDoesNotExist": "المدينة المختارة غير موجودة.",
+    "selectedCountryDoesNotExist": "الدولة المختارة غير موجودة.",
+    "selectedWarehouseDoesNotExist": "المستودع المحدد غير موجود.",
+    "itemNameRequired": "اسم الصنف مطلوب.",
+    "cityNameRequired": "اسم المدينة مطلوب.",
+    "cannotDeactivateOwnAccount": "لا يمكنك إلغاء تفعيل حسابك الخاص.",
+    "cannotRemoveOwnAdminRole": "لا يمكنك إزالة دور المسؤول من حسابك الخاص.",
+    "cannotDeleteOwnAccount": "لا يمكنك حذف حسابك الخاص.",
+    "inventoryUpdateRequestRequired": "طلب تحديث المخزون مطلوب.",
+    "warehouseIdMustBePositive": "يجب أن يكون رقم المستودع أكبر من الصفر.",
+    "skuCodeRequired": "رمز SKU مطلوب.",
+    "quantityMustBePositive": "يجب أن تكون الكمية أكبر من الصفر.",
+    "insufficientStock": "المخزون غير كافٍ لـ SKU '{sku}'. الكمية المتاحة: {available}, الكمية المطلوبة: {requested}.",
+    "skuAmbiguous": "عناصر مستودع متعددة تطابق رمز SKU المحدد. لا يمكن تطبيق تحديث المخزون بشكل غير غامض.",
+    "logNotFound": "سجل النظام المطلوب غير موجود.",
+    "invalidDateRange": "يجب أن يكون تاريخ البداية قبل تاريخ النهاية.",
+    "invalidRetention": "يجب أن تكون أيام الاحتفاظ بين 1 و3650.",
+    "invalidLogLevel": "يجب أن يكون المستوى أحد التالي: Verbose, Debug, Information, Warning, Error, Fatal."
   }
 }

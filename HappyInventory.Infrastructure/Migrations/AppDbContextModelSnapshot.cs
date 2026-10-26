@@ -104,7 +104,82 @@ namespace HappyInventory.Infrastructure.Migrations
 
                     b.HasIndex("CreatedUtc");
 
+                    b.HasIndex("SKUCode");
+
+                    b.HasIndex("WarehouseId");
+
                     b.ToTable("InventoryUpdateRecords");
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.SystemLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Exception")
+                        .HasMaxLength(8000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MessageTemplate")
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Properties")
+                        .HasMaxLength(8000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequestMethod")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequestPath")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SourceContext")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("StatusCode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TraceId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceContext");
+
+                    b.HasIndex("TimestampUtc");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Level", "TimestampUtc");
+
+                    b.ToTable("SystemLogs", (string)null);
                 });
 
             modelBuilder.Entity("HappyInventory.Core.Entities.User", b =>
@@ -126,6 +201,9 @@ namespace HappyInventory.Infrastructure.Migrations
 
                     b.Property<DateTime?>("LastLoginUtc")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("NormalizedUsername")
                         .IsRequired()
@@ -218,6 +296,12 @@ namespace HappyInventory.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Qty");
+
+                    b.HasIndex("SKUCode");
+
+                    b.HasIndex("WarehouseId");
 
                     b.HasIndex("WarehouseId", "ItemName")
                         .IsUnique();

@@ -17,30 +17,24 @@ public class DashboardRepository : IDashboardRepository
     public async Task<DashboardSnapshot> GetSnapshotAsync(
         CancellationToken cancellationToken = default)
     {
+        // Warehouse-level aggregation is performed in SQL to avoid loading
+        // all items into memory. Correlated subqueries are efficient for
+        // per-warehouse counts and sums.
         var warehouseRows = await _db.Warehouses
             .AsNoTracking()
-            .Select(warehouse => new
-            {
-                warehouse.Id,
-                warehouse.Name,
-                CityName = warehouse.City != null ? warehouse.City.Name : string.Empty,
-                CountryName = warehouse.Country != null ? warehouse.Country.Name : string.Empty,
-                ItemCount = warehouse.Items.Count,
-                TotalQuantity = warehouse.Items.Sum(item => (int?)item.Qty) ?? 0,
-            })
             .OrderBy(warehouse => warehouse.Name)
-            .ToListAsync(cancellationToken);
-
-        var warehouses = warehouseRows
             .Select(warehouse => new WarehouseSummary(
                 warehouse.Id,
                 warehouse.Name,
-                warehouse.CityName,
-                warehouse.CountryName,
-                warehouse.ItemCount,
-                warehouse.TotalQuantity))
-            .ToList();
+                warehouse.City != null ? warehouse.City.Name : string.Empty,
+                warehouse.Country != null ? warehouse.Country.Name : string.Empty,
+                warehouse.Items.Count,
+                warehouse.Items.Sum(item => (int?)item.Qty) ?? 0))
+            .ToListAsync(cancellationToken);
 
+        // SQLite cannot translate ToLowerInvariant inside a GROUP BY key.
+        // Project only the four columns needed for the dashboard and group
+        // case-insensitively in memory instead.
         var itemRows = await _db.WarehouseItems
             .AsNoTracking()
             .Select(item => new
@@ -52,14 +46,16 @@ public class DashboardRepository : IDashboardRepository
             })
             .ToListAsync(cancellationToken);
 
-        var items = itemRows
-            .Select(item => new WarehouseItemSummary(
-                item.ItemName,
-                item.SKUCode,
-                item.Qty,
-                item.WarehouseId))
+        var itemGroups = itemRows
+            .GroupBy(item => item.ItemName.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(group => new WarehouseItemSummary(
+                group.First().ItemName.Trim(),
+                group.Select(item => item.SKUCode)
+                    .FirstOrDefault(sku => !string.IsNullOrWhiteSpace(sku)),
+                group.Sum(item => item.Qty),
+                group.Select(item => item.WarehouseId).Distinct().Count()))
             .ToList();
 
-        return new DashboardSnapshot(warehouses, items);
+        return new DashboardSnapshot(warehouseRows, itemGroups);
     }
 }

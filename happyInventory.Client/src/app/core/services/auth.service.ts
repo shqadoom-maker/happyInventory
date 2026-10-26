@@ -27,31 +27,30 @@ export class AuthService {
     this.restoreSession();
   }
 
-  login(request: LoginRequest): Observable<LoginResponse> {
+  login(request: LoginRequest, remember = true): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request).pipe(
-      tap((response) => this.storeSession(response)),
+      tap((response) => this.storeSession(response, remember)),
     );
   }
 
   logout(): void {
     this.currentUser.set(null);
     this.currentToken.set(null);
-
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-    } catch {
-      // Storage can be blocked; the in-memory session is still cleared.
-    }
+    this.clearStoredSession();
   }
 
-  private storeSession(response: LoginResponse): void {
+  private storeSession(response: LoginResponse, remember: boolean): void {
     this.currentToken.set(response.token);
     this.currentUser.set(response.user);
 
     try {
-      localStorage.setItem(TOKEN_KEY, response.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+      this.clearStoredSession();
+
+      // "Remember me" keeps the JWT across browser restarts; otherwise the
+      // session lives only in this tab.
+      const storage = remember ? localStorage : sessionStorage;
+      storage.setItem(TOKEN_KEY, response.token);
+      storage.setItem(USER_KEY, JSON.stringify(response.user));
     } catch {
       // Keep working for this tab even when storage is unavailable.
     }
@@ -59,8 +58,15 @@ export class AuthService {
 
   private restoreSession(): void {
     try {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const rawUser = localStorage.getItem(USER_KEY);
+      const storage = this.sessionStorageWithToken() ?? this.localStorageWithToken();
+
+      if (!storage) {
+        this.logout();
+        return;
+      }
+
+      const token = storage.getItem(TOKEN_KEY);
+      const rawUser = storage.getItem(USER_KEY);
 
       if (!token || !rawUser || this.isExpired(token)) {
         this.logout();
@@ -79,6 +85,25 @@ export class AuthService {
     } catch {
       this.logout();
     }
+  }
+
+  private clearStoredSession(): void {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(USER_KEY);
+    } catch {
+      // Storage can be blocked; the in-memory session is still cleared.
+    }
+  }
+
+  private sessionStorageWithToken(): Storage | null {
+    return sessionStorage.getItem(TOKEN_KEY) ? sessionStorage : null;
+  }
+
+  private localStorageWithToken(): Storage | null {
+    return localStorage.getItem(TOKEN_KEY) ? localStorage : null;
   }
 
   private isExpired(token: string): boolean {

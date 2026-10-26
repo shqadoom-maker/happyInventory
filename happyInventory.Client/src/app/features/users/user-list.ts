@@ -14,6 +14,7 @@ import { errorMessage } from '../../core/error-message';
 import { ChangePasswordRequest, User } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { ToastService } from '../../core/services/toast.service';
 
 function passwordsMatch(control: AbstractControl): ValidationErrors | null {
   const newPassword = control.get('newPassword')?.value;
@@ -33,6 +34,7 @@ export class UserList implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
 
   protected readonly users = signal<User[]>([]);
   protected readonly loading = signal(false);
@@ -162,15 +164,22 @@ export class UserList implements OnInit {
       name: user.fullName,
     });
 
-    if (!confirm(message)) {
-      return;
-    }
+    this.toast
+      .confirm(message, this.translate.instant('common.confirmDeleteTitle'))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.error.set(null);
+        this.error.set(null);
 
-    this.userService.delete(user.id).subscribe({
-      next: () => this.load(),
-      error: (error) => this.error.set(errorMessage(error, this.translate)),
-    });
+        this.userService.delete(user.id).subscribe({
+          next: () => {
+            this.toast.success(this.translate.instant('common.deletedSuccessfully'));
+            this.load();
+          },
+          error: (error) => this.error.set(errorMessage(error, this.translate)),
+        });
+      });
   }
 }

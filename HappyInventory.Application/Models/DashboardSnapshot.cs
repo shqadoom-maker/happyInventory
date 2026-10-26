@@ -12,7 +12,7 @@ public sealed record WarehouseItemSummary(
     string ItemName,
     string? SkuCode,
     int Qty,
-    int WarehouseId);
+    int WarehouseCount);
 
 public sealed record DashboardSnapshot(
     IReadOnlyList<WarehouseSummary> Warehouses,

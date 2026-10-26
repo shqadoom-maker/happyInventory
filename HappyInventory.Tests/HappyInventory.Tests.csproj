@@ -23,6 +23,14 @@
   <ItemGroup>
     <ProjectReference Include="..\HappyInventory.Application\HappyInventory.Application.csproj" />
     <ProjectReference Include="..\HappyInventory.Core\HappyInventory.Core.csproj" />
+    <ProjectReference Include="..\HappyInventory.Infrastructure\HappyInventory.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.36" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.1" />
   </ItemGroup>
 
 </Project>

@@ -52,7 +52,16 @@ public class UserService : IUserService
 
         var user = await _users.GetByNormalizedUsernameAsync(normalized, cancellationToken);
 
-        if (user is null || !_passwordHasher.Verify(password, user.PasswordHash))
+        // Always perform a hash operation to prevent timing attacks that could
+        // reveal whether a username exists. When the user is not found, hash a
+        // dummy password so the response time is similar in both cases.
+        if (user is null)
+        {
+            _ = _passwordHasher.Verify(password, "$2a$10$dummyhashforserusernotfounddummyhashforserusernotfoundd");
+            return null;
+        }
+
+        if (!_passwordHasher.Verify(password, user.PasswordHash))
         {
             return null;
         }
@@ -200,6 +209,7 @@ public class UserService : IUserService
         }
 
         user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
+        user.MustChangePassword = false;
         await _users.SaveChangesAsync(cancellationToken);
     }
 
@@ -246,6 +256,7 @@ public class UserService : IUserService
         FullName = user.FullName,
         Role = user.Role,
         IsActive = user.IsActive,
+        MustChangePassword = user.MustChangePassword,
         CreatedUtc = user.CreatedUtc,
         LastLoginUtc = user.LastLoginUtc,
     };

@@ -7,6 +7,7 @@ import { City } from '../../core/models/city.model';
 import { Country } from '../../core/models/country.model';
 import { CityService } from '../../core/services/city.service';
 import { CountryService } from '../../core/services/country.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-locations',
@@ -19,6 +20,7 @@ export class Locations implements OnInit {
   private readonly cityService = inject(CityService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
 
   protected readonly countries = signal<Country[]>([]);
   protected readonly cities = signal<City[]>([]);
@@ -95,16 +97,23 @@ export class Locations implements OnInit {
       name: country.name,
     });
 
-    if (!confirm(message)) {
-      return;
-    }
+    this.toast
+      .confirm(message, this.translate.instant('common.confirmDeleteTitle'))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.error.set(null);
+        this.error.set(null);
 
-    this.countryService.delete(country.id).subscribe({
-      next: () => this.load(),
-      error: (error) => this.error.set(errorMessage(error, this.translate)),
-    });
+        this.countryService.delete(country.id).subscribe({
+          next: () => {
+            this.toast.success(this.translate.instant('common.deletedSuccessfully'));
+            this.load();
+          },
+          error: (error) => this.error.set(errorMessage(error, this.translate)),
+        });
+      });
   }
 
   protected removeCity(city: City): void {
@@ -112,15 +121,22 @@ export class Locations implements OnInit {
       name: city.name,
     });
 
-    if (!confirm(message)) {
-      return;
-    }
+    this.toast
+      .confirm(message, this.translate.instant('common.confirmDeleteTitle'))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
 
-    this.error.set(null);
+        this.error.set(null);
 
-    this.cityService.delete(city.id).subscribe({
-      next: () => this.load(),
-      error: (error) => this.error.set(errorMessage(error, this.translate)),
-    });
+        this.cityService.delete(city.id).subscribe({
+          next: () => {
+            this.toast.success(this.translate.instant('common.deletedSuccessfully'));
+            this.load();
+          },
+          error: (error) => this.error.set(errorMessage(error, this.translate)),
+        });
+      });
   }
 }

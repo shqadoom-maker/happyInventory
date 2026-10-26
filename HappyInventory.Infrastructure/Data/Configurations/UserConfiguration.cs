@@ -34,6 +34,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(20)
             .IsRequired();
 
+        builder.Property(user => user.MustChangePassword)
+            .IsRequired();
+
         builder.Property(user => user.CreatedUtc)
             .IsRequired();
     }

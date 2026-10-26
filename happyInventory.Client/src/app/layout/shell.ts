@@ -16,7 +16,7 @@ interface NavItem {
 const BASE_NAV_ITEMS: NavItem[] = [
   { path: '/dashboard', labelKey: 'nav.dashboard', icon: 'dashboard', exact: true },
   { path: '/warehouses', labelKey: 'nav.warehouses', icon: 'warehouse', exact: false },
-  { path: '/stock-movements', labelKey: 'nav.stockMovements', icon: 'swap_vert', exact: false },
+  { path: '/stock-movements', labelKey: 'nav.stockMovements', icon: 'integration_instructions', exact: false },
   { path: '/locations', labelKey: 'nav.locations', icon: 'location_on', exact: false },
 ];
 
@@ -41,6 +41,12 @@ export class Shell implements OnDestroy {
 
     if (this.auth.isAdmin()) {
       items.push({ path: '/users', labelKey: 'nav.users', icon: 'group', exact: false });
+      items.push({
+        path: '/system-logs',
+        labelKey: 'nav.systemLogs',
+        icon: 'receipt_long',
+        exact: false,
+      });
     }
 
     return items;

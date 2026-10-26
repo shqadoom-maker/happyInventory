@@ -47,6 +47,10 @@ coverage/
 *.coverage
 *.coveragexml
 
+## Logs
+logs/
+*.log
+
 ## OS files
 Thumbs.db
 desktop.ini

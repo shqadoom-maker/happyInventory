@@ -13,10 +13,12 @@ namespace HappyInventory.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _users;
+    private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IUserService users)
+    public UsersController(IUserService users, ILogger<UsersController> logger)
     {
         _users = users;
+        _logger = logger;
     }
 
     private int CurrentUserId =>
@@ -46,6 +48,13 @@ public class UsersController : ControllerBase
     {
         var user = await _users.CreateAsync(request, cancellationToken);
 
+        _logger.LogInformation(
+            "Administrator {ActorId} created user {UserId} ({Username}) with role {Role}.",
+            CurrentUserId,
+            user.Id,
+            user.Username,
+            user.Role);
+
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
 
@@ -58,7 +67,17 @@ public class UsersController : ControllerBase
         [FromBody] UpdateUserRequest request,
         CancellationToken cancellationToken)
     {
-        return Ok(await _users.UpdateAsync(id, request, CurrentUserId, cancellationToken));
+        var updated = await _users.UpdateAsync(id, request, CurrentUserId, cancellationToken);
+
+        _logger.LogInformation(
+            "Administrator {ActorId} updated user {UserId} ({Username}): role {Role}, active {IsActive}.",
+            CurrentUserId,
+            updated.Id,
+            updated.Username,
+            updated.Role,
+            updated.IsActive);
+
+        return Ok(updated);
     }
 
     [HttpPost("{id:int}/change-password")]
@@ -71,6 +90,12 @@ public class UsersController : ControllerBase
         CancellationToken cancellationToken)
     {
         await _users.ChangePasswordAsync(id, request, cancellationToken);
+
+        _logger.LogInformation(
+            "Administrator {ActorId} changed the password for user {UserId}.",
+            CurrentUserId,
+            id);
+
         return NoContent();
     }
 
@@ -81,6 +106,12 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await _users.DeleteAsync(id, CurrentUserId, cancellationToken);
+
+        _logger.LogInformation(
+            "Administrator {ActorId} deleted user {UserId}.",
+            CurrentUserId,
+            id);
+
         return NoContent();
     }
 }

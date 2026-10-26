@@ -80,15 +80,15 @@
 }
 
 .legend-dot.items {
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  background: linear-gradient(180deg, var(--blue-400), var(--blue-600));
 }
 
 .legend-dot.high {
-  background: #16a34a;
+  background: var(--success);
 }
 
 .legend-dot.low {
-  background: #dc2626;
+  background: var(--danger);
 }
 
 .column-chart {
@@ -112,7 +112,7 @@
 }
 
 .column-value {
-  color: #1e293b;
+  color: var(--text-soft);
   font-size: 0.82rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -124,14 +124,14 @@
   width: 100%;
   height: 170px;
   border-radius: 8px 8px 4px 4px;
-  background: #f1f5f9;
+  background: var(--bg-subtle);
   overflow: hidden;
 }
 
 .column-fill {
   width: 100%;
   border-radius: 8px 8px 4px 4px;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  background: linear-gradient(180deg, var(--blue-400), var(--blue-600));
   transition: height 0.35s ease;
 }
 
@@ -145,7 +145,7 @@
 }
 
 .column-label {
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -188,7 +188,7 @@
 }
 
 .hbar-name {
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -201,7 +201,7 @@
 .hbar-track {
   height: 12px;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: var(--bg-subtle);
   overflow: hidden;
 }
 
@@ -214,16 +214,16 @@
 }
 
 .hbar-fill.high {
-  background: linear-gradient(90deg, #22c55e, #15803d);
+  background: linear-gradient(90deg, #34d399, var(--success));
 }
 
 .hbar-fill.low {
-  background: linear-gradient(90deg, #f87171, #dc2626);
+  background: linear-gradient(90deg, #f87171, var(--danger));
 }
 
 .hbar-value {
   min-width: 44px;
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.8rem;
   font-weight: 700;
   text-align: end;

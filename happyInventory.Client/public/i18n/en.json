@@ -5,21 +5,26 @@
   },
   "auth": {
     "eyebrow": "Happy Company",
-    "title": "Sign in",
-    "subtitle": "Use your warehouse account to continue.",
+    "title": "Welcome back",
+    "subtitle": "Sign in to manage your warehouse efficiently.",
     "username": "Username",
-    "usernamePlaceholder": "admin",
+    "usernamePlaceholder": "e.g. admin",
     "usernameRequired": "Username is required.",
     "password": "Password",
-    "passwordPlaceholder": "Your password",
+    "passwordPlaceholder": "Enter your password",
     "passwordRequired": "Password is required.",
-    "showPassword": "Show",
-    "hidePassword": "Hide",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordBody": "Password resets are handled by your administrator. Contact your administrator to restore access.",
     "signIn": "Sign in",
     "signingIn": "Signing in…",
+    "secureConnection": "Secure session",
     "invalidCredentials": "Invalid username or password.",
     "accountDisabled": "Your account is disabled. Please contact support.",
     "accountsManaged": "Accounts are created and managed by an administrator.",
+    "copyright": "© {{year}} Happy Inventory. All rights reserved.",
     "asideTitle": "Warehouse inventory, in one place.",
     "asideBody": "Sign in to manage warehouses, check stock and keep the catalogue current across countries and cities.",
     "point1": "JWT-protected API for every request",
@@ -45,17 +50,19 @@
   "nav": {
     "dashboard": "Dashboard",
     "warehouses": "Warehouses",
-    "stockMovements": "Stock movements",
+    "stockMovements": "eCommerce Integration",
     "locations": "Locations",
-    "users": "Users"
+    "users": "Users",
+    "systemLogs": "System logs"
   },
   "titles": {
     "login": "Sign in",
     "dashboard": "Dashboard",
     "warehouses": "Warehouses",
-    "stockMovements": "Stock movements",
+    "stockMovements": "eCommerce Integration",
     "locations": "Locations",
-    "users": "Users"
+    "users": "Users",
+    "systemLogs": "System logs"
   },
   "common": {
     "refresh": "Refresh",
@@ -74,7 +81,11 @@
     "pageOf": "Page {{page}} of {{totalPages}} · {{totalCount}} total",
     "active": "Active",
     "inactive": "Inactive",
-    "notAvailable": "—"
+    "notAvailable": "—",
+    "yes": "Yes",
+    "no": "No",
+    "confirmDeleteTitle": "Confirm Delete",
+    "deletedSuccessfully": "Deleted successfully"
   },
   "dashboard": {
     "eyebrow": "Happy Company",
@@ -119,7 +130,7 @@
   "warehouses": {
     "title": "Warehouses",
     "subtitle": "Every warehouse belongs to a city, which belongs to a country.",
-    "new": "+ New warehouse",
+    "new": "New warehouse",
     "viewItems": "View items",
     "searchPlaceholder": "Name, code, city or country",
     "emptyTitle": "No warehouses yet",
@@ -168,7 +179,7 @@
   "warehouseItems": {
     "title": "Warehouse items",
     "subtitle": "Items stored in this warehouse.",
-    "new": "+ New item",
+    "new": "New item",
     "searchPlaceholder": "Name or SKU",
     "empty": "No items in this warehouse yet.",
     "confirmDelete": "Delete item \"{{name}}\"?",
@@ -197,20 +208,22 @@
     "outbound": "Outbound",
     "adjustment": "Adjustment"
   },
-  "stockMovements": {
-    "title": "Stock movements",
-    "subtitle": "Audit trail of every inbound, outbound and manual adjustment, whatever the source.",
+  "integration": {
+    "title": "eCommerce Integration",
+    "subtitle": "Monitor inventory deductions from external eCommerce systems. Each row records an atomic stock deduction with its idempotency key.",
     "warehouse": "Warehouse",
     "allWarehouses": "All warehouses",
-    "emptyTitle": "No movements recorded",
-    "emptyHint": "Stock changes will appear here as soon as they happen.",
+    "emptyTitle": "No integration records",
+    "emptyHint": "eCommerce inventory deductions will appear here as they happen.",
     "columns": {
-      "when": "When (UTC)",
+      "key": "Idempotency Key",
       "warehouse": "Warehouse",
-      "type": "Type",
-      "change": "Change",
-      "source": "Source",
-      "reference": "Reference"
+      "sku": "SKU",
+      "item": "Item",
+      "quantity": "Deducted",
+      "previous": "Previous Qty",
+      "remaining": "Remaining Qty",
+      "when": "When (UTC)"
     }
   },
   "locations": {
@@ -238,7 +251,7 @@
   "users": {
     "title": "Users",
     "subtitle": "Accounts that can sign in to the system. Each user has exactly one role.",
-    "new": "+ New user",
+    "new": "New user",
     "searchPlaceholder": "Username, full name or role",
     "emptyTitle": "No users yet",
     "emptyHint": "Create the first account to let someone sign in.",
@@ -284,6 +297,62 @@
       "save": "Save changes"
     }
   },
+  "systemLogs": {
+    "title": "System logs",
+    "subtitle": "Structured application events persisted to SQLite. Visible to administrators only.",
+    "showing": "Showing {{count}} of {{total}} entries",
+    "emptyTitle": "No log entries found",
+    "emptyHint": "Try a different filter, or wait for new activity.",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Message, source, user, path or exception",
+      "level": "Level",
+      "allLevels": "All levels",
+      "user": "User",
+      "allUsers": "All users",
+      "from": "From date (UTC)",
+      "to": "To date (UTC)",
+      "reset": "Reset filters"
+    },
+    "levels": {
+      "verbose": "Verbose",
+      "debug": "Debug",
+      "information": "Information",
+      "warning": "Warning",
+      "error": "Error",
+      "fatal": "Fatal"
+    },
+    "columns": {
+      "timestamp": "Time (UTC)",
+      "level": "Level",
+      "message": "Message",
+      "user": "User",
+      "request": "Request"
+    },
+    "details": {
+      "title": "Log details",
+      "source": "Source",
+      "user": "User",
+      "request": "Request",
+      "status": "Status",
+      "traceId": "Trace ID",
+      "messageTemplate": "Message template",
+      "exception": "Exception",
+      "properties": "Structured properties"
+    },
+    "cleanup": {
+      "label": "Retention",
+      "action": "Clean up",
+      "title": "Delete old logs",
+      "confirm": "Delete log entries older than {{days}} days? This cannot be undone.",
+      "success": "Deleted {{count}} log entries older than {{days}} days.",
+      "days7": "Older than 7 days",
+      "days30": "Older than 30 days",
+      "days90": "Older than 90 days",
+      "days180": "Older than 180 days",
+      "days365": "Older than 365 days"
+    }
+  },
   "roles": {
     "admin": "Administrator",
     "management": "Management",
@@ -294,6 +363,37 @@
     "forbidden": "You are not allowed to perform this action.",
     "notFound": "The requested resource was not found.",
     "genericStatus": "Request failed with status {{status}}.",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "countryInUse": "The country cannot be deleted while it has cities or warehouses.",
+    "cityInUse": "The city cannot be deleted while it has warehouses.",
+    "defaultAdminCannotBeDeleted": "The default administrator cannot be deleted.",
+    "administratorAccountsCannotBeDeleted": "Administrator accounts cannot be deleted.",
+    "countryNotFound": "The requested country was not found.",
+    "cityNotFound": "The requested city was not found.",
+    "userNotFound": "The requested user was not found.",
+    "accountDisabled": "Your account is disabled and you need to contact support.",
+    "usernameTaken": "Username '{username}' is already taken.",
+    "passwordTooShort": "Password must be at least 8 characters long.",
+    "warehouseNotFound": "The requested warehouse was not found.",
+    "warehouseItemNotFound": "The requested warehouse item was not found.",
+    "fieldRequired": "{field} is required.",
+    "selectedCityDoesNotExist": "The selected city does not exist.",
+    "selectedCountryDoesNotExist": "The selected country does not exist.",
+    "selectedWarehouseDoesNotExist": "The selected warehouse does not exist.",
+    "itemNameRequired": "Item name is required.",
+    "cityNameRequired": "City name is required.",
+    "cannotDeactivateOwnAccount": "You cannot deactivate your own account.",
+    "cannotRemoveOwnAdminRole": "You cannot remove your own administrator role.",
+    "cannotDeleteOwnAccount": "You cannot delete your own account.",
+    "inventoryUpdateRequestRequired": "An inventory update request is required.",
+    "warehouseIdMustBePositive": "WarehouseId must be greater than zero.",
+    "skuCodeRequired": "SKUCode is required.",
+    "quantityMustBePositive": "Quantity must be greater than zero.",
+    "insufficientStock": "Insufficient stock for SKU '{sku}'. Available quantity is {available}, requested deduction is {requested}.",
+    "skuAmbiguous": "Multiple warehouse items match the supplied SKU. The inventory update cannot be applied unambiguously.",
+    "logNotFound": "The requested log entry was not found.",
+    "invalidDateRange": "The start date must be before the end date.",
+    "invalidRetention": "Retention days must be between 1 and 3650.",
+    "invalidLogLevel": "Level must be one of: Verbose, Debug, Information, Warning, Error, Fatal."
   }
 }

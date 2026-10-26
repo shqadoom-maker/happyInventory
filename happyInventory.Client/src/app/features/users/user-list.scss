@@ -1,11 +1,11 @@
 .alert.success {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
-  color: #166534;
+  border-color: #b9e6cc;
+  background: var(--success-soft);
+  color: #0b6b3c;
 }
 
 .inactive-row {
-  background: #fafafa;
+  background: var(--surface-muted);
 }
 
 .row-actions {
@@ -18,19 +18,19 @@
   position: sticky;
   inset-inline-end: 0;
   z-index: 1;
-  background: #fff;
+  background: var(--surface);
 }
 
 .table th:last-child {
-  background: #f8fafc;
+  background: var(--surface-muted);
 }
 
 .table tbody tr:hover td:last-child {
-  background: #f8fafc;
+  background: var(--surface-hover);
 }
 
 .inactive-row td:last-child {
-  background: #fafafa;
+  background: var(--surface-muted);
 }
 
 @media (max-width: 1100px) {
@@ -57,13 +57,14 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(4, 11, 24, 0.52);
+  backdrop-filter: blur(3px);
   overflow-y: auto;
 }
 
 .modal {
   width: min(460px, 100%);
-  padding: 22px;
+  padding: 24px;
 }
 
 .modal h3 {

@@ -22,5 +22,7 @@ public class InventoryUpdateRecordConfiguration : IEntityTypeConfiguration<Inven
             .IsRequired();
 
         builder.HasIndex(record => record.CreatedUtc);
+        builder.HasIndex(record => record.WarehouseId);
+        builder.HasIndex(record => record.SKUCode);
     }
 }

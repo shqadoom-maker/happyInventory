@@ -1,4 +1,5 @@
 using HappyInventory.Application.Common;
+using HappyInventory.Application.DTOs.Integrations;
 using HappyInventory.Application.Interfaces.Repositories;
 using HappyInventory.Core.Entities;
 using HappyInventory.Infrastructure.Data;
@@ -69,5 +70,62 @@ public class InventoryUpdateRepository : IInventoryUpdateRepository
             throw new ConflictException(
                 "The inventory update conflicts with another request. Retry with the same Idempotency-Key.");
         }
+    }
+
+    public async Task<(IReadOnlyList<InventoryUpdateRecordDto> Items, int TotalCount)> GetPagedAsync(
+        int? warehouseId,
+        int page,
+        int pageSize,
+        string? search,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.InventoryUpdateRecords
+            .AsNoTracking()
+            .Join(
+                _db.WarehouseItems,
+                record => record.WarehouseItemId,
+                item => item.Id,
+                (record, item) => new { record, item })
+            .Join(
+                _db.Warehouses,
+                x => x.item.WarehouseId,
+                warehouse => warehouse.Id,
+                (x, warehouse) => new InventoryUpdateRecordDto
+                {
+                    IdempotencyKey = x.record.IdempotencyKey,
+                    WarehouseId = x.record.WarehouseId,
+                    WarehouseName = warehouse.Name,
+                    SKUCode = x.record.SKUCode,
+                    ItemName = x.record.ItemName,
+                    Quantity = x.record.Quantity,
+                    PreviousQuantity = x.record.PreviousQuantity,
+                    RemainingQuantity = x.record.RemainingQuantity,
+                    CreatedUtc = x.record.CreatedUtc,
+                });
+
+        if (warehouseId.HasValue)
+        {
+            query = query.Where(x => x.WarehouseId == warehouseId.Value);
+        }
+
+        var term = search?.Trim().ToLowerInvariant();
+        if (!string.IsNullOrWhiteSpace(term))
+        {
+            query = query.Where(x =>
+                x.IdempotencyKey.ToLower().Contains(term) ||
+                x.SKUCode.ToLower().Contains(term) ||
+                x.ItemName.ToLower().Contains(term) ||
+                x.WarehouseName.ToLower().Contains(term));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(x => x.CreatedUtc)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 }

@@ -1,3 +1,4 @@
+using HappyInventory.Application.DTOs.Integrations;
 using HappyInventory.Core.Entities;
 
 namespace HappyInventory.Application.Interfaces.Repositories;
@@ -20,4 +21,15 @@ public interface IInventoryUpdateRepository
     void AddIdempotencyRecord(InventoryUpdateRecord record);
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reads completed inventory deduction records for monitoring the
+    /// eCommerce integration.
+    /// </summary>
+    Task<(IReadOnlyList<InventoryUpdateRecordDto> Items, int TotalCount)> GetPagedAsync(
+        int? warehouseId,
+        int page,
+        int pageSize,
+        string? search,
+        CancellationToken cancellationToken = default);
 }

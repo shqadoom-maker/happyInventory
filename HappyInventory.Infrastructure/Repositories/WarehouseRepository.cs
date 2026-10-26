@@ -20,11 +20,13 @@ public class WarehouseRepository : IWarehouseRepository
         string? search,
         CancellationToken cancellationToken = default)
     {
+        // Note: Warehouse.Items is intentionally NOT included here to avoid
+        // loading all item rows when only the count is needed. WarehouseService
+        // handles null Items gracefully in ToDto.
         var query = _db.Warehouses
             .AsNoTracking()
             .Include(warehouse => warehouse.City)
             .Include(warehouse => warehouse.Country)
-            .Include(warehouse => warehouse.Items)
             .AsQueryable();
 
         var term = search?.Trim().ToLowerInvariant();
@@ -32,10 +34,10 @@ public class WarehouseRepository : IWarehouseRepository
         if (!string.IsNullOrWhiteSpace(term))
         {
             query = query.Where(warehouse =>
-                warehouse.Name.ToLower().Contains(term) ||
-                warehouse.Address.ToLower().Contains(term) ||
-                (warehouse.City != null && warehouse.City.Name.ToLower().Contains(term)) ||
-                (warehouse.Country != null && warehouse.Country.Name.ToLower().Contains(term)));
+                EF.Functions.Like(warehouse.Name, $"%{term}%") ||
+                EF.Functions.Like(warehouse.Address, $"%{term}%") ||
+                (warehouse.City != null && EF.Functions.Like(warehouse.City.Name, $"%{term}%")) ||
+                (warehouse.Country != null && EF.Functions.Like(warehouse.Country.Name, $"%{term}%")));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -52,11 +54,12 @@ public class WarehouseRepository : IWarehouseRepository
     public async Task<IReadOnlyList<Warehouse>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
+        // Note: Warehouse.Items is intentionally NOT included here to avoid
+        // loading all item rows. Use GetByIdAsync if item details are needed.
         return await _db.Warehouses
             .AsNoTracking()
             .Include(warehouse => warehouse.City)
             .Include(warehouse => warehouse.Country)
-            .Include(warehouse => warehouse.Items)
             .OrderBy(warehouse => warehouse.Name)
             .ToListAsync(cancellationToken);
     }

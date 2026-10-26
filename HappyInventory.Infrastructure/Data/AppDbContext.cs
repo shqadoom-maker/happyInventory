@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<WarehouseItem> WarehouseItems => Set<WarehouseItem>();
     public DbSet<InventoryUpdateRecord> InventoryUpdateRecords => Set<InventoryUpdateRecord>();
+    public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

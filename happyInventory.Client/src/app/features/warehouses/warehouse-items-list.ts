@@ -7,6 +7,7 @@ import { PagedResult } from '../../core/models/paged-result.model';
 import { WarehouseItem } from '../../core/models/warehouse-item.model';
 import { WarehouseService } from '../../core/services/warehouse.service';
 import { WarehouseItemService } from '../../core/services/warehouse-item.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-warehouse-items-list',
@@ -17,6 +18,7 @@ export class WarehouseItemsList implements OnInit {
   private readonly warehouseService = inject(WarehouseService);
   private readonly itemService = inject(WarehouseItemService);
   private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
 
   readonly warehouseId = input.required<string>();
 
@@ -86,20 +88,29 @@ export class WarehouseItemsList implements OnInit {
   }
 
   protected delete(item: WarehouseItem): void {
-    if (!confirm(this.translate.instant('warehouseItems.confirmDelete', { name: item.itemName }))) {
-      return;
-    }
-
-    this.itemService.delete(item.id).subscribe({
-      next: () => {
-        if (this.items().length === 1 && this.page() > 1) {
-          this.page.set(this.page() - 1);
-        }
-        this.load();
-      },
-      error: (err) => {
-        this.error.set(errorMessage(err, this.translate));
-      },
+    const message = this.translate.instant('warehouseItems.confirmDelete', {
+      name: item.itemName,
     });
+
+    this.toast
+      .confirm(message, this.translate.instant('common.confirmDeleteTitle'))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.itemService.delete(item.id).subscribe({
+          next: () => {
+            this.toast.success(this.translate.instant('common.deletedSuccessfully'));
+            if (this.items().length === 1 && this.page() > 1) {
+              this.page.set(this.page() - 1);
+            }
+            this.load();
+          },
+          error: (err) => {
+            this.error.set(errorMessage(err, this.translate));
+          },
+        });
+      });
   }
 }
