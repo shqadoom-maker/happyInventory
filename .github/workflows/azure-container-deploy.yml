@@ -39,7 +39,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      - name: Validate Azure configuration
+        env:
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          [ -n "$CLIENT_ID" ] || { echo "AZURE_CLIENT_ID is missing"; exit 1; }
+          [ -n "$TENANT_ID" ] || { echo "AZURE_TENANT_ID is missing"; exit 1; }
+          [ -n "$SUBSCRIPTION_ID" ] || { echo "AZURE_SUBSCRIPTION_ID is missing"; exit 1; }
+          echo "Azure configuration variables are present."
       - name: Sign in to Azure
         uses: azure/login@v2
         with:
