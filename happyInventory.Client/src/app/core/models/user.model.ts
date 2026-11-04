@@ -38,5 +38,11 @@ export interface UpdateUserRequest {
 }
 
 export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/** Administrator-only password reset; the current password is unknown. */
+export interface ResetPasswordRequest {
   newPassword: string;
 }

@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
-  ChangePasswordRequest,
   CreateUserRequest,
+  ResetPasswordRequest,
   UpdateUserRequest,
   User,
 } from '../models/user.model';
@@ -31,7 +31,7 @@ export class UserService {
     return this.http.put<User>(`${this.baseUrl}/${id}`, request);
   }
 
-  changePassword(id: number, request: ChangePasswordRequest): Observable<void> {
+  resetPassword(id: number, request: ResetPasswordRequest): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/change-password`, request);
   }
 

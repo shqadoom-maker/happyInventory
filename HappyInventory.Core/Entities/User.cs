@@ -20,7 +20,10 @@ public class User
 
     public bool IsActive { get; set; } = true;
 
-    /// <summary>When true, the user must change their password before accessing other endpoints.</summary>
+    /// <summary>
+    /// Legacy column retained for database compatibility. First-login password
+    /// changes are no longer enforced, and startup seeding clears stale values.
+    /// </summary>
     public bool MustChangePassword { get; set; } = false;
 
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;

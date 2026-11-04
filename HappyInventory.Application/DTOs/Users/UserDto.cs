@@ -12,8 +12,6 @@ public class UserDto
 
     public bool IsActive { get; set; }
 
-    public bool MustChangePassword { get; set; }
-
     public DateTime CreatedUtc { get; set; }
 
     public DateTime? LastLoginUtc { get; set; }

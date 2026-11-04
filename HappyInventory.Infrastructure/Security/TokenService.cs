@@ -29,7 +29,6 @@ public class TokenService : ITokenService
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, user.Role),
             new Claim("fullName", user.FullName),
-            new Claim("mustChangePassword", user.MustChangePassword.ToString().ToLowerInvariant()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 

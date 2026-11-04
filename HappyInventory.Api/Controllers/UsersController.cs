@@ -86,10 +86,10 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ChangePassword(
         int id,
-        [FromBody] ChangePasswordRequest request,
+        [FromBody] ResetPasswordRequest request,
         CancellationToken cancellationToken)
     {
-        await _users.ChangePasswordAsync(id, request, cancellationToken);
+        await _users.ResetPasswordAsync(id, request, cancellationToken);
 
         _logger.LogInformation(
             "Administrator {ActorId} changed the password for user {UserId}.",

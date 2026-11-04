@@ -155,6 +155,7 @@ JWT key for any real deployment.
 | GET | `/api/users/{id}` | Admin |
 | PUT | `/api/users/{id}` | Admin |
 | POST | `/api/users/{id}/change-password` | Admin |
+| POST | `/api/auth/change-password` | Authenticated (current user) |
 | DELETE | `/api/users/{id}` | Admin |
 | GET | `/api/system-logs` | Admin |
 | GET | `/api/system-logs/{id}` | Admin |
@@ -166,8 +167,13 @@ JWT key for any real deployment.
 | POST | `/api/inventory/updates` | Authenticated (eCommerce/ERP) |
 
 `PUT /api/users/{id}` accepts `password: null` to keep the current password.
-`POST /api/users/{id}/change-password` accepts `{ "newPassword": "..." }`.
-Swagger is enabled in Development at `/swagger` and includes a Bearer scheme.
+`POST /api/users/{id}/change-password` is the administrator reset endpoint and
+accepts `{ "newPassword": "..." }`. The optional current-user self-service
+endpoint `POST /api/auth/change-password` accepts
+`{ "currentPassword": "...", "newPassword": "..." }` and returns a fresh
+`LoginResponse` token. First-login password changes are not enforced, and JWTs
+do not contain a `mustChangePassword` claim. Swagger is enabled in Development at
+`/swagger` and includes a Bearer scheme.
 
 The authenticated CRUD routes are not limited to the Angular UI. External
 eCommerce/ERP systems, scripts and services can call `POST /api/auth/login`,

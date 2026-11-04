@@ -110,14 +110,14 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Changes the current user's password. Required at first login when
-    /// <see cref="User.MustChangePassword"/> is true.
+    /// Changes the current user's password. Returns a fresh token so the client
+    /// can continue with an updated session.
     /// </summary>
     [HttpPost("change-password")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangePassword(
+    public async Task<ActionResult<LoginResponse>> ChangePassword(
         [FromBody] ChangePasswordRequest request,
         CancellationToken cancellationToken)
     {
@@ -130,10 +130,18 @@ public class AuthController : ControllerBase
 
         await _users.ChangePasswordAsync(userId, request, cancellationToken);
 
+        var user = await _users.GetByIdAsync(userId, cancellationToken);
+        var (token, expiresUtc) = _tokens.CreateToken(user);
+
         _logger.LogInformation(
             "User {UserId} changed their password.",
             userId);
 
-        return NoContent();
+        return Ok(new LoginResponse
+        {
+            Token = token,
+            ExpiresUtc = expiresUtc,
+            User = user,
+        });
     }
 }

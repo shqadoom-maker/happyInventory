@@ -10,5 +10,6 @@ public interface IUserService
     Task<UserDto> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken = default);
     Task<UserDto> UpdateAsync(int id, UpdateUserRequest request, int currentUserId, CancellationToken cancellationToken = default);
     Task ChangePasswordAsync(int id, ChangePasswordRequest request, CancellationToken cancellationToken = default);
+    Task ResetPasswordAsync(int id, ResetPasswordRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, int currentUserId, CancellationToken cancellationToken = default);
 }

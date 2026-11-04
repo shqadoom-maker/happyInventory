@@ -200,6 +200,12 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
         },
         new RateLimitRule
         {
+            Endpoint = "POST:/api/auth/change-password",
+            Period = "1m",
+            Limit = 10, // limit current-password guessing with a stolen token
+        },
+        new RateLimitRule
+        {
             Endpoint = "*",
             Period = "1m",
             Limit = 120, // 120 requests per minute per IP for all other endpoints
@@ -300,8 +306,6 @@ app.UseAuthentication();
 // Enrich service/controller logs with the signed-in user and trace id.
 app.UseMiddleware<LogContextMiddleware>();
 
-// Enforce first-login password change before authorizing access to endpoints.
-app.UseMiddleware<RequirePasswordChangeMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -342,4 +346,9 @@ static LogEventLevel ParseLogLevel(string? value, LogEventLevel fallback)
     return Enum.TryParse<LogEventLevel>(value, ignoreCase: true, out var level)
         ? level
         : fallback;
+}
+
+// Exposed for WebApplicationFactory-based integration tests.
+public partial class Program
+{
 }

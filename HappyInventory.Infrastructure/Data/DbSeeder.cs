@@ -25,6 +25,7 @@ public static class DbSeeder
 
         await db.Database.MigrateAsync();
         await EnsureDefaultAdminAsync(db, hasher, configuration, logger);
+        await ClearLegacyPasswordChangeFlagsAsync(db, logger);
         await NormalizeLegacyRolesAsync(db, logger);
     }
 
@@ -44,16 +45,18 @@ public static class DbSeeder
 
         if (await db.Users.AnyAsync(user => user.NormalizedUsername == normalized))
         {
-            // Administrator already exists. Do not reset the password or any
-            // other property on subsequent startups.
+            // Administrator already exists. Do not reset the password or
+            // account details on subsequent startups. Legacy password-change
+            // flags are cleared separately below.
             return;
         }
 
         // Obtain the initial password from configuration. If none is provided,
-        // generate a one-time password that must be changed at first login.
+        // generate a strong initial password. The administrator can change it
+        // later, but is not forced to do so at first login.
         var configuredPassword = configuration["Seed:AdminPassword"];
         var password = string.IsNullOrWhiteSpace(configuredPassword)
-            ? GenerateOneTimePassword()
+            ? GenerateInitialPassword()
             : configuredPassword;
 
         db.Users.Add(CreateDefaultAdmin(username, normalized, fullName, password, hasher));
@@ -61,11 +64,9 @@ public static class DbSeeder
 
         if (string.IsNullOrWhiteSpace(configuredPassword))
         {
-            // Only log the one-time password in development. Never log it in
-            // production; retrieve it from the secure secret store instead.
             logger.LogInformation(
-                "Seeded default administrator account '{Username}' with a one-time password. " +
-                "The administrator must change it at first login.",
+                "Seeded default administrator account '{Username}' with a generated password. " +
+                "Change it after signing in.",
                 username);
         }
         else
@@ -76,9 +77,9 @@ public static class DbSeeder
         }
     }
 
-    private static string GenerateOneTimePassword()
+    private static string GenerateInitialPassword()
     {
-        // 24 bytes base64-url = 32 characters, sufficient for a one-time password.
+        // 24 bytes base64 = 32 characters, sufficient for an initial password.
         var bytes = RandomNumberGenerator.GetBytes(24);
         return Convert.ToBase64String(bytes);
     }
@@ -95,11 +96,35 @@ public static class DbSeeder
         FullName = fullName,
         Role = UserRoles.Admin,
         IsActive = true,
-        // Force the administrator to change the one-time password at first login.
-        MustChangePassword = true,
+        MustChangePassword = false,
         PasswordHash = hasher.Hash(password),
         CreatedUtc = DateTime.UtcNow,
     };
+
+    private static async Task ClearLegacyPasswordChangeFlagsAsync(AppDbContext db, ILogger logger)
+    {
+        // Older seeded administrators may still have MustChangePassword = true.
+        // Clear the legacy flag without touching their password or other data.
+        var users = await db.Users
+            .Where(user => user.MustChangePassword)
+            .ToListAsync();
+
+        if (users.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var user in users)
+        {
+            user.MustChangePassword = false;
+        }
+
+        await db.SaveChangesAsync();
+
+        logger.LogInformation(
+            "Cleared the legacy first-login password-change flag for {Count} account(s).",
+            users.Count);
+    }
 
     private static async Task NormalizeLegacyRolesAsync(AppDbContext db, ILogger logger)
     {

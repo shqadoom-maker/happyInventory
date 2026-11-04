@@ -203,10 +203,38 @@ public class UserService : IUserService
             throw new KeyNotFoundException("The requested user was not found.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 8)
+        ValidateNewPassword(request.NewPassword);
+
+        if (string.IsNullOrWhiteSpace(request.CurrentPassword)
+            || !_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
         {
-            throw new InvalidOperationException("Password must be at least 8 characters long.");
+            throw new InvalidOperationException("Current password is incorrect.");
         }
+
+        if (_passwordHasher.Verify(request.NewPassword, user.PasswordHash))
+        {
+            throw new InvalidOperationException(
+                "New password must be different from the current password.");
+        }
+
+        user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
+        user.MustChangePassword = false;
+        await _users.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ResetPasswordAsync(
+        int id,
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _users.GetByIdAsync(id, cancellationToken);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("The requested user was not found.");
+        }
+
+        ValidateNewPassword(request.NewPassword);
 
         user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
         user.MustChangePassword = false;
@@ -244,6 +272,14 @@ public class UserService : IUserService
         await _users.SaveChangesAsync(cancellationToken);
     }
 
+    private static void ValidateNewPassword(string? password)
+    {
+        if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
+        {
+            throw new InvalidOperationException("Password must be at least 8 characters long.");
+        }
+    }
+
     private bool IsDefaultAdmin(User user) =>
         string.Equals(user.NormalizedUsername, _defaultAdminUsername, StringComparison.Ordinal);
 
@@ -256,7 +292,6 @@ public class UserService : IUserService
         FullName = user.FullName,
         Role = user.Role,
         IsActive = user.IsActive,
-        MustChangePassword = user.MustChangePassword,
         CreatedUtc = user.CreatedUtc,
         LastLoginUtc = user.LastLoginUtc,
     };

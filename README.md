@@ -290,13 +290,14 @@ The default administrator is created only when no matching user exists in the
 database. The password is **never reset on subsequent startups**.
 
 - If `Seed:AdminPassword` is provided, that password is hashed and stored.
-- If `Seed:AdminPassword` is not provided, a one-time password is generated and
-  the administrator is required to change it at first login (`MustChangePassword`
-  is set to `true`). The one-time password is logged only in development.
+- If `Seed:AdminPassword` is not provided, a strong initial password is generated.
+  The administrator is not forced to change it at first login.
 
-The administrator must change the password at first login. While
-`MustChangePassword` is true, all endpoints except `POST /api/auth/change-password`
-return `403 Forbidden`.
+New accounts and existing accounts can sign in and use the application normally.
+On startup the seeder clears the legacy `MustChangePassword` flag for any
+remaining records without changing their passwords or inventory data. The
+optional self-service endpoint `POST /api/auth/change-password` still requires
+the current password and returns a fresh `LoginResponse` token.
 
 ### Compromised credentials
 
@@ -328,8 +329,12 @@ existing administrator passwords immediately after deploying this update.
 | POST | `/api/inventory/updates` | Authenticated (eCommerce/ERP) |
 
 On edit, send `"password": null` (or omit it) to keep the current password.
-`POST /api/users/{id}/change-password` accepts `{ "newPassword": "..." }` and
-requires a password of at least 8 characters.
+`POST /api/users/{id}/change-password` is the administrator reset endpoint and
+accepts `{ "newPassword": "..." }`; the administrator does not need the user's
+current password. The optional self-service endpoint
+`POST /api/auth/change-password` accepts
+`{ "currentPassword": "...", "newPassword": "..." }` and returns a new token.
+Both require a new password of at least 8 characters.
 
 ### External API clients
 
@@ -357,6 +362,9 @@ certificate, or place it behind a reverse proxy.
   in `sessionStorage` (the tab session only). It is restored on reload until it
   expires.
 - A `401` response clears the session and redirects to login.
+- A successful login goes straight to the dashboard (or the requested return URL).
+  The optional `/change-password` page is available to signed-in users but is
+  never forced.
 - The navigation menu hides the Users and System logs entries for non-admins, and
   `/users` and `/system-logs` are additionally protected by an admin route guard.
 - The Dashboard is the welcome page and shows warehouse status and top/bottom

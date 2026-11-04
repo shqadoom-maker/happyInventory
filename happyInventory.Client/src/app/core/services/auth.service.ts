@@ -3,7 +3,12 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, User } from '../models/user.model';
+import {
+  ChangePasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  User,
+} from '../models/user.model';
 
 const TOKEN_KEY = 'happy-inventory.token';
 const USER_KEY = 'happy-inventory.user';
@@ -30,6 +35,12 @@ export class AuthService {
   login(request: LoginRequest, remember = true): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request).pipe(
       tap((response) => this.storeSession(response, remember)),
+    );
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/change-password`, request).pipe(
+      tap((response) => this.storeSession(response, this.usesPersistentStorage())),
     );
   }
 
@@ -95,6 +106,14 @@ export class AuthService {
       sessionStorage.removeItem(USER_KEY);
     } catch {
       // Storage can be blocked; the in-memory session is still cleared.
+    }
+  }
+
+  private usesPersistentStorage(): boolean {
+    try {
+      return localStorage.getItem(TOKEN_KEY) !== null;
+    } catch {
+      return false;
     }
   }
 

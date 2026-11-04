@@ -49,7 +49,10 @@ public class UserRepository : IUserRepository
 
         return state is null
             ? null
-            : new UserAuthState(state.Id, state.IsActive, state.Role);
+            : new UserAuthState(
+                state.Id,
+                state.IsActive,
+                state.Role);
     }
 
     public Task<bool> UsernameExistsAsync(

@@ -1,4 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Security.Claims;
 using System.Text;
 using HappyInventory.Application.Common;
 using HappyInventory.Application.DTOs.Users;
@@ -82,6 +84,39 @@ public class SecurityTests
         Assert.True(EncodingUtf8ByteCount(jwtOptions.Key) >= 32);
     }
 
+    [Fact]
+    public void TokenService_EmitsRoleClaim_WithoutMustChangePasswordClaim()
+    {
+        var options = new JwtOptions
+        {
+            Key = new string('K', 32),
+            Issuer = "happyInventory",
+            Audience = "happyInventory.Client",
+            ExpiryMinutes = 60,
+        };
+        var service = new TokenService(options);
+
+        var (token, expiresUtc) = service.CreateToken(new UserDto
+        {
+            Id = 7,
+            Username = "admin@happywarehouse.com",
+            FullName = "System Administrator",
+            Role = UserRoles.Admin,
+            IsActive = true,
+        });
+
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "mustChangePassword");
+        Assert.Contains(
+            jwt.Claims,
+            claim => claim.Type == ClaimTypes.Role && claim.Value == UserRoles.Admin);
+        Assert.Contains(
+            jwt.Claims,
+            claim => claim.Type == ClaimTypes.Name && claim.Value == "admin@happywarehouse.com");
+        Assert.True(expiresUtc > DateTime.UtcNow);
+    }
+
     private static ServiceProvider BuildServiceProvider(AppDbContext db, IPasswordHasher hasher)
     {
         var services = new ServiceCollection();
@@ -93,14 +128,14 @@ public class SecurityTests
     }
 
     [Fact]
-    public async Task DbSeeder_CreatesAdmin_WithMustChangePassword_WhenNoPasswordConfigured()
+    public async Task DbSeeder_CreatesAdmin_WithoutPasswordChangeRequirement_WhenNoPasswordConfigured()
     {
         var db = CreateMigratedDb();
         var hasher = new PasswordHasher();
         var config = BuildConfiguration(b => b.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Seed:AdminUsername"] = "admin@happywarehouse.com",
-            // No Seed:AdminPassword -> one-time password should be generated
+            // No Seed:AdminPassword -> an initial password should be generated
         }));
 
         await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), config);
@@ -110,7 +145,7 @@ public class SecurityTests
         Assert.NotNull(user);
         Assert.Equal(UserRoles.Admin, user.Role);
         Assert.True(user.IsActive);
-        Assert.True(user.MustChangePassword);
+        Assert.False(user.MustChangePassword);
         Assert.NotEmpty(user.PasswordHash);
         Assert.NotEqual("P@ssw0rd", user.PasswordHash);
     }
@@ -131,8 +166,33 @@ public class SecurityTests
         var user = await db.Users.FirstOrDefaultAsync(u => u.NormalizedUsername == "admin@happywarehouse.com");
 
         Assert.NotNull(user);
-        Assert.True(user.MustChangePassword);
+        Assert.False(user.MustChangePassword);
         Assert.True(hasher.Verify("SecurePassword123!", user.PasswordHash));
+    }
+
+    [Fact]
+    public async Task DbSeeder_ClearsLegacyPasswordChangeFlag_WithoutResettingPassword()
+    {
+        var db = CreateMigratedDb();
+        var hasher = new PasswordHasher();
+        var config = BuildConfiguration(b => b.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Seed:AdminUsername"] = "admin@happywarehouse.com",
+            ["Seed:AdminPassword"] = "InitialPassword123!",
+        }));
+
+        await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), config);
+
+        var user = await db.Users.FirstAsync(u => u.NormalizedUsername == "admin@happywarehouse.com");
+        user.MustChangePassword = true;
+        user.PasswordHash = hasher.Hash("ChangedPassword123!");
+        await db.SaveChangesAsync();
+
+        await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), config);
+
+        var updated = await db.Users.FirstAsync(u => u.NormalizedUsername == "admin@happywarehouse.com");
+        Assert.False(updated.MustChangePassword);
+        Assert.True(hasher.Verify("ChangedPassword123!", updated.PasswordHash));
     }
 
     [Fact]
@@ -170,7 +230,7 @@ public class SecurityTests
     }
 
     [Fact]
-    public async Task UserService_ChangePassword_ClearsMustChangePassword()
+    public async Task UserService_ChangePassword_UpdatesPassword()
     {
         var db = CreateMigratedDb();
         var hasher = new PasswordHasher();
@@ -191,7 +251,14 @@ public class SecurityTests
         await repo.AddAsync(user);
         await repo.SaveChangesAsync();
 
-        await service.ChangePasswordAsync(user.Id, new ChangePasswordRequest { NewPassword = "NewPassword123!" }, default);
+        await service.ChangePasswordAsync(
+            user.Id,
+            new ChangePasswordRequest
+            {
+                CurrentPassword = "OldPassword123!",
+                NewPassword = "NewPassword123!",
+            },
+            default);
 
         var updated = await repo.GetByIdAsync(user.Id, default);
         Assert.NotNull(updated);
@@ -200,7 +267,45 @@ public class SecurityTests
     }
 
     [Fact]
-    public async Task UserService_Authenticate_DoesNotClearMustChangePassword()
+    public async Task UserService_ChangePassword_RejectsWrongCurrentPassword()
+    {
+        var db = CreateMigratedDb();
+        var hasher = new PasswordHasher();
+        var repo = new TestUserRepository(db);
+        var service = new UserService(repo, hasher, new AdminPolicyOptions { DefaultAdminUsername = "admin@happywarehouse.com" });
+
+        var user = new User
+        {
+            Username = "user@test.com",
+            NormalizedUsername = "user@test.com",
+            FullName = "Test User",
+            Role = UserRoles.Auditor,
+            IsActive = true,
+            PasswordHash = hasher.Hash("OldPassword123!"),
+            CreatedUtc = DateTime.UtcNow,
+        };
+        await repo.AddAsync(user);
+        await repo.SaveChangesAsync();
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.ChangePasswordAsync(
+                user.Id,
+                new ChangePasswordRequest
+                {
+                    CurrentPassword = "WrongPassword123!",
+                    NewPassword = "NewPassword123!",
+                },
+                default));
+
+        Assert.Equal("Current password is incorrect.", exception.Message);
+
+        var updated = await repo.GetByIdAsync(user.Id, default);
+        Assert.NotNull(updated);
+        Assert.True(hasher.Verify("OldPassword123!", updated.PasswordHash));
+    }
+
+    [Fact]
+    public async Task UserService_ResetPassword_DoesNotRequireCurrentPassword()
     {
         var db = CreateMigratedDb();
         var hasher = new PasswordHasher();
@@ -215,6 +320,38 @@ public class SecurityTests
             Role = UserRoles.Auditor,
             IsActive = true,
             MustChangePassword = true,
+            PasswordHash = hasher.Hash("OldPassword123!"),
+            CreatedUtc = DateTime.UtcNow,
+        };
+        await repo.AddAsync(user);
+        await repo.SaveChangesAsync();
+
+        await service.ResetPasswordAsync(
+            user.Id,
+            new ResetPasswordRequest { NewPassword = "ResetPassword123!" },
+            default);
+
+        var updated = await repo.GetByIdAsync(user.Id, default);
+        Assert.NotNull(updated);
+        Assert.False(updated.MustChangePassword);
+        Assert.True(hasher.Verify("ResetPassword123!", updated.PasswordHash));
+    }
+
+    [Fact]
+    public async Task UserService_Authenticate_DoesNotChangePasswordHash()
+    {
+        var db = CreateMigratedDb();
+        var hasher = new PasswordHasher();
+        var repo = new TestUserRepository(db);
+        var service = new UserService(repo, hasher, new AdminPolicyOptions { DefaultAdminUsername = "admin@happywarehouse.com" });
+
+        var user = new User
+        {
+            Username = "user@test.com",
+            NormalizedUsername = "user@test.com",
+            FullName = "Test User",
+            Role = UserRoles.Auditor,
+            IsActive = true,
             PasswordHash = hasher.Hash("Password123!"),
             CreatedUtc = DateTime.UtcNow,
         };
@@ -224,7 +361,7 @@ public class SecurityTests
         var result = await service.AuthenticateAsync("user@test.com", "Password123!", default);
 
         Assert.NotNull(result);
-        Assert.True(result.MustChangePassword);
+        Assert.True(hasher.Verify("Password123!", user.PasswordHash));
     }
 
     [Fact]

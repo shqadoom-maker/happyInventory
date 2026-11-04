@@ -18,6 +18,12 @@ const backendErrorToKey: Record<string, string> = {
   "You cannot deactivate your own account.": "errors.cannotDeactivateOwnAccount",
   "You cannot remove your own administrator role.": "errors.cannotRemoveOwnAdminRole",
   "You cannot delete your own account.": "errors.cannotDeleteOwnAccount",
+  "Password must be at least 8 characters long.": "errors.passwordTooShort",
+  "Current password is incorrect.": "errors.currentPasswordIncorrect",
+  "New password must be different from the current password.":
+    "errors.newPasswordMustDiffer",
+  "You must change your password before accessing other endpoints.":
+    "errors.passwordChangeRequired",
   // Warehouse
   "The requested warehouse was not found.": "errors.warehouseNotFound",
   // Warehouse item

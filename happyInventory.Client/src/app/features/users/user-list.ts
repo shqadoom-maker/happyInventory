@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { errorMessage } from '../../core/error-message';
-import { ChangePasswordRequest, User } from '../../core/models/user.model';
+import { ResetPasswordRequest, User } from '../../core/models/user.model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -132,14 +132,14 @@ export class UserList implements OnInit {
       return;
     }
 
-    const request: ChangePasswordRequest = {
+    const request: ResetPasswordRequest = {
       newPassword: this.passwordForm.controls.newPassword.value,
     };
 
     this.passwordSaving.set(true);
     this.passwordError.set(null);
 
-    this.userService.changePassword(user.id, request).subscribe({
+    this.userService.resetPassword(user.id, request).subscribe({
       next: () => {
         this.passwordSaving.set(false);
         this.passwordUser.set(null);
