@@ -69,7 +69,7 @@ public class InventoryUpdateServiceTests
         var repository = new FakeInventoryUpdateRepository();
         var service = new InventoryUpdateService(repository);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.ApplyAsync(new InventoryUpdateRequest
+        await Assert.ThrowsAsync<NotFoundException>(() => service.ApplyAsync(new InventoryUpdateRequest
         {
             WarehouseId = 2,
             SKUCode = "missing",
@@ -83,7 +83,7 @@ public class InventoryUpdateServiceTests
         var repository = new FakeInventoryUpdateRepository();
         var service = new InventoryUpdateService(repository);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.ApplyAsync(new InventoryUpdateRequest
+        await Assert.ThrowsAsync<ValidationException>(() => service.ApplyAsync(new InventoryUpdateRequest
         {
             WarehouseId = 2,
             SKUCode = "SKU-1",
@@ -183,7 +183,7 @@ public class InventoryUpdateServiceTests
 
         var service = new InventoryUpdateService(repository);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.ApplyAsync(new InventoryUpdateRequest
+        await Assert.ThrowsAsync<ValidationException>(() => service.ApplyAsync(new InventoryUpdateRequest
         {
             WarehouseId = 2,
             SKUCode = "SKU-1",

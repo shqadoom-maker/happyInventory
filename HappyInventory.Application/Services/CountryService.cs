@@ -1,3 +1,4 @@
+using HappyInventory.Application.Common;
 using HappyInventory.Application.DTOs.Countries;
 using HappyInventory.Application.Interfaces.Repositories;
 using HappyInventory.Application.Interfaces.Services;
@@ -27,7 +28,7 @@ public class CountryService : ICountryService
 
         if (country is null)
         {
-            throw new KeyNotFoundException("The requested country was not found.");
+            throw new NotFoundException("The requested country was not found.");
         }
 
         return ToDto(country);
@@ -42,7 +43,7 @@ public class CountryService : ICountryService
 
         if (await _countries.AnyDuplicateAsync(name, code, null, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "A country with the same name or code already exists.");
         }
 
@@ -67,7 +68,7 @@ public class CountryService : ICountryService
 
         if (country is null)
         {
-            throw new KeyNotFoundException("The requested country was not found.");
+            throw new NotFoundException("The requested country was not found.");
         }
 
         var name = Require(request.Name, "Country name");
@@ -75,7 +76,7 @@ public class CountryService : ICountryService
 
         if (await _countries.AnyDuplicateAsync(name, code, id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "A country with the same name or code already exists.");
         }
 
@@ -93,12 +94,12 @@ public class CountryService : ICountryService
 
         if (country is null)
         {
-            throw new KeyNotFoundException("The requested country was not found.");
+            throw new NotFoundException("The requested country was not found.");
         }
 
         if (await _countries.IsInUseAsync(id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "The country cannot be deleted while it has cities or warehouses.");
         }
 
@@ -112,7 +113,7 @@ public class CountryService : ICountryService
 
         if (string.IsNullOrWhiteSpace(trimmed))
         {
-            throw new InvalidOperationException($"{field} is required.");
+            throw new ValidationException($"{field} is required.");
         }
 
         return trimmed;

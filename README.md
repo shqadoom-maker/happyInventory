@@ -63,18 +63,19 @@ Swagger is available at `https://localhost:7157/swagger`.
 
 The database (`HappyInventory.Api/happyInventory.db`) is created and migrated on
 startup. The existing development database was copied there so its migration
-history and seed data carry over. The default administrator is seeded from
-`appsettings.json`:
+history and seed data carry over. The default administrator is seeded from the
+`Seed` configuration:
 
 | Email | Password |
 | --- | --- |
-| `admin@happywarehouse.com` | `P@ssw0rd` |
+| `admin@happywarehouse.com` | `Seed:AdminPassword` |
 
 The seeder ensures the default administrator account exists. On a fresh database
-it is the first account. On an existing database it migrates the legacy seeded
-`admin` account to the new email and resets its password once; legacy `User`
-roles are mapped to `Auditor`. Change the seeded credentials and the JWT signing
-key before deploying.
+it is the first account, so `Seed:AdminPassword` must be configured. If no
+administrator exists and no password is configured, startup fails instead of
+creating an account with an unknown generated password. The seeder never resets
+the password of an existing account; legacy `User` roles are mapped to `Auditor`.
+Change the seeded credentials and the JWT signing key before deploying.
 
 Frontend:
 
@@ -218,8 +219,13 @@ Database logging is configured under `Logging:Database`:
 | --- | --- | --- |
 | `Enabled` | `true` | Enables the SQLite sink and writer/retention services. |
 | `MinimumLevel` | `Information` | Minimum level stored in SQLite; console and file logging keep Serilog's global level. |
-| `QueueCapacity` | `10000` | Bounded queue size; events are dropped when full rather than blocking requests. |
+| `QueueCapacity` | `10000` | Bounded queue size; oldest events are dropped when full rather than blocking requests. |
 | `RetentionDays` | `30` | Automatic cleanup age; `0` disables automatic pruning. |
+
+`SystemLogQueue` exposes `Capacity`, `QueuedCount` and `DroppedCount` for
+monitoring. When the queue is full it drops the oldest entry, increments
+`DroppedCount`, and writes a throttled warning to standard error. The warning
+does not use Serilog, so a full queue cannot recursively enqueue another event.
 
 The retention service runs after a one-minute startup delay and then every six
 hours. Administrators can trigger the same cleanup manually with
@@ -252,10 +258,12 @@ JWT settings live in `HappyInventory.Api/appsettings.json` (`Jwt:Issuer`,
 
 ## Security configuration
 
-### JWT signing key
+### JWT and database configuration
 
-`Jwt:Key` must be set to a random string of at least 32 bytes. It is intentionally
-left empty in `appsettings.json` and must be provided through a secure source.
+`Jwt:Issuer`, `Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, and
+`ConnectionStrings:Default` are validated during startup. `Jwt:Key` must be a
+random string of at least 32 bytes. It is intentionally left empty in
+`appsettings.json` and must be provided through a secure source.
 
 **Local development (User Secrets):**
 
@@ -275,14 +283,37 @@ dotnet user-secrets set "Jwt:Key" "$(openssl rand -base64 32)"
 
 ```bash
 export ConnectionStrings__Default="Data Source=/var/lib/happyinventory/happyInventory.db"
+export Jwt__Issuer="happyInventory"
+export Jwt__Audience="happyInventory.Client"
 export Jwt__Key="<random-32-byte-or-longer-string>"
 export Seed__AdminPassword="<secure-admin-password>"
 ```
 
 or configure them in your secret manager (Azure Key Vault, AWS Secrets Manager,
-HashiCorp Vault, etc.) and map them to the `Jwt:Key` and `Seed:AdminPassword`
-configuration keys. The application fails fast on startup if `Jwt:Key` is missing
-or shorter than 32 bytes. The signing key is never logged.
+HashiCorp Vault, etc.) and map them to the `Jwt` and `Seed` configuration keys.
+The application fails fast if the issuer, audience, key, expiry, or database
+connection string is missing or invalid. The signing key is never logged.
+
+### Trusted reverse proxy and rate limiting
+
+Rate limiting uses `HttpContext.Connection.RemoteIpAddress`. The application
+does not trust client-supplied `X-Real-IP` or `X-Client-Id` headers. If the API
+runs behind a reverse proxy or load balancer, add only that proxy's address to
+`ForwardedHeaders`:
+
+```json
+"ForwardedHeaders": {
+  "KnownProxies": [ "10.0.0.10" ],
+  "KnownNetworks": [ "10.0.0.0/8" ],
+  "ForwardLimit": 1
+}
+```
+
+`UseForwardedHeaders` runs before rate limiting and only accepts
+`X-Forwarded-For`/`X-Forwarded-Proto` from a configured trusted peer. If the
+lists are empty, forwarding headers are ignored and the direct connection IP is
+used. This is fail-closed: behind an unconfigured proxy, all callers may share
+the proxy's IP for rate limiting.
 
 ### Administrator seeding
 
@@ -290,8 +321,9 @@ The default administrator is created only when no matching user exists in the
 database. The password is **never reset on subsequent startups**.
 
 - If `Seed:AdminPassword` is provided, that password is hashed and stored.
-- If `Seed:AdminPassword` is not provided, a strong initial password is generated.
-  The administrator is not forced to change it at first login.
+- If no administrator exists and `Seed:AdminPassword` is not provided, startup
+  fails with a clear configuration error. The application does not generate an
+  unrecoverable password or print a password to logs.
 
 New accounts and existing accounts can sign in and use the application normally.
 On startup the seeder clears the legacy `MustChangePassword` flag for any
@@ -349,10 +381,20 @@ or service can use the same JSON/HTTP endpoints:
    `POST /api/inventory/updates` and also requires `Idempotency-Key`.
 
 CORS applies only to browser callers; server-to-server clients are not blocked
-by the Angular development origin policy. The development launch profile binds
-to `localhost`. To accept calls from another machine, start the API with an
-explicit binding such as `--urls "https://0.0.0.0:7157"` and use a trusted
-certificate, or place it behind a reverse proxy.
+by the browser origin policy. Allowed origins are configured under
+`Cors:AllowedOrigins`. Development defaults to `http://localhost:4200`; add the
+production Angular origin through configuration, for example:
+
+```bash
+export Cors__AllowedOrigins__0="https://app.example.com"
+```
+
+When the list is empty, no cross-origin browser origin is allowed. This is the
+correct setting when Angular is served from the same App Service as the API.
+The development launch profile binds to `localhost`. To accept calls from
+another machine, start the API with an explicit binding such as
+`--urls "https://0.0.0.0:7157"` and use a trusted certificate, or place it
+behind a reverse proxy.
 
 ## Frontend behaviour
 
@@ -361,6 +403,8 @@ certificate, or place it behind a reverse proxy.
 - The JWT is stored in `localStorage` when "Remember me" is checked, otherwise
   in `sessionStorage` (the tab session only). It is restored on reload until it
   expires.
+- On startup, an existing session calls `GET /api/auth/me` before route guards
+  run, so profile and role changes are reflected without signing out.
 - A `401` response clears the session and redirects to login.
 - A successful login goes straight to the dashboard (or the requested return URL).
   The optional `/change-password` page is available to signed-in users but is

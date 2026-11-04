@@ -35,25 +35,33 @@ public class ExceptionHandlingMiddleware
 
     private async Task HandleAsync(HttpContext context, Exception exception)
     {
-        var (status, title, detail) = exception switch
+        var (status, title, code) = exception switch
         {
-            KeyNotFoundException => (
+            NotFoundException e => (
                 StatusCodes.Status404NotFound,
                 "Resource not found",
-                exception.Message),
-            ConflictException => (
-                StatusCodes.Status409Conflict,
-                "Request conflicts with the current state",
-                exception.Message),
-            InvalidOperationException => (
+                e.Code),
+            ValidationException e => (
                 StatusCodes.Status400BadRequest,
                 "Request could not be processed",
-                exception.Message),
+                e.Code),
+            ConflictException e => (
+                StatusCodes.Status409Conflict,
+                "Request conflicts with the current state",
+                e.Code),
+            AuthenticationException e => (
+                StatusCodes.Status401Unauthorized,
+                "Authentication failed",
+                e.Code),
             _ => (
                 StatusCodes.Status500InternalServerError,
                 "An unexpected error occurred",
-                "An unexpected error occurred. Please try again."),
+                (string?)null),
         };
+
+        var detail = exception is AppException appException
+            ? appException.Message
+            : "An unexpected error occurred. Please try again.";
 
         using (LogContext.PushProperty(
             "UserId",
@@ -75,13 +83,15 @@ public class ExceptionHandlingMiddleware
             }
             else
             {
-                // For client errors (4xx), log a safe message without the raw
-                // exception detail to avoid leaking sensitive information.
+                // For expected client errors (4xx), log the domain reason. The
+                // reason is written to server logs only and never returned
+                // outside the ProblemDetails body.
                 _logger.LogInformation(
-                    "Request to {Path} {Method} failed with status {Status}",
+                    "Request to {Path} {Method} failed with status {Status}: {Reason}",
                     context.Request.Path,
                     context.Request.Method,
-                    status);
+                    status,
+                    detail);
             }
         }
 
@@ -101,6 +111,11 @@ public class ExceptionHandlingMiddleware
             Detail = detail,
             Instance = context.Request.Path,
         };
+
+        if (!string.IsNullOrWhiteSpace(code))
+        {
+            problem.Extensions["code"] = code;
+        }
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(problem, JsonOptions));
     }

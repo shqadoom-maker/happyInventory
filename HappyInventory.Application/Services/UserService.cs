@@ -37,7 +37,7 @@ public class UserService : IUserService
 
         if (user is null)
         {
-            throw new KeyNotFoundException("The requested user was not found.");
+            throw new NotFoundException("The requested user was not found.");
         }
 
         return ToDto(user);
@@ -68,8 +68,9 @@ public class UserService : IUserService
 
         if (!user.IsActive)
         {
-            throw new InvalidOperationException(
-                "Your account is disabled and you need to contact support.");
+            throw new AuthenticationException(
+                "Your account is disabled and you need to contact support.",
+                "account_disabled");
         }
 
         user.LastLoginUtc = DateTime.UtcNow;
@@ -83,7 +84,7 @@ public class UserService : IUserService
         CancellationToken cancellationToken = default)
     {
         var role = UserRoles.Normalize(request.Role)
-            ?? throw new InvalidOperationException(
+            ?? throw new ValidationException(
                 $"Role must be one of: {string.Join(", ", UserRoles.All)}.");
 
         var username = request.Username.Trim();
@@ -91,7 +92,7 @@ public class UserService : IUserService
 
         if (await _users.UsernameExistsAsync(normalized, null, cancellationToken))
         {
-            throw new InvalidOperationException($"Username '{username}' is already taken.");
+            throw new ConflictException($"Username '{username}' is already taken.");
         }
 
         var user = new User
@@ -121,11 +122,11 @@ public class UserService : IUserService
 
         if (user is null)
         {
-            throw new KeyNotFoundException("The requested user was not found.");
+            throw new NotFoundException("The requested user was not found.");
         }
 
         var role = UserRoles.Normalize(request.Role)
-            ?? throw new InvalidOperationException(
+            ?? throw new ValidationException(
                 $"Role must be one of: {string.Join(", ", UserRoles.All)}.");
 
         var username = request.Username.Trim();
@@ -135,19 +136,19 @@ public class UserService : IUserService
         {
             if (!string.Equals(normalized, _defaultAdminUsername, StringComparison.Ordinal))
             {
-                throw new InvalidOperationException(
+                throw new ValidationException(
                     "The default administrator email cannot be changed.");
             }
 
             if (role != UserRoles.Admin)
             {
-                throw new InvalidOperationException(
+                throw new ValidationException(
                     "The default administrator role cannot be changed.");
             }
 
             if (!request.IsActive)
             {
-                throw new InvalidOperationException(
+                throw new ValidationException(
                     "The default administrator cannot be deactivated.");
             }
         }
@@ -156,18 +157,18 @@ public class UserService : IUserService
         {
             if (!request.IsActive)
             {
-                throw new InvalidOperationException("You cannot deactivate your own account.");
+                throw new ValidationException("You cannot deactivate your own account.");
             }
 
             if (role != UserRoles.Admin)
             {
-                throw new InvalidOperationException("You cannot remove your own administrator role.");
+                throw new ValidationException("You cannot remove your own administrator role.");
             }
         }
 
         if (await _users.UsernameExistsAsync(normalized, id, cancellationToken))
         {
-            throw new InvalidOperationException($"Username '{username}' is already taken.");
+            throw new ConflictException($"Username '{username}' is already taken.");
         }
 
         user.Username = username;
@@ -180,7 +181,7 @@ public class UserService : IUserService
         {
             if (request.Password.Length < 8)
             {
-                throw new InvalidOperationException("Password must be at least 8 characters long.");
+                throw new ValidationException("Password must be at least 8 characters long.");
             }
 
             user.PasswordHash = _passwordHasher.Hash(request.Password);
@@ -200,7 +201,7 @@ public class UserService : IUserService
 
         if (user is null)
         {
-            throw new KeyNotFoundException("The requested user was not found.");
+            throw new NotFoundException("The requested user was not found.");
         }
 
         ValidateNewPassword(request.NewPassword);
@@ -208,12 +209,12 @@ public class UserService : IUserService
         if (string.IsNullOrWhiteSpace(request.CurrentPassword)
             || !_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
         {
-            throw new InvalidOperationException("Current password is incorrect.");
+            throw new ValidationException("Current password is incorrect.");
         }
 
         if (_passwordHasher.Verify(request.NewPassword, user.PasswordHash))
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 "New password must be different from the current password.");
         }
 
@@ -231,7 +232,7 @@ public class UserService : IUserService
 
         if (user is null)
         {
-            throw new KeyNotFoundException("The requested user was not found.");
+            throw new NotFoundException("The requested user was not found.");
         }
 
         ValidateNewPassword(request.NewPassword);
@@ -248,24 +249,24 @@ public class UserService : IUserService
     {
         if (id == currentUserId)
         {
-            throw new InvalidOperationException("You cannot delete your own account.");
+            throw new ValidationException("You cannot delete your own account.");
         }
 
         var user = await _users.GetByIdAsync(id, cancellationToken);
 
         if (user is null)
         {
-            throw new KeyNotFoundException("The requested user was not found.");
+            throw new NotFoundException("The requested user was not found.");
         }
 
         if (IsDefaultAdmin(user))
         {
-            throw new InvalidOperationException("The default administrator cannot be deleted.");
+            throw new ValidationException("The default administrator cannot be deleted.");
         }
 
         if (string.Equals(user.Role, UserRoles.Admin, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("Administrator accounts cannot be deleted.");
+            throw new ValidationException("Administrator accounts cannot be deleted.");
         }
 
         _users.Remove(user);
@@ -276,7 +277,7 @@ public class UserService : IUserService
     {
         if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
         {
-            throw new InvalidOperationException("Password must be at least 8 characters long.");
+            throw new ValidationException("Password must be at least 8 characters long.");
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using HappyInventory.Api.Logging;
@@ -10,6 +11,7 @@ using HappyInventory.Infrastructure;
 using HappyInventory.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using AspNetCoreRateLimit;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -68,21 +70,51 @@ var jwtOptions = builder.Configuration
     .Get<JwtOptions>()
     ?? throw new InvalidOperationException("JWT configuration is missing.");
 
-if (string.IsNullOrWhiteSpace(jwtOptions.Key))
-{
-    throw new InvalidOperationException("Jwt:Key is required. Set it via User Secrets (development) or environment variables (production).");
-}
-
-if (Encoding.UTF8.GetByteCount(jwtOptions.Key) < 32)
-{
-    throw new InvalidOperationException("Jwt:Key must be at least 32 bytes long.");
-}
+jwtOptions.Validate();
 
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddSingleton(new AdminPolicyOptions
 {
     DefaultAdminUsername = builder.Configuration["Seed:AdminUsername"]
         ?? throw new InvalidOperationException("Seed:AdminUsername is required."),
+});
+
+// Forwarded headers are only accepted from proxies/networks listed in
+// configuration. If the list is empty, only the framework's loopback defaults
+// are trusted and client-supplied forwarding headers are ignored.
+var forwardedHeadersSection = builder.Configuration.GetSection("ForwardedHeaders");
+var knownProxies = forwardedHeadersSection.GetSection("KnownProxies").Get<string[]>()
+    ?? Array.Empty<string>();
+var knownNetworks = forwardedHeadersSection.GetSection("KnownNetworks").Get<string[]>()
+    ?? Array.Empty<string>();
+var forwardLimit = forwardedHeadersSection.GetValue("ForwardLimit", 1);
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = forwardLimit;
+
+    foreach (var proxyValue in knownProxies)
+    {
+        if (!IPAddress.TryParse(proxyValue?.Trim(), out var proxy))
+        {
+            throw new InvalidOperationException(
+                $"ForwardedHeaders:KnownProxies contains an invalid IP address: '{proxyValue}'.");
+        }
+
+        options.KnownProxies.Add(proxy);
+    }
+
+    foreach (var networkValue in knownNetworks)
+    {
+        if (!TryParseNetwork(networkValue, out var network))
+        {
+            throw new InvalidOperationException(
+                $"ForwardedHeaders:KnownNetworks contains an invalid CIDR network: '{networkValue}'.");
+        }
+
+        options.KnownNetworks.Add(network);
+    }
 });
 
 builder.Services.AddApplication();
@@ -167,13 +199,32 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole(UserRoles.Admin));
 });
 
+var allowedOrigins = (builder.Configuration
+        .GetSection("Cors:AllowedOrigins")
+        .Get<string[]>()
+        ?? Array.Empty<string>())
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim())
+    .ToArray();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AngularDev", policy =>
-        policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+    options.AddPolicy("Angular", policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+        else
+        {
+            // Same-origin deployments do not need CORS. Deny all cross-origin
+            // callers instead of accidentally allowing every origin.
+            policy.SetIsOriginAllowed(_ => false);
+        }
+    });
 });
 
 builder.Services.AddControllers();
@@ -188,8 +239,12 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
     options.EnableEndpointRateLimiting = true;
     options.StackBlockedRequests = false;
     options.HttpStatusCode = 429;
-    options.ClientIdHeader = "X-Client-Id";
-    options.RealIpHeader = "X-Real-IP";
+
+    // Do not trust client-supplied identity headers. The rate limiter uses
+    // HttpContext.Connection.RemoteIpAddress, which UseForwardedHeaders()
+    // rewrites only when the immediate peer is a configured trusted proxy.
+    options.ClientIdHeader = null!;
+    options.RealIpHeader = null!;
     options.GeneralRules = new List<RateLimitRule>
     {
         new RateLimitRule
@@ -212,6 +267,15 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
         },
     };
 });
+
+// The rate-limit library also reads these values from ClientRateLimitOptions.
+// Clear them there too so X-Client-Id is never registered as a client identity.
+builder.Services.Configure<ClientRateLimitOptions>(options =>
+{
+    options.ClientIdHeader = null!;
+    options.RealIpHeader = null!;
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -284,13 +348,18 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Rewrite the connection IP from X-Forwarded-For only when the immediate peer
+// is a trusted proxy configured under ForwardedHeaders. This must run before
+// rate limiting and HTTPS redirection.
+app.UseForwardedHeaders();
+
 // Serve the Angular production build from wwwroot when the API and client are
 // deployed as a single App Service. In development the Angular dev server is
 // used instead and wwwroot may not exist.
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseCors("AngularDev");
+app.UseCors("Angular");
 
 // Azure App Service terminates TLS and forwards HTTP to the container. The
 // platform's "HTTPS Only" setting handles the public redirect, so only enable
@@ -346,6 +415,37 @@ static LogEventLevel ParseLogLevel(string? value, LogEventLevel fallback)
     return Enum.TryParse<LogEventLevel>(value, ignoreCase: true, out var level)
         ? level
         : fallback;
+}
+
+static bool TryParseNetwork(
+    string? value,
+    out Microsoft.AspNetCore.HttpOverrides.IPNetwork network)
+{
+    network = default!;
+
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        return false;
+    }
+
+    var parts = value.Split('/');
+
+    if (parts.Length != 2
+        || !IPAddress.TryParse(parts[0].Trim(), out var prefix)
+        || !int.TryParse(parts[1].Trim(), out var prefixLength))
+    {
+        return false;
+    }
+
+    var maxPrefixLength = prefix.GetAddressBytes().Length * 8;
+
+    if (prefixLength < 0 || prefixLength > maxPrefixLength)
+    {
+        return false;
+    }
+
+    network = new Microsoft.AspNetCore.HttpOverrides.IPNetwork(prefix, prefixLength);
+    return true;
 }
 
 // Exposed for WebApplicationFactory-based integration tests.

@@ -1,3 +1,4 @@
+using HappyInventory.Application.Common;
 using HappyInventory.Application.DTOs.Cities;
 using HappyInventory.Application.Interfaces.Repositories;
 using HappyInventory.Application.Interfaces.Services;
@@ -28,7 +29,7 @@ public class CityService : ICityService
 
         if (city is null)
         {
-            throw new KeyNotFoundException("The requested city was not found.");
+            throw new NotFoundException("The requested city was not found.");
         }
 
         return ToDto(city);
@@ -42,12 +43,12 @@ public class CityService : ICityService
 
         if (!await _cities.CountryExistsAsync(request.CountryId, cancellationToken))
         {
-            throw new InvalidOperationException("The selected country does not exist.");
+            throw new ValidationException("The selected country does not exist.");
         }
 
         if (await _cities.AnyDuplicateAsync(name, request.CountryId, null, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "A city with the same name already exists in that country.");
         }
 
@@ -81,19 +82,19 @@ public class CityService : ICityService
 
         if (city is null)
         {
-            throw new KeyNotFoundException("The requested city was not found.");
+            throw new NotFoundException("The requested city was not found.");
         }
 
         var name = Require(request.Name);
 
         if (!await _cities.CountryExistsAsync(request.CountryId, cancellationToken))
         {
-            throw new InvalidOperationException("The selected country does not exist.");
+            throw new ValidationException("The selected country does not exist.");
         }
 
         if (await _cities.AnyDuplicateAsync(name, request.CountryId, id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "A city with the same name already exists in that country.");
         }
 
@@ -120,12 +121,12 @@ public class CityService : ICityService
 
         if (city is null)
         {
-            throw new KeyNotFoundException("The requested city was not found.");
+            throw new NotFoundException("The requested city was not found.");
         }
 
         if (await _cities.IsInUseAsync(id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 "The city cannot be deleted while it has warehouses.");
         }
 
@@ -139,7 +140,7 @@ public class CityService : ICityService
 
         if (string.IsNullOrWhiteSpace(trimmed))
         {
-            throw new InvalidOperationException("City name is required.");
+            throw new ValidationException("City name is required.");
         }
 
         return trimmed;

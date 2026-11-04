@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, firstValueFrom, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
@@ -30,6 +30,30 @@ export class AuthService {
 
   constructor() {
     this.restoreSession();
+  }
+
+  /**
+   * Refreshes the signed-in profile before the first route is activated.
+   * This makes role changes and profile edits visible without requiring a
+   * sign-out/sign-in cycle.
+   */
+  async initializeSession(): Promise<void> {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(this.refreshCurrentUser());
+    } catch {
+      // A rejected token is handled by authInterceptor; transient failures
+      // keep the cached profile so the app can still open.
+    }
+  }
+
+  refreshCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/me`).pipe(
+      tap((user) => this.updateStoredUser(user)),
+    );
   }
 
   login(request: LoginRequest, remember = true): Observable<LoginResponse> {
@@ -64,6 +88,17 @@ export class AuthService {
       storage.setItem(USER_KEY, JSON.stringify(response.user));
     } catch {
       // Keep working for this tab even when storage is unavailable.
+    }
+  }
+
+  private updateStoredUser(user: User): void {
+    this.currentUser.set(user);
+
+    try {
+      const storage = this.sessionStorageWithToken() ?? this.localStorageWithToken();
+      storage?.setItem(USER_KEY, JSON.stringify(user));
+    } catch {
+      // The in-memory profile is still updated when storage is unavailable.
     }
   }
 

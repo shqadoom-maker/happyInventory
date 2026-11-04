@@ -28,7 +28,7 @@ happyInventory/
 │  └─ Enums/                           UserRoles
 ├─ HappyInventory.Application/         Application layer
 │  ├─ Common/                          JwtOptions, AdminPolicyOptions, PagedResult,
-│  │                                   ConflictException
+│  │                                   AppException and semantic exceptions
 │  ├─ DTOs/                            Auth, Users, Countries, Cities, Warehouses,
 │  │                                   WarehouseItems, Dashboard, Integrations,
 │  │                                   SystemLogs
@@ -91,8 +91,11 @@ HTTP
 
 DTOs cross the HTTP boundary. Controllers never access `AppDbContext` and never
 return database entities. Domain entities stay inside Application and
-Infrastructure. Application exceptions are translated to HTTP problem responses by
-`ExceptionHandlingMiddleware`.
+Infrastructure. Services throw semantic application exceptions such as
+`NotFoundException`, `ValidationException`, `ConflictException` and
+`AuthenticationException`; they never choose HTTP status codes.
+`ExceptionHandlingMiddleware` translates those exceptions to RFC 7807 problem
+responses at the API boundary.
 
 ## Security model
 
@@ -104,7 +107,9 @@ Infrastructure. Application exceptions are translated to HTTP problem responses 
 - A successful login returns an HS256 JWT with `NameIdentifier`, `Name` and
   `Role` claims, plus the user profile and expiry.
 - JWT issuer, audience, signing key and lifetime come from `Jwt` configuration.
-  The key must be at least 32 bytes; validation allows 30 seconds of clock skew.
+  Startup validates that the issuer and audience are non-empty, the key is at
+  least 32 bytes, and the lifetime is positive. Validation allows 30 seconds of
+  clock skew.
 - `JwtBearerEvents.OnTokenValidated` re-reads the user through
   `IUserRepository` on every request. Deleted or inactive users are rejected, and
   the role claim is replaced with the current database role so promotions and
@@ -128,20 +133,39 @@ Infrastructure. Application exceptions are translated to HTTP problem responses 
 - The inbound eCommerce endpoint uses the same JWT fallback policy. External
   systems need a bearer token; no separate API-key scheme was introduced.
 
+### Rate limiting and trusted proxies
+
+- Rate limiting uses `HttpContext.Connection.RemoteIpAddress`; client-supplied
+  `X-Real-IP` and `X-Client-Id` are not trusted.
+- `UseForwardedHeaders` runs before rate limiting. `X-Forwarded-For` and
+  `X-Forwarded-Proto` are accepted only from peers listed in
+  `ForwardedHeaders:KnownProxies` / `ForwardedHeaders:KnownNetworks`. When those
+  lists are empty, the framework's loopback defaults are the only trusted peers.
+
+### CORS
+
+- Browser origins are configured through `Cors:AllowedOrigins`.
+- `appsettings.Development.json` allows `http://localhost:4200`.
+- Production origins should be supplied with
+  `Cors__AllowedOrigins__0`, `Cors__AllowedOrigins__1`, etc.
+- An empty list denies all cross-origin browser requests; same-origin hosting
+  does not need CORS.
+
 ### Default account
 
 The database is migrated and seeded on startup from `Seed` configuration:
 
 | Email | Password | Role | Full name |
 | --- | --- | --- | --- |
-| `admin@happywarehouse.com` | `P@ssw0rd` | `Admin` | System Administrator |
+| `admin@happywarehouse.com` | `Seed:AdminPassword` | `Admin` | System Administrator |
 
-On a fresh database this is the first account. On an existing database the
-seeder migrates the legacy seeded `admin` account to the new email and resets its
-password once, and maps any legacy `User` role to `Auditor`. If neither account
-exists, it creates the default administrator. There is no public registration.
-All other accounts are created by an administrator. Change the seed password and
-JWT key for any real deployment.
+On a fresh database this is the first account, so `Seed:AdminPassword` is
+required. If no administrator exists and no password is configured, startup
+fails instead of creating an account with an unrecoverable generated password.
+On an existing database the seeder maps any legacy `User` role to `Auditor` and
+never resets an existing password. There is no public registration. All other
+accounts are created by an administrator. Change the seed password and JWT key
+for any real deployment.
 
 ## Implemented API surface
 
@@ -294,10 +318,15 @@ HTTP error mapping is centralized in `ExceptionHandlingMiddleware`:
 
 | Exception | Status |
 | --- | --- |
-| `InvalidOperationException` | `400 Bad Request` |
-| `KeyNotFoundException` | `404 Not Found` |
+| `ValidationException` | `400 Bad Request` |
+| `AuthenticationException` | `401 Unauthorized` |
+| `NotFoundException` | `404 Not Found` |
 | `ConflictException` | `409 Conflict` |
 | Unexpected exception | `500 Internal Server Error` |
+
+`AuthenticationException` may carry a stable `code` (for example
+`account_disabled`). The middleware adds it to the problem response as the
+`code` extension so clients do not need to parse the human-readable detail.
 
 The endpoint is authenticated by the existing JWT fallback policy. No separate
 integration API key or configuration section exists. The integration does not
@@ -334,7 +363,10 @@ structured properties to JSON, redacts secret-bearing property names, truncates
 long values and never throws. `SystemLogWriterService` drains the queue, writes
 batches, and flushes remaining entries during graceful shutdown. A persistence
 failure is reported to standard error rather than logged, so it cannot recurse.
-`SystemLogRetentionService` deletes rows older than
+When the bounded queue is full, the oldest entry is dropped; `SystemLogQueue`
+tracks `Capacity`, `QueuedCount` and `DroppedCount` and emits a throttled
+standard-error warning so operators can detect overflow without a Serilog
+feedback loop. `SystemLogRetentionService` deletes rows older than
 `Logging:Database:RetentionDays` (default 30; 0 disables) after a one-minute
 delay and every six hours.
 
@@ -385,7 +417,9 @@ automatically and should not be used for regulatory record keeping.
 - `App` is a thin host containing the router outlet and the global toast
   container.
 - `AuthService` exposes the session as signals, persists the JWT in
-  `localStorage`, restores it until expiry, and logs out on demand.
+  `localStorage`, restores it until expiry, and logs out on demand. A
+  `provideAppInitializer` calls `GET /api/auth/me` for an existing session
+  before route guards run and updates the stored profile/role.
 - `authInterceptor` adds the bearer token to `/api` calls. A `401` (except from
   login) clears the session and redirects to `/login` with a `returnUrl`.
 - The login page maps the API's `account_disabled` error code to a localized
@@ -437,10 +471,12 @@ dotnet ef database update -p HappyInventory.Infrastructure -s HappyInventory.Api
 ```
 
 `DbSeeder.SeedAsync` runs pending migrations and ensures the default administrator
-exists. On a fresh database it creates `admin@happywarehouse.com`; on an existing
-database it migrates the legacy seeded `admin` account and maps legacy `User`
-roles to `Auditor`. Startup fails if the configured JWT key is missing or shorter
-than 32 bytes.
+exists. On a fresh database it creates `admin@happywarehouse.com` using
+`Seed:AdminPassword`; on an existing database it maps legacy `User` roles to
+`Auditor` without resetting passwords. Startup fails if `Jwt:Issuer`,
+`Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, or `ConnectionStrings:Default`
+is missing or invalid, and it fails if an administrator must be created without
+a configured password.
 
 ## Running
 

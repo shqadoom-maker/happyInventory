@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using HappyInventory.Application.Interfaces.Services;
 using HappyInventory.Core.Entities;
 using HappyInventory.Core.Enums;
@@ -51,37 +50,23 @@ public static class DbSeeder
             return;
         }
 
-        // Obtain the initial password from configuration. If none is provided,
-        // generate a strong initial password. The administrator can change it
-        // later, but is not forced to do so at first login.
+        // A newly created administrator must have a known password. Refuse to
+        // generate an unrecoverable password that is never shown to an operator.
         var configuredPassword = configuration["Seed:AdminPassword"];
-        var password = string.IsNullOrWhiteSpace(configuredPassword)
-            ? GenerateInitialPassword()
-            : configuredPassword;
-
-        db.Users.Add(CreateDefaultAdmin(username, normalized, fullName, password, hasher));
-        await db.SaveChangesAsync();
 
         if (string.IsNullOrWhiteSpace(configuredPassword))
         {
-            logger.LogInformation(
-                "Seeded default administrator account '{Username}' with a generated password. " +
-                "Change it after signing in.",
-                username);
+            throw new InvalidOperationException(
+                $"No administrator account exists for '{username}', and Seed:AdminPassword is not configured. " +
+                "Set Seed:AdminPassword to a strong password before starting the application.");
         }
-        else
-        {
-            logger.LogInformation(
-                "Seeded default administrator account '{Username}'. Change the password after signing in.",
-                username);
-        }
-    }
 
-    private static string GenerateInitialPassword()
-    {
-        // 24 bytes base64 = 32 characters, sufficient for an initial password.
-        var bytes = RandomNumberGenerator.GetBytes(24);
-        return Convert.ToBase64String(bytes);
+        db.Users.Add(CreateDefaultAdmin(username, normalized, fullName, configuredPassword, hasher));
+        await db.SaveChangesAsync();
+
+        logger.LogInformation(
+            "Seeded default administrator account '{Username}'. Change the password after signing in.",
+            username);
     }
 
     private static User CreateDefaultAdmin(

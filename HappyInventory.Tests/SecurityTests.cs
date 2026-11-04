@@ -10,6 +10,7 @@ using HappyInventory.Application.Interfaces.Services;
 using HappyInventory.Application.Services;
 using HappyInventory.Core.Entities;
 using HappyInventory.Core.Enums;
+using HappyInventory.Infrastructure;
 using HappyInventory.Infrastructure.Data;
 using HappyInventory.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
@@ -85,6 +86,62 @@ public class SecurityTests
     }
 
     [Fact]
+    public void JwtOptions_MissingIssuer_Throws()
+    {
+        var options = new JwtOptions
+        {
+            Issuer = "",
+            Audience = "happyInventory.Client",
+            Key = new string('A', 32),
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Equal("Jwt:Issuer is required.", exception.Message);
+    }
+
+    [Fact]
+    public void JwtOptions_MissingAudience_Throws()
+    {
+        var options = new JwtOptions
+        {
+            Issuer = "happyInventory",
+            Audience = "",
+            Key = new string('A', 32),
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Equal("Jwt:Audience is required.", exception.Message);
+    }
+
+    [Fact]
+    public void JwtOptions_ValidConfiguration_DoesNotThrow()
+    {
+        var options = new JwtOptions
+        {
+            Issuer = "happyInventory",
+            Audience = "happyInventory.Client",
+            Key = new string('A', 32),
+            ExpiryMinutes = 60,
+        };
+
+        options.Validate();
+    }
+
+    [Fact]
+    public void AddInfrastructure_MissingConnectionString_Throws()
+    {
+        var services = new ServiceCollection();
+        var configuration = BuildConfiguration();
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => services.AddInfrastructure(configuration));
+
+        Assert.Contains("ConnectionStrings:Default", exception.Message);
+    }
+
+    [Fact]
     public void TokenService_EmitsRoleClaim_WithoutMustChangePasswordClaim()
     {
         var options = new JwtOptions
@@ -128,26 +185,46 @@ public class SecurityTests
     }
 
     [Fact]
-    public async Task DbSeeder_CreatesAdmin_WithoutPasswordChangeRequirement_WhenNoPasswordConfigured()
+    public async Task DbSeeder_Throws_WhenAdminMissingAndPasswordNotConfigured()
     {
         var db = CreateMigratedDb();
         var hasher = new PasswordHasher();
         var config = BuildConfiguration(b => b.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Seed:AdminUsername"] = "admin@happywarehouse.com",
-            // No Seed:AdminPassword -> an initial password should be generated
+            // No Seed:AdminPassword -> creating an unrecoverable account is unsafe
         }));
 
-        await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), config);
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), config));
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.NormalizedUsername == "admin@happywarehouse.com");
+        Assert.Contains("Seed:AdminPassword", exception.Message);
+        Assert.Empty(await db.Users.ToListAsync());
+    }
 
-        Assert.NotNull(user);
-        Assert.Equal(UserRoles.Admin, user.Role);
-        Assert.True(user.IsActive);
-        Assert.False(user.MustChangePassword);
-        Assert.NotEmpty(user.PasswordHash);
-        Assert.NotEqual("P@ssw0rd", user.PasswordHash);
+    [Fact]
+    public async Task DbSeeder_DoesNotRequirePassword_WhenAdminAlreadyExists()
+    {
+        var db = CreateMigratedDb();
+        var hasher = new PasswordHasher();
+        var firstConfig = BuildConfiguration(b => b.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Seed:AdminUsername"] = "admin@happywarehouse.com",
+            ["Seed:AdminPassword"] = "InitialPassword123!",
+        }));
+
+        await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), firstConfig);
+
+        var secondConfig = BuildConfiguration(b => b.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Seed:AdminUsername"] = "admin@happywarehouse.com",
+            // Existing administrator: no password is needed on later startups.
+        }));
+
+        await DbSeeder.SeedAsync(BuildServiceProvider(db, hasher), secondConfig);
+
+        var user = await db.Users.SingleAsync(u => u.NormalizedUsername == "admin@happywarehouse.com");
+        Assert.True(hasher.Verify("InitialPassword123!", user.PasswordHash));
     }
 
     [Fact]
@@ -287,7 +364,7 @@ public class SecurityTests
         await repo.AddAsync(user);
         await repo.SaveChangesAsync();
 
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var exception = await Assert.ThrowsAsync<ValidationException>(() =>
             service.ChangePasswordAsync(
                 user.Id,
                 new ChangePasswordRequest

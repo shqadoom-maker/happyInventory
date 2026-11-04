@@ -45,7 +45,7 @@ public class SystemLogService : ISystemLogService
             normalizedTo.HasValue &&
             normalizedFrom.Value > normalizedTo.Value)
         {
-            throw new InvalidOperationException("The start date must be before the end date.");
+            throw new ValidationException("The start date must be before the end date.");
         }
 
         var normalizedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
@@ -83,7 +83,7 @@ public class SystemLogService : ISystemLogService
 
         if (log is null)
         {
-            throw new KeyNotFoundException("The requested log entry was not found.");
+            throw new NotFoundException("The requested log entry was not found.");
         }
 
         return ToDto(log);
@@ -95,7 +95,7 @@ public class SystemLogService : ISystemLogService
     {
         if (olderThanDays < 1 || olderThanDays > MaxRetentionDays)
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 $"Retention days must be between 1 and {MaxRetentionDays}.");
         }
 
@@ -123,7 +123,7 @@ public class SystemLogService : ISystemLogService
 
         if (match is null)
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 $"Level must be one of: {string.Join(", ", AllowedLevels)}.");
         }
 

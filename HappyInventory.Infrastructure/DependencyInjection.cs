@@ -15,10 +15,17 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("Default");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "ConnectionStrings:Default is required. Configure it in appsettings.json, " +
+                "User Secrets, or an environment variable.");
+        }
+
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(
-                configuration.GetConnectionString("Default")
-                ?? "Data Source=happyInventory.db"));
+            options.UseSqlite(connectionString));
 
         services.AddScoped<UserRepository>();
         services.AddScoped<IUserRepository>(provider => provider.GetRequiredService<UserRepository>());

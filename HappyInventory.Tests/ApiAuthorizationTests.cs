@@ -118,6 +118,7 @@ public sealed class HappyInventoryApiFactory : WebApplicationFactory<Program>
         SetEnvironmentVariable("Seed__AdminPassword", "AdminPassword123!");
         SetEnvironmentVariable("Seed__AdminFullName", "System Administrator");
         SetEnvironmentVariable("Logging__Database__Enabled", "false");
+        SetEnvironmentVariable("Cors__AllowedOrigins__0", "http://localhost:4200");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

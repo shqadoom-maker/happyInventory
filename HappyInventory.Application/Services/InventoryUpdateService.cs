@@ -30,24 +30,24 @@ public class InventoryUpdateService : IInventoryUpdateService
     {
         if (request is null)
         {
-            throw new InvalidOperationException("An inventory update request is required.");
+            throw new ValidationException("An inventory update request is required.");
         }
 
         if (request.WarehouseId <= 0)
         {
-            throw new InvalidOperationException("WarehouseId must be greater than zero.");
+            throw new ValidationException("WarehouseId must be greater than zero.");
         }
 
         var sku = request.SKUCode?.Trim();
 
         if (string.IsNullOrWhiteSpace(sku))
         {
-            throw new InvalidOperationException("SKUCode is required.");
+            throw new ValidationException("SKUCode is required.");
         }
 
         if (request.Quantity <= 0)
         {
-            throw new InvalidOperationException("Quantity must be greater than zero.");
+            throw new ValidationException("Quantity must be greater than zero.");
         }
 
         var key = string.IsNullOrWhiteSpace(idempotencyKey)
@@ -56,7 +56,7 @@ public class InventoryUpdateService : IInventoryUpdateService
 
         if (key is { Length: > MaxIdempotencyKeyLength })
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 $"Idempotency-Key must be {MaxIdempotencyKeyLength} characters or fewer.");
         }
 
@@ -85,7 +85,7 @@ public class InventoryUpdateService : IInventoryUpdateService
 
         if (matches.Count == 0)
         {
-            throw new KeyNotFoundException("The requested warehouse item was not found.");
+            throw new NotFoundException("The requested warehouse item was not found.");
         }
 
         if (matches.Count > 1)

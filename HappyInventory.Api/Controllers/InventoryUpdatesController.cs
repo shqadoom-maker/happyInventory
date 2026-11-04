@@ -54,43 +54,11 @@ public class InventoryUpdatesController : ControllerBase
                 request.WarehouseId,
                 request.SKUCode);
 
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 "The Idempotency-Key header is required for inventory updates.");
         }
 
-        InventoryUpdateResponse result;
-
-        try
-        {
-            result = await _updates.ApplyAsync(request, idempotencyKey, cancellationToken);
-        }
-        catch (ConflictException exception)
-        {
-            _logger.LogWarning(
-                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
-                request.WarehouseId,
-                request.SKUCode,
-                exception.Message);
-            throw;
-        }
-        catch (KeyNotFoundException exception)
-        {
-            _logger.LogWarning(
-                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
-                request.WarehouseId,
-                request.SKUCode,
-                exception.Message);
-            throw;
-        }
-        catch (InvalidOperationException exception)
-        {
-            _logger.LogWarning(
-                "Inventory update rejected for warehouse {WarehouseId}, SKU {SKUCode}: {Reason}",
-                request.WarehouseId,
-                request.SKUCode,
-                exception.Message);
-            throw;
-        }
+        var result = await _updates.ApplyAsync(request, idempotencyKey, cancellationToken);
 
         if (result.Replayed)
         {

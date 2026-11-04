@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import { apiErrorInterceptor } from './core/interceptors/api-error.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { LocalizedTitleStrategy } from './core/localized-title.strategy';
+import { AuthService } from './core/services/auth.service';
 import { LanguageService } from './core/services/language.service';
 
 export const appConfig: ApplicationConfig = {
@@ -27,6 +28,7 @@ export const appConfig: ApplicationConfig = {
       lang: 'en',
     }),
     provideAppInitializer(() => inject(LanguageService).initialize()),
+    provideAppInitializer(() => inject(AuthService).initializeSession()),
     { provide: TitleStrategy, useClass: LocalizedTitleStrategy },
   ],
 };

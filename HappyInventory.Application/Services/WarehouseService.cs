@@ -60,7 +60,7 @@ public class WarehouseService : IWarehouseService
 
         if (warehouse is null)
         {
-            throw new KeyNotFoundException("The requested warehouse was not found.");
+            throw new NotFoundException("The requested warehouse was not found.");
         }
 
         return ToDto(warehouse);
@@ -77,18 +77,18 @@ public class WarehouseService : IWarehouseService
 
         if (city is null)
         {
-            throw new InvalidOperationException("The selected city does not exist.");
+            throw new ValidationException("The selected city does not exist.");
         }
 
         if (city.CountryId != request.CountryId)
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 "The selected city does not belong to the selected country.");
         }
 
         if (await _warehouses.AnyDuplicateNameAsync(name, null, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 $"A warehouse named '{name}' already exists.");
         }
 
@@ -118,7 +118,7 @@ public class WarehouseService : IWarehouseService
 
         if (warehouse is null)
         {
-            throw new KeyNotFoundException("The requested warehouse was not found.");
+            throw new NotFoundException("The requested warehouse was not found.");
         }
 
         var name = Require(request.Name, "Warehouse name");
@@ -128,18 +128,18 @@ public class WarehouseService : IWarehouseService
 
         if (city is null)
         {
-            throw new InvalidOperationException("The selected city does not exist.");
+            throw new ValidationException("The selected city does not exist.");
         }
 
         if (city.CountryId != request.CountryId)
         {
-            throw new InvalidOperationException(
+            throw new ValidationException(
                 "The selected city does not belong to the selected country.");
         }
 
         if (await _warehouses.AnyDuplicateNameAsync(name, id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 $"A warehouse named '{name}' already exists.");
         }
 
@@ -162,7 +162,7 @@ public class WarehouseService : IWarehouseService
 
         if (warehouse is null)
         {
-            throw new KeyNotFoundException("The requested warehouse was not found.");
+            throw new NotFoundException("The requested warehouse was not found.");
         }
 
         _warehouses.Remove(warehouse);
@@ -175,7 +175,7 @@ public class WarehouseService : IWarehouseService
 
         if (string.IsNullOrWhiteSpace(trimmed))
         {
-            throw new InvalidOperationException($"{field} is required.");
+            throw new ValidationException($"{field} is required.");
         }
 
         return trimmed;

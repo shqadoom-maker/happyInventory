@@ -25,7 +25,7 @@ public class WarehouseItemService : IWarehouseItemService
     {
         if (await _items.GetWarehouseAsync(warehouseId, cancellationToken) is null)
         {
-            throw new KeyNotFoundException("The requested warehouse was not found.");
+            throw new NotFoundException("The requested warehouse was not found.");
         }
 
         page = Math.Max(1, page);
@@ -60,7 +60,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (item is null)
         {
-            throw new KeyNotFoundException("The requested warehouse item was not found.");
+            throw new NotFoundException("The requested warehouse item was not found.");
         }
 
         return ToDto(item);
@@ -75,7 +75,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (await _items.AnyDuplicateNameAsync(name, warehouse.Id, null, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 $"An item named '{name}' already exists in this warehouse.");
         }
 
@@ -106,7 +106,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (item is null)
         {
-            throw new KeyNotFoundException("The requested warehouse item was not found.");
+            throw new NotFoundException("The requested warehouse item was not found.");
         }
 
         var name = Require(request.ItemName);
@@ -114,7 +114,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (await _items.AnyDuplicateNameAsync(name, warehouse.Id, id, cancellationToken))
         {
-            throw new InvalidOperationException(
+            throw new ConflictException(
                 $"An item named '{name}' already exists in this warehouse.");
         }
 
@@ -138,7 +138,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (item is null)
         {
-            throw new KeyNotFoundException("The requested warehouse item was not found.");
+            throw new NotFoundException("The requested warehouse item was not found.");
         }
 
         _items.Remove(item);
@@ -153,7 +153,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (warehouse is null)
         {
-            throw new InvalidOperationException("The selected warehouse does not exist.");
+            throw new ValidationException("The selected warehouse does not exist.");
         }
 
         return warehouse;
@@ -165,7 +165,7 @@ public class WarehouseItemService : IWarehouseItemService
 
         if (string.IsNullOrWhiteSpace(trimmed))
         {
-            throw new InvalidOperationException("Item name is required.");
+            throw new ValidationException("Item name is required.");
         }
 
         return trimmed;

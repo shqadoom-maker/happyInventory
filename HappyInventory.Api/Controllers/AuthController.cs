@@ -34,31 +34,10 @@ public class AuthController : ControllerBase
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
-        UserDto? user;
-
-        try
-        {
-            user = await _users.AuthenticateAsync(
-                request.Username,
-                request.Password,
-                cancellationToken);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(
-                "Login rejected for {Username}: account disabled.",
-                request.Username);
-
-            var problem = new ProblemDetails
-            {
-                Status = StatusCodes.Status401Unauthorized,
-                Title = "Authentication failed",
-                Detail = ex.Message,
-            };
-            problem.Extensions["code"] = "account_disabled";
-
-            return Unauthorized(problem);
-        }
+        var user = await _users.AuthenticateAsync(
+            request.Username,
+            request.Password,
+            cancellationToken);
 
         if (user is null)
         {
