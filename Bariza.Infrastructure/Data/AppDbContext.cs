@@ -21,6 +21,12 @@ public class AppDbContext : DbContext
     public DbSet<InventoryUpdateRecord> InventoryUpdateRecords => Set<InventoryUpdateRecord>();
     public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
+    public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<SellerOrder> SellerOrders => Set<SellerOrder>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

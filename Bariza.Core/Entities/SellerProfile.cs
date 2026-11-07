@@ -6,6 +6,10 @@ public class SellerProfile
 {
     public int Id { get; set; }
 
+    public int? UserId { get; set; }
+
+    public User? User { get; set; }
+
     [Required]
     [MaxLength(150)]
     public string StoreName { get; set; } = string.Empty;

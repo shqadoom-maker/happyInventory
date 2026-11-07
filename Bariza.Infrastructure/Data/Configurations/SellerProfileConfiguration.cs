@@ -24,5 +24,10 @@ public class SellerProfileConfiguration : IEntityTypeConfiguration<SellerProfile
 
         builder.HasIndex(seller => seller.Slug).IsUnique();
         builder.HasIndex(seller => new { seller.IsApproved, seller.IsActive });
+
+        builder.HasOne(seller => seller.User)
+            .WithMany()
+            .HasForeignKey(seller => seller.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
