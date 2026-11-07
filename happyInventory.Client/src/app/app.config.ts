@@ -10,6 +10,7 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { LocalizedTitleStrategy } from './core/localized-title.strategy';
 import { AuthService } from './core/services/auth.service';
 import { LanguageService } from './core/services/language.service';
+import { ThemeService } from './core/services/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,7 +28,7 @@ export const appConfig: ApplicationConfig = {
       fallbackLang: 'en',
       lang: 'en',
     }),
-    provideAppInitializer(() => inject(LanguageService).initialize()),
+    provideAppInitializer(() => inject(ThemeService).initialize()),
     provideAppInitializer(() => inject(AuthService).initializeSession()),
     { provide: TitleStrategy, useClass: LocalizedTitleStrategy },
   ],

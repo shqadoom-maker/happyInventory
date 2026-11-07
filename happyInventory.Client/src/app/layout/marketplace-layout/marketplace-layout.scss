@@ -212,8 +212,35 @@
   border-color: var(--border-strong);
 }
 
+.theme-toggle {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.theme-toggle .material-icons-round {
+  font-size: 1.18rem;
+}
+
 .cart-button {
-  position: relative;
   display: grid;
   flex: 0 0 auto;
   place-items: center;
