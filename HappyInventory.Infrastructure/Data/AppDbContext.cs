@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
     public DbSet<WarehouseItem> WarehouseItems => Set<WarehouseItem>();
     public DbSet<InventoryUpdateRecord> InventoryUpdateRecords => Set<InventoryUpdateRecord>();
     public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

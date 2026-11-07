@@ -5,7 +5,8 @@ Web API (N-tier), Angular 22, EF Core 6 and SQLite.
 
 ## What is implemented
 
-- JWT authentication with a login-first Angular layout.
+- JWT authentication with rotating refresh tokens in an HttpOnly cookie and a
+  login-first Angular layout.
 - Role-based users management (`Admin`, `Management`, `Auditor`), managed inside
   the app (there is no public registration).
 - Dashboard with summary cards, warehouse inventory counts, and top/bottom item
@@ -237,13 +238,20 @@ stack traces, so both the API and the UI restrict the Log Viewer to `Admin`.
 
 ## Authentication and roles
 
-- `POST /api/auth/login` is the only anonymous endpoint. It returns a JWT and the
-  signed-in user profile.
+- `POST /api/auth/login` returns an access JWT and the signed-in user profile.
+  It also sets a rotating refresh token in an `HttpOnly`, `Secure`,
+  `SameSite=Strict` cookie scoped to `/api/auth`.
+- `POST /api/auth/refresh` rotates the refresh token and returns a new access
+  token. The old token is revoked immediately; replaying an already-rotated
+  token is rejected and revokes the user's other active refresh tokens.
+- `POST /api/auth/logout` revokes the current refresh token and clears the
+  cookie. Password changes and administrator password resets revoke every
+  refresh token for the affected user.
 - Every other endpoint requires `Authorization: Bearer <token>`. The API uses a
   fallback authorization policy, so new controllers are closed by default.
-- Tokens are validated on every request, and the user is re-checked in the
-  database. Deleted or deactivated users are rejected immediately; role changes
-  take effect without waiting for the token to expire.
+- Access tokens are validated on every request, and the user is re-checked in
+  the database. Deleted or deactivated users are rejected immediately; role
+  changes take effect without waiting for the token to expire.
 - Each user has exactly one role: `Admin`, `Management` or `Auditor`. Only
   administrators can list, create, edit, change the password of, or delete users.
 - Administrator accounts cannot be deleted. Administrators cannot delete,
@@ -253,17 +261,18 @@ stack traces, so both the API and the UI restrict the Log Viewer to `Admin`.
   "account disabled, contact support" message.
 
 JWT settings live in `HappyInventory.Api/appsettings.json` (`Jwt:Issuer`,
-`Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`). Seed credentials live under
-`Seed`.
+`Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, `Jwt:RefreshTokenExpiryDays`).
+Seed credentials live under `Seed`.
 
 ## Security configuration
 
 ### JWT and database configuration
 
-`Jwt:Issuer`, `Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, and
-`ConnectionStrings:Default` are validated during startup. `Jwt:Key` must be a
-random string of at least 32 bytes. It is intentionally left empty in
-`appsettings.json` and must be provided through a secure source.
+`Jwt:Issuer`, `Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`,
+`Jwt:RefreshTokenExpiryDays`, and `ConnectionStrings:Default` are validated
+during startup. `Jwt:Key` must be a random string of at least 32 bytes. It is
+intentionally left empty in `appsettings.json` and must be provided through a
+secure source.
 
 **Local development (User Secrets):**
 
@@ -286,6 +295,7 @@ export ConnectionStrings__Default="Data Source=/var/lib/happyinventory/happyInve
 export Jwt__Issuer="happyInventory"
 export Jwt__Audience="happyInventory.Client"
 export Jwt__Key="<random-32-byte-or-longer-string>"
+export Jwt__RefreshTokenExpiryDays="30"
 export Seed__AdminPassword="<secure-admin-password>"
 ```
 
@@ -342,6 +352,8 @@ existing administrator passwords immediately after deploying this update.
 | Method | Route | Access |
 | --- | --- | --- |
 | POST | `/api/auth/login` | Anonymous |
+| POST | `/api/auth/refresh` | Anonymous (HttpOnly refresh cookie) |
+| POST | `/api/auth/logout` | Anonymous (HttpOnly refresh cookie) |
 | GET | `/api/auth/me` | Authenticated |
 | GET | `/api/dashboard` | Authenticated |
 | GET | `/api/users` | Admin |
@@ -391,6 +403,10 @@ export Cors__AllowedOrigins__0="https://app.example.com"
 
 When the list is empty, no cross-origin browser origin is allowed. This is the
 correct setting when Angular is served from the same App Service as the API.
+Allowed origins also receive `Access-Control-Allow-Credentials: true` so the
+browser can send the refresh cookie. Keep the Angular app and API on the same
+site when using the default `SameSite=Strict` cookie; a cross-site deployment
+would need a deliberate `SameSite=None` plus CSRF protection.
 The development launch profile binds to `localhost`. To accept calls from
 another machine, start the API with an explicit binding such as
 `--urls "https://0.0.0.0:7157"` and use a trusted certificate, or place it
@@ -400,12 +416,16 @@ behind a reverse proxy.
 
 - The login page is the first route. Visiting a protected route while signed out
   redirects to `/login` and returns to the requested page after sign-in.
-- The JWT is stored in `localStorage` when "Remember me" is checked, otherwise
-  in `sessionStorage` (the tab session only). It is restored on reload until it
-  expires.
+- The access JWT is stored in `localStorage` when "Remember me" is checked,
+  otherwise in `sessionStorage` (the tab session only). The refresh token is
+  never exposed to JavaScript; it lives in the API's HttpOnly cookie.
 - On startup, an existing session calls `GET /api/auth/me` before route guards
-  run, so profile and role changes are reflected without signing out.
-- A `401` response clears the session and redirects to login.
+  run, so profile and role changes are reflected without signing out. If the
+  access token has expired, the app first calls `POST /api/auth/refresh` using
+  the HttpOnly cookie.
+- A `401` on a normal API request triggers one shared refresh request and then
+  retries the original request. The session is cleared and the user is sent to
+  login only when the refresh token is also rejected.
 - A successful login goes straight to the dashboard (or the requested return URL).
   The optional `/change-password` page is available to signed-in users but is
   never forced.

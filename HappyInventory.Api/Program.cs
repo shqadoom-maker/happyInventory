@@ -216,7 +216,8 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins(allowedOrigins)
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         }
         else
         {
@@ -261,6 +262,18 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
         },
         new RateLimitRule
         {
+            Endpoint = "POST:/api/auth/refresh",
+            Period = "1m",
+            Limit = 30,
+        },
+        new RateLimitRule
+        {
+            Endpoint = "POST:/api/auth/logout",
+            Period = "1m",
+            Limit = 30,
+        },
+        new RateLimitRule
+        {
             Endpoint = "*",
             Period = "1m",
             Limit = 120, // 120 requests per minute per IP for all other endpoints
@@ -283,7 +296,9 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Happy Inventory API",
         Version = "v1",
         Description = "Warehouse inventory API. Sign in with POST /api/auth/login, then use the returned JWT. " +
-                      "External eCommerce systems post inventory deductions to POST /api/inventory/updates.",
+                      "Login also sets an HttpOnly refresh cookie; POST /api/auth/refresh rotates it and " +
+                      "POST /api/auth/logout revokes it. External eCommerce systems post inventory deductions " +
+                      "to POST /api/inventory/updates.",
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

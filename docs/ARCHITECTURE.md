@@ -101,15 +101,30 @@ responses at the API boundary.
 
 ### Authentication
 
-- `POST /api/auth/login` is the only `[AllowAnonymous]` endpoint.
+- `POST /api/auth/login`, `POST /api/auth/refresh` and `POST /api/auth/logout`
+  are `[AllowAnonymous]` endpoints. Every other endpoint uses the fallback
+  policy.
 - Credentials are checked against the active user with a normalized username and
   a PBKDF2-SHA256 hash (100,000 iterations, per-password salt).
-- A successful login returns an HS256 JWT with `NameIdentifier`, `Name` and
-  `Role` claims, plus the user profile and expiry.
-- JWT issuer, audience, signing key and lifetime come from `Jwt` configuration.
-  Startup validates that the issuer and audience are non-empty, the key is at
-  least 32 bytes, and the lifetime is positive. Validation allows 30 seconds of
-  clock skew.
+- A successful login returns an HS256 access JWT with `NameIdentifier`, `Name`
+  and `Role` claims, plus the user profile and expiry. It also sets a refresh
+  token in an `HttpOnly`, `Secure` (outside Development/Testing),
+  `SameSite=Strict` cookie scoped to `/api/auth`. The raw refresh token is never
+  returned in JSON.
+- Refresh tokens are random 64-byte values. Only their SHA-256 hash is stored in
+  the `RefreshTokens` table. The raw value stays in the browser cookie.
+- `POST /api/auth/refresh` rotates the token: the old row is marked revoked, a
+  replacement is issued and the new cookie is set. Reusing an already-rotated
+  token is treated as a possible theft and revokes the user's other active
+  refresh tokens. A concurrency token prevents two simultaneous refreshes from
+  both succeeding.
+- `POST /api/auth/logout` revokes the current refresh token and deletes the
+  cookie. Changing a password, an administrator resetting a password, and
+  deactivating an account revoke all refresh tokens for that user.
+- JWT issuer, audience, signing key, access lifetime and refresh-token lifetime
+  come from `Jwt` configuration. Startup validates that the issuer and audience
+  are non-empty, the key is at least 32 bytes, and both lifetimes are positive.
+  Validation allows 30 seconds of clock skew.
 - `JwtBearerEvents.OnTokenValidated` re-reads the user through
   `IUserRepository` on every request. Deleted or inactive users are rejected, and
   the role claim is replaced with the current database role so promotions and
@@ -150,6 +165,10 @@ responses at the API boundary.
   `Cors__AllowedOrigins__0`, `Cors__AllowedOrigins__1`, etc.
 - An empty list denies all cross-origin browser requests; same-origin hosting
   does not need CORS.
+- Configured origins also receive `Access-Control-Allow-Credentials: true` so
+  the browser can send the HttpOnly refresh cookie. The default
+  `SameSite=Strict` cookie assumes the client and API share a site; a cross-site
+  deployment would need `SameSite=None` plus CSRF protection.
 
 ### Default account
 
@@ -172,6 +191,8 @@ for any real deployment.
 | Method | Route | Caller |
 | --- | --- | --- |
 | POST | `/api/auth/login` | Anonymous |
+| POST | `/api/auth/refresh` | Anonymous (HttpOnly refresh cookie) |
+| POST | `/api/auth/logout` | Anonymous (HttpOnly refresh cookie) |
 | GET | `/api/auth/me` | Authenticated |
 | GET | `/api/dashboard` | Authenticated |
 | GET | `/api/users` | Admin |
@@ -194,10 +215,11 @@ for any real deployment.
 `POST /api/users/{id}/change-password` is the administrator reset endpoint and
 accepts `{ "newPassword": "..." }`. The optional current-user self-service
 endpoint `POST /api/auth/change-password` accepts
-`{ "currentPassword": "...", "newPassword": "..." }` and returns a fresh
-`LoginResponse` token. First-login password changes are not enforced, and JWTs
-do not contain a `mustChangePassword` claim. Swagger is enabled in Development at
-`/swagger` and includes a Bearer scheme.
+`{ "currentPassword": "...", "newPassword": "..." }`, revokes every existing
+refresh token, and returns a fresh `LoginResponse` plus a new refresh cookie.
+First-login password changes are not enforced, and JWTs do not contain a
+`mustChangePassword` claim. Swagger is enabled in Development at `/swagger` and
+includes a Bearer scheme.
 
 The authenticated CRUD routes are not limited to the Angular UI. External
 eCommerce/ERP systems, scripts and services can call `POST /api/auth/login`,
@@ -416,12 +438,17 @@ automatically and should not be used for regulatory record keeping.
   dependency-free CSS bar charts for warehouse status and top/bottom items.
 - `App` is a thin host containing the router outlet and the global toast
   container.
-- `AuthService` exposes the session as signals, persists the JWT in
-  `localStorage`, restores it until expiry, and logs out on demand. A
-  `provideAppInitializer` calls `GET /api/auth/me` for an existing session
-  before route guards run and updates the stored profile/role.
-- `authInterceptor` adds the bearer token to `/api` calls. A `401` (except from
-  login) clears the session and redirects to `/login` with a `returnUrl`.
+- `AuthService` exposes the session as signals, persists the access JWT in
+  `localStorage` or `sessionStorage`, and stores only a non-sensitive session
+  marker for the HttpOnly refresh cookie. A `provideAppInitializer` calls
+  `GET /api/auth/me` for a valid access token, or `POST /api/auth/refresh` when
+  the access token has expired, before route guards run.
+- `authInterceptor` adds the bearer token to `/api` calls. On a `401` it shares
+  a single refresh request between concurrent callers, retries the original
+  request once with the new token, and only clears the session and redirects to
+  `/login` when the refresh token is also rejected.
+- `logout()` clears local state immediately and best-effort calls
+  `POST /api/auth/logout` so the server revokes the refresh cookie.
 - The login page maps the API's `account_disabled` error code to a localized
   message that tells the user to contact support.
 - `apiErrorInterceptor` normalizes HTTP failures into a translated `ApiError`.
@@ -462,8 +489,10 @@ is git-ignored (`*.db`).
 The migrations were moved to `HappyInventory.Infrastructure/Migrations` with the
 same migration IDs, so an existing database keeps its migration history. The
 `SystemLogs` table is created by `20261026174335_AddSystemLogs` and pruned by the
-retention service described above. Serilog's rolling file output lives under
-`logs/`, which is git-ignored.
+retention service described above. The `RefreshTokens` table is created by
+`20261105121051_AddRefreshTokens`; it stores only token hashes and is linked to
+`Users` with cascade delete. Serilog's rolling file output lives under `logs/`,
+which is git-ignored.
 
 ```sh
 dotnet ef migrations add <Name> -p HappyInventory.Infrastructure -s HappyInventory.Api
@@ -474,9 +503,9 @@ dotnet ef database update -p HappyInventory.Infrastructure -s HappyInventory.Api
 exists. On a fresh database it creates `admin@happywarehouse.com` using
 `Seed:AdminPassword`; on an existing database it maps legacy `User` roles to
 `Auditor` without resetting passwords. Startup fails if `Jwt:Issuer`,
-`Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, or `ConnectionStrings:Default`
-is missing or invalid, and it fails if an administrator must be created without
-a configured password.
+`Jwt:Audience`, `Jwt:Key`, `Jwt:ExpiryMinutes`, `Jwt:RefreshTokenExpiryDays`, or
+`ConnectionStrings:Default` is missing or invalid, and it fails if an
+administrator must be created without a configured password.
 
 ## Running
 

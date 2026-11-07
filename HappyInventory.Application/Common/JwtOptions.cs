@@ -15,6 +15,12 @@ public class JwtOptions
     public int ExpiryMinutes { get; set; } = 480;
 
     /// <summary>
+    /// Lifetime of a refresh token. Refresh tokens are rotated on every use, so
+    /// this is the maximum idle/session lifetime, not the access-token lifetime.
+    /// </summary>
+    public int RefreshTokenExpiryDays { get; set; } = 30;
+
+    /// <summary>
     /// Validates the settings that are required to issue and validate JWTs.
     /// Called during startup so a misconfigured deployment fails immediately
     /// instead of issuing tokens with an empty issuer or audience.
@@ -45,6 +51,12 @@ public class JwtOptions
         if (ExpiryMinutes <= 0)
         {
             throw new InvalidOperationException("Jwt:ExpiryMinutes must be greater than zero.");
+        }
+
+        if (RefreshTokenExpiryDays <= 0)
+        {
+            throw new InvalidOperationException(
+                "Jwt:RefreshTokenExpiryDays must be greater than zero.");
         }
     }
 }

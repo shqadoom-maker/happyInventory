@@ -130,6 +130,25 @@ public class SecurityTests
     }
 
     [Fact]
+    public void JwtOptions_RefreshTokenExpiryMustBePositive_Throws()
+    {
+        var options = new JwtOptions
+        {
+            Issuer = "happyInventory",
+            Audience = "happyInventory.Client",
+            Key = new string('A', 32),
+            ExpiryMinutes = 60,
+            RefreshTokenExpiryDays = 0,
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Equal(
+            "Jwt:RefreshTokenExpiryDays must be greater than zero.",
+            exception.Message);
+    }
+
+    [Fact]
     public void AddInfrastructure_MissingConnectionString_Throws()
     {
         var services = new ServiceCollection();

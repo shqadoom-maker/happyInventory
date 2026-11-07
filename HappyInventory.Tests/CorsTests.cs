@@ -23,6 +23,10 @@ public class CorsTests : IClassFixture<HappyInventoryApiFactory>
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.True(response.Headers.TryGetValues("Access-Control-Allow-Origin", out var values));
         Assert.Contains("http://localhost:4200", values);
+        Assert.True(response.Headers.TryGetValues(
+            "Access-Control-Allow-Credentials",
+            out var credentials));
+        Assert.Contains("true", credentials);
     }
 
     [Fact]

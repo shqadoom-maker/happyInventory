@@ -13,11 +13,16 @@ namespace HappyInventory.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _users;
+    private readonly IAuthSessionService _sessions;
     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IUserService users, ILogger<UsersController> logger)
+    public UsersController(
+        IUserService users,
+        IAuthSessionService sessions,
+        ILogger<UsersController> logger)
     {
         _users = users;
+        _sessions = sessions;
         _logger = logger;
     }
 
@@ -69,6 +74,11 @@ public class UsersController : ControllerBase
     {
         var updated = await _users.UpdateAsync(id, request, CurrentUserId, cancellationToken);
 
+        if (!updated.IsActive || !string.IsNullOrWhiteSpace(request.Password))
+        {
+            await _sessions.RevokeAllForUserAsync(id, cancellationToken);
+        }
+
         _logger.LogInformation(
             "Administrator {ActorId} updated user {UserId} ({Username}): role {Role}, active {IsActive}.",
             CurrentUserId,
@@ -90,6 +100,7 @@ public class UsersController : ControllerBase
         CancellationToken cancellationToken)
     {
         await _users.ResetPasswordAsync(id, request, cancellationToken);
+        await _sessions.RevokeAllForUserAsync(id, cancellationToken);
 
         _logger.LogInformation(
             "Administrator {ActorId} changed the password for user {UserId}.",

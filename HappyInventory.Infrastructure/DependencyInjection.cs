@@ -30,6 +30,10 @@ public static class DependencyInjection
         services.AddScoped<UserRepository>();
         services.AddScoped<IUserRepository>(provider => provider.GetRequiredService<UserRepository>());
 
+        services.AddScoped<RefreshTokenRepository>();
+        services.AddScoped<IRefreshTokenRepository>(provider =>
+            provider.GetRequiredService<RefreshTokenRepository>());
+
         services.AddScoped<CountryRepository>();
         services.AddScoped<ICountryRepository>(provider => provider.GetRequiredService<CountryRepository>());
 
