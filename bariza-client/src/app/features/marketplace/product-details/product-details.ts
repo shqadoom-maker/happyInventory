@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { ProductDetails } from '../../../core/models/product-details.model';
 export class ProductDetailsPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly catalog = inject(MarketplaceProductService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   product: ProductDetails | null = null;
   loading = true;
@@ -28,11 +29,15 @@ export class ProductDetailsPage implements OnInit {
         next: (product) => {
           this.product = product;
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.loading = false;
+          this.cdr.detectChanges();
         },
       });
+    } else {
+      this.loading = false;
     }
   }
 
