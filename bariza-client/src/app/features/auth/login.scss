@@ -6,7 +6,7 @@
   min-height: 100vh;
   min-height: 100svh;
   background: var(--navy-950);
-  color: #e2e8f0;
+  color: #E7DFD3;
 }
 
 /* --------------------------------------------------------------------------
@@ -113,7 +113,7 @@
 
 .login-lang .lang-switch-icon {
   margin-inline: 9px 4px;
-  color: #94a3b8;
+  color: #8F7F6B;
   font-size: 1rem;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .login-lang .lang-btn:focus-visible {
-  outline: 2px solid #7dd3fc;
+  outline: 2px solid #E8F0FA;
   outline-offset: 1px;
 }
 
@@ -253,7 +253,7 @@
   position: absolute;
   top: 50%;
   left: 13px;
-  color: #7c8ba1;
+  color: #8F7F6B;
   font-size: 1.15rem;
   pointer-events: none;
   transform: translateY(-50%);
@@ -288,11 +288,11 @@
 }
 
 .input-shell input::placeholder {
-  color: #94a3b8;
+  color: #8F7F6B;
 }
 
 .input-shell input:hover {
-  border-color: #a9bcd6;
+  border-color: #D5EFE3;
 }
 
 .input-shell input:focus {
@@ -332,7 +332,7 @@
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #7c8ba1;
+  color: #8F7F6B;
   cursor: pointer;
   transition:
     background var(--transition),
@@ -455,7 +455,7 @@
   align-items: flex-start;
   margin: 0 0 16px;
   padding: 10px 12px;
-  border: 1px solid #bfe3f2;
+  border: 1px solid #E8F0FA;
   border-radius: 10px;
   background: var(--info-soft);
   color: var(--info);
@@ -489,7 +489,7 @@
   gap: 10px;
   align-items: center;
   margin: 20px 0 14px;
-  color: #94a3b8;
+  color: #8F7F6B;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.09em;

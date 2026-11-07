@@ -420,7 +420,7 @@
   border: 1px solid rgba(148, 163, 184, 0.24);
   border-radius: 10px;
   background: rgba(148, 163, 184, 0.06);
-  color: #e2e8f0;
+  color: #E7DFD3;
   cursor: pointer;
 }
 
@@ -441,7 +441,7 @@
 
 .drawer-search > .material-icons-round {
   flex: 0 0 auto;
-  color: #94a3b8;
+  color: #8F7F6B;
   font-size: 1.05rem;
 }
 
@@ -458,7 +458,7 @@
 }
 
 .drawer-search input::placeholder {
-  color: #94a3b8;
+  color: #8F7F6B;
 }
 
 .drawer-nav {
@@ -491,7 +491,7 @@
 .drawer-nav a.active {
   border-color: rgba(34, 211, 238, 0.22);
   background: linear-gradient(90deg, rgba(34, 211, 238, 0.18), rgba(37, 99, 235, 0.08));
-  color: #7dd3fc;
+  color: #E8F0FA;
   font-weight: 600;
 }
 
@@ -521,7 +521,7 @@
 
 .drawer-lang > .material-icons-round {
   margin-inline: 8px 2px;
-  color: #94a3b8;
+  color: #8F7F6B;
   font-size: 1rem;
 }
 
@@ -553,7 +553,7 @@
 }
 
 .drawer-secondary-link:hover {
-  color: #7dd3fc;
+  color: #E8F0FA;
 }
 
 .drawer-cart {
@@ -641,7 +641,7 @@
 }
 
 .footer-links a:hover {
-  color: #7dd3fc;
+  color: #E8F0FA;
 }
 
 .footer-copy {
