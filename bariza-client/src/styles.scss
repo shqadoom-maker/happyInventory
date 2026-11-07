@@ -57,9 +57,9 @@
   --ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #0f6b63 0%, #1f7a8c 48%, #F5A524 100%);
-  --gradient-navy: linear-gradient(160deg, #081714 0%, #102b26 55%, #173a34 100%);
-  --gradient-surface: linear-gradient(180deg, #ffffff 0%, #f3eee6 100%);
+  --gradient-primary: #0B6E4F;
+  --gradient-navy: #064E3B;
+  --gradient-surface: #FAF7F2;
 
   /* Typography */
   --font-sans: 'Cairo', 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
@@ -953,7 +953,7 @@ html[dir='rtl'] .icon-login {
   --warning: #d6a04c;
   --danger: #e06a6a;
   --info: #6aa6e8;
-  --gradient-primary: linear-gradient(135deg, #3FB3A8 0%, #2563A8 48%, #F5A524 100%);
-  --gradient-navy: linear-gradient(160deg, #064E3B 0%, #095A41 55%, #0B6E4F 100%);
-  --gradient-surface: linear-gradient(180deg, #17211e 0%, #101714 100%);
+  --gradient-primary: #0B6E4F;
+  --gradient-navy: #064E3B;
+  --gradient-surface: #FAF7F2;
 }
