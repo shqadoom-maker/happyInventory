@@ -1,7 +1,7 @@
-# HappyInventory Marketplace — Architecture and Phase Plan
+# BARIZA Market - Architecture and Phase Plan
 
 This document describes the public marketplace structure that will be built on top
-of the existing HappyInventory warehouse platform. It is intentionally additive:
+of the existing BARIZA Market platform. It is intentionally additive:
 the current admin application, authentication, and inventory APIs remain in place.
 
 ## Phase 1 — Marketplace foundation

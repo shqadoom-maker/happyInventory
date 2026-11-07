@@ -50,7 +50,7 @@ var loggerConfiguration = new LoggerConfiguration()
     .WriteTo.Console(
         outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {SourceContext} - {Message:lj}{NewLine}{Exception:lj}")
     .WriteTo.File(
-        path: "logs/happy-inventory-.log",
+        path: "logs/bariza-market-.log",
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 30,
         outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {SourceContext} - {Message:lj}{NewLine}{Exception:lj}");
@@ -293,9 +293,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Happy Inventory API",
+        Title = "BARIZA Market API",
         Version = "v1",
-        Description = "Warehouse inventory API. Sign in with POST /api/auth/login, then use the returned JWT. " +
+        Description = "BARIZA Market API. Sign in with POST /api/auth/login, then use the returned JWT. " +
                       "Login also sets an HttpOnly refresh cookie; POST /api/auth/refresh rotates it and " +
                       "POST /api/auth/logout revokes it. External eCommerce systems post inventory deductions " +
                       "to POST /api/inventory/updates.",
