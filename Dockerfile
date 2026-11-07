@@ -2,34 +2,34 @@
 FROM node:22-alpine AS client-build
 WORKDIR /src/client
 
-COPY happyInventory.Client/package.json happyInventory.Client/package-lock.json ./
+COPY bariza-client/package.json bariza-client/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
-COPY happyInventory.Client/ ./
+COPY bariza-client/ ./
 RUN npm run build
 
 # Build and publish the ASP.NET Core API.
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS api-build
 WORKDIR /src
 
-COPY HappyInventory.Core/HappyInventory.Core.csproj HappyInventory.Core/
-COPY HappyInventory.Application/HappyInventory.Application.csproj HappyInventory.Application/
-COPY HappyInventory.Infrastructure/HappyInventory.Infrastructure.csproj HappyInventory.Infrastructure/
-COPY HappyInventory.Api/HappyInventory.Api.csproj HappyInventory.Api/
-RUN dotnet restore HappyInventory.Api/HappyInventory.Api.csproj
+COPY Bariza.Core/Bariza.Core.csproj Bariza.Core/
+COPY Bariza.Application/Bariza.Application.csproj Bariza.Application/
+COPY Bariza.Infrastructure/Bariza.Infrastructure.csproj Bariza.Infrastructure/
+COPY Bariza.Api/Bariza.Api.csproj Bariza.Api/
+RUN dotnet restore Bariza.Api/Bariza.Api.csproj
 
-COPY HappyInventory.Core/ HappyInventory.Core/
-COPY HappyInventory.Application/ HappyInventory.Application/
-COPY HappyInventory.Infrastructure/ HappyInventory.Infrastructure/
-COPY HappyInventory.Api/ HappyInventory.Api/
+COPY Bariza.Core/ Bariza.Core/
+COPY Bariza.Application/ Bariza.Application/
+COPY Bariza.Infrastructure/ Bariza.Infrastructure/
+COPY Bariza.Api/ Bariza.Api/
 
-RUN dotnet publish HappyInventory.Api/HappyInventory.Api.csproj \
+RUN dotnet publish Bariza.Api/Bariza.Api.csproj \
     --configuration Release \
     --no-restore \
     --output /app/publish
 
 # Serve the Angular production build from the API's wwwroot.
-COPY --from=client-build /src/client/dist/happy-inventory-client/browser /app/publish/wwwroot
+COPY --from=client-build /src/client/dist/bariza-client/browser /app/publish/wwwroot
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
@@ -39,4 +39,4 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "HappyInventory.Api.dll"]
+ENTRYPOINT ["dotnet", "Bariza.Api.dll"]

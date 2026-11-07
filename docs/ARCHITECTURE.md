@@ -9,8 +9,8 @@ internal users (Angular UI) or by external systems (eCommerce, ERP, etc.).
 | Layer | Choice |
 | --- | --- |
 | Backend | ASP.NET Core .NET 6 Web API, N-tier |
-| Frontend | Angular 22 (`happyInventory.Client`, Angular CLI 22.2.4) |
-| Database | SQLite (`HappyInventory.Api/happyInventory.db`) |
+| Frontend | Angular 22 (`Bariza.Client`, Angular CLI 22.2.4) |
+| Database | SQLite (`Bariza.Api/Bariza.db`) |
 | ORM | EF Core 6 with migrations |
 | Authentication | JWT Bearer (HS256), PBKDF2-SHA256 password hashing |
 | Logging | Serilog (console, rolling file and asynchronous SQLite sink) |
@@ -20,13 +20,13 @@ internal users (Angular UI) or by external systems (eCommerce, ERP, etc.).
 
 ```
 happyInventory/
-├─ happyInventory.slnx                 Solution (N-tier projects only)
+├─ Bariza.slnx                 Solution (N-tier projects only)
 ├─ docs/                               Design notes
-├─ HappyInventory.Core/                Domain layer
+├─ Bariza.Core/                Domain layer
 │  ├─ Entities/                        User, Country, City, Warehouse, WarehouseItem,
 │  │                                   SystemLog
 │  └─ Enums/                           UserRoles
-├─ HappyInventory.Application/         Application layer
+├─ Bariza.Application/         Application layer
 │  ├─ Common/                          JwtOptions, AdminPolicyOptions, PagedResult,
 │  │                                   AppException and semantic exceptions
 │  ├─ DTOs/                            Auth, Users, Countries, Cities, Warehouses,
@@ -39,13 +39,13 @@ happyInventory/
 │  │                                   dashboard, inventory-update and system-log
 │  │                                   use cases
 │  └─ DependencyInjection.cs           AddApplication()
-├─ HappyInventory.Infrastructure/      Infrastructure layer
+├─ Bariza.Infrastructure/      Infrastructure layer
 │  ├─ Data/                            AppDbContext, DbSeeder, configurations
 │  ├─ Migrations/                      EF Core migrations
 │  ├─ Repositories/                    EF Core repository implementations
 │  ├─ Security/                        PasswordHasher, TokenService
 │  └─ DependencyInjection.cs           AddInfrastructure()
-├─ HappyInventory.Api/                 Presentation/composition layer
+├─ Bariza.Api/                 Presentation/composition layer
 │  ├─ Controllers/                     Auth, Users, Dashboard, Countries, Cities,
 │  │                                   Warehouses, WarehouseItems, InventoryUpdates,
 │  │                                   SystemLogs
@@ -57,22 +57,22 @@ happyInventory/
 │  │                                   startup seed
 │  └─ appsettings.json                 Connection string, JWT, seed and logging
 │                                      settings
-├─ HappyInventory.Tests/               Unit tests for integration and security
-├─ happyInventory.Client/              Angular application
+├─ Bariza.Tests/               Unit tests for integration and security
+├─ Bariza.Client/              Angular application
 ├─ happyInventory/                     Legacy monolith, not in the solution
 └─ docs/ARCHITECTURE.md                This document
 ```
 
 The project references enforce the layering:
 
-- `HappyInventory.Core` has no project references.
-- `HappyInventory.Application` references `HappyInventory.Core`.
-- `HappyInventory.Infrastructure` references `HappyInventory.Application` and
-  `HappyInventory.Core`.
-- `HappyInventory.Api` references `HappyInventory.Application`,
-  `HappyInventory.Infrastructure` and `HappyInventory.Core`.
-- `HappyInventory.Tests` references `HappyInventory.Application` and
-  `HappyInventory.Core`.
+- `Bariza.Core` has no project references.
+- `Bariza.Application` references `Bariza.Core`.
+- `Bariza.Infrastructure` references `Bariza.Application` and
+  `Bariza.Core`.
+- `Bariza.Api` references `Bariza.Application`,
+  `Bariza.Infrastructure` and `Bariza.Core`.
+- `Bariza.Tests` references `Bariza.Application` and
+  `Bariza.Core`.
 
 Application code never references Infrastructure. The API is the composition
 root: it calls `AddApplication()` and `AddInfrastructure()`, then injects the
@@ -82,10 +82,10 @@ Request flow:
 
 ```
 HTTP
-  → Controller (HappyInventory.Api)
-  → I...Service (HappyInventory.Application)
-  → I...Repository (HappyInventory.Application)
-  → Repository implementation (HappyInventory.Infrastructure)
+  → Controller (Bariza.Api)
+  → I...Service (Bariza.Application)
+  → I...Repository (Bariza.Application)
+  → Repository implementation (Bariza.Infrastructure)
   → EF Core / SQLite
 ```
 
@@ -261,11 +261,11 @@ The documented inbound route is:
 POST /api/inventory/updates
 ```
 
-The endpoint lives in `HappyInventory.Api/Controllers/InventoryUpdatesController.cs`.
+The endpoint lives in `Bariza.Api/Controllers/InventoryUpdatesController.cs`.
 It delegates to `IInventoryUpdateService` in the Application layer, which uses
 `IInventoryUpdateRepository` to read the stock record and persist both the
 deduction and its idempotency record. The EF Core implementation is
-`HappyInventory.Infrastructure/Repositories/InventoryUpdateRepository.cs`.
+`Bariza.Infrastructure/Repositories/InventoryUpdateRepository.cs`.
 
 Required header:
 
@@ -481,12 +481,12 @@ To add a string, add the key to both JSON files and use
 
 ## Database
 
-The connection string defaults to `Data Source=happyInventory.db`, relative to the
+The connection string defaults to `Data Source=Bariza.db`, relative to the
 API process working directory. When the API is started from
-`HappyInventory.Api`, the file is `HappyInventory.Api/happyInventory.db`. The file
+`Bariza.Api`, the file is `Bariza.Api/Bariza.db`. The file
 is git-ignored (`*.db`).
 
-The migrations were moved to `HappyInventory.Infrastructure/Migrations` with the
+The migrations were moved to `Bariza.Infrastructure/Migrations` with the
 same migration IDs, so an existing database keeps its migration history. The
 `SystemLogs` table is created by `20261026174335_AddSystemLogs` and pruned by the
 retention service described above. The `RefreshTokens` table is created by
@@ -495,8 +495,8 @@ retention service described above. The `RefreshTokens` table is created by
 which is git-ignored.
 
 ```sh
-dotnet ef migrations add <Name> -p HappyInventory.Infrastructure -s HappyInventory.Api
-dotnet ef database update -p HappyInventory.Infrastructure -s HappyInventory.Api
+dotnet ef migrations add <Name> -p Bariza.Infrastructure -s Bariza.Api
+dotnet ef database update -p Bariza.Infrastructure -s Bariza.Api
 ```
 
 `DbSeeder.SeedAsync` runs pending migrations and ensures the default administrator
@@ -510,22 +510,22 @@ administrator must be created without a configured password.
 ## Running
 
 ```sh
-dotnet run --project HappyInventory.Api
-cd happyInventory.Client && npm start
+dotnet run --project Bariza.Api
+cd Bariza.Client && npm start
 ```
 
 Backend build and tests:
 
 ```sh
-dotnet build happyInventory.slnx
-dotnet test HappyInventory.Tests/HappyInventory.Tests.csproj
+dotnet build Bariza.slnx
+dotnet test Bariza.Tests/Bariza.Tests.csproj
 ```
 
 Angular production build/tests:
 
 ```sh
-cd happyInventory.Client && npm run build && npm test -- --watch=false
+cd Bariza.Client && npm run build && npm test -- --watch=false
 ```
 
 The `happyInventory/` folder is the old monolith. It is intentionally excluded
-from `happyInventory.slnx`; use `HappyInventory.Api` instead.
+from `Bariza.slnx`; use `Bariza.Api` instead.

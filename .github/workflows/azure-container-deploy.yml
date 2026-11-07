@@ -32,7 +32,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run backend tests
-        run: dotnet test HappyInventory.Tests/HappyInventory.Tests.csproj --configuration Release
+        run: dotnet test Bariza.Tests/Bariza.Tests.csproj --configuration Release
 
   build-and-deploy:
     needs: test

@@ -1,0 +1,7 @@
+﻿<Solution>
+  <Project Path="Bariza.Api/Bariza.Api.csproj" />
+  <Project Path="Bariza.Application/Bariza.Application.csproj" />
+  <Project Path="Bariza.Core/Bariza.Core.csproj" />
+  <Project Path="Bariza.Infrastructure/Bariza.Infrastructure.csproj" />
+  <Project Path="Bariza.Tests/Bariza.Tests.csproj" />
+</Solution>

@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="HappyInventory.Api/HappyInventory.Api.csproj" />
-  <Project Path="HappyInventory.Application/HappyInventory.Application.csproj" />
-  <Project Path="HappyInventory.Core/HappyInventory.Core.csproj" />
-  <Project Path="HappyInventory.Infrastructure/HappyInventory.Infrastructure.csproj" />
-  <Project Path="HappyInventory.Tests/HappyInventory.Tests.csproj" />
-</Solution>

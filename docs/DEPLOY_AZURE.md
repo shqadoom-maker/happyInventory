@@ -5,7 +5,7 @@ runs it as **one Linux Azure App Service container**. The container serves both 
 Angular client and the `/api` endpoints from the same origin, so no frontend API URL
 or CORS change is required.
 
-The SQLite database is stored at `/home/happyInventory.db`, which is persistent App
+The SQLite database is stored at `/home/Bariza.db`, which is persistent App
 Service storage. This is suitable for a demo or a single-instance deployment. It is
 **not** safe for scale-out; see [SQLite and scaling](#sqlite-and-scaling).
 
@@ -16,7 +16,7 @@ Service storage. This is suitable for a demo or a single-instance deployment. It
 ## 1. Prerequisites
 
 - A GitHub account and push access to
-  `https://github.com/shqadoom-maker/happyInventory.git`
+  `https://github.com/shqadoom-maker/Bariza.git`
 - An Azure subscription where you can create a resource group, Azure Container
   Registry (ACR), and App Service
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and
@@ -78,10 +78,10 @@ az webapp config appsettings set --resource-group $RG --name $APP --settings `
   WEBSITES_PORT=8080 `
   WEBSITES_ENABLE_APP_SERVICE_STORAGE=true `
   ASPNETCORE_ENVIRONMENT=Production `
-  "ConnectionStrings__Default=Data Source=/home/happyInventory.db" `
+  "ConnectionStrings__Default=Data Source=/home/Bariza.db" `
   "Jwt__Key=$JwtKey" `
   "Jwt__Issuer=happyInventory" `
-  "Jwt__Audience=happyInventory.Client" `
+  "Jwt__Audience=Bariza.Client" `
   "Seed__AdminUsername=admin@happywarehouse.com" `
   "Seed__AdminPassword=$AdminPassword" `
   "Logging__Database__Enabled=true"
@@ -233,7 +233,7 @@ authorization error.
 
 ## SQLite and scaling
 
-- The database file is `/home/happyInventory.db`. `WEBSITES_ENABLE_APP_SERVICE_STORAGE=true`
+- The database file is `/home/Bariza.db`. `WEBSITES_ENABLE_APP_SERVICE_STORAGE=true`
   is required for Linux custom containers, otherwise `/home` is not persistent.
 - Keep the App Service plan at **one instance**. SQLite does not support safe
   concurrent writers across multiple instances.
@@ -254,7 +254,7 @@ authorization error.
 | Workflow fails at `az acr login` | Service principal has `AcrPush` on the registry |
 | App shows "Application Error" | `az webapp log tail`; check `Jwt__Key`, port `8080`, and image pull |
 | `401` on every API call | Sign in first; verify `Jwt__Key`, issuer, and audience settings |
-| Login succeeds but data disappears after restart | `WEBSITES_ENABLE_APP_SERVICE_STORAGE=true` and `/home/happyInventory.db` |
+| Login succeeds but data disappears after restart | `WEBSITES_ENABLE_APP_SERVICE_STORAGE=true` and `/home/Bariza.db` |
 | New deployment still serves old code | Wait for the image pull/restart; check the workflow run and container logs |
 | `.NET 6` warning in the image build | Expected; plan an upgrade to .NET 8 LTS |
 
