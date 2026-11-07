@@ -1,6 +1,6 @@
-# Happy Inventory — Solution Structure
+# BARIZA Market - Solution Structure
 
-Warehouse inventory management for Happy Company. Warehouses live in different
+Multi-vendor marketplace built on the existing inventory platform.
 countries and cities; stock is tracked per warehouse and can be updated by
 internal users (Angular UI) or by external systems (eCommerce, ERP, etc.).
 

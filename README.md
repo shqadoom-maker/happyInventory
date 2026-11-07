@@ -1,6 +1,6 @@
-# Happy Inventory
+# BARIZA Market
 
-Warehouse inventory management for Happy Company, built with ASP.NET Core .NET 6
+BARIZA Market is a multi-vendor marketplace built with ASP.NET Core .NET 6
 Web API (N-tier), Angular 22, EF Core 6 and SQLite.
 
 ## What is implemented
