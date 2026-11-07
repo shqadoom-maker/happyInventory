@@ -176,7 +176,7 @@ The database is migrated and seeded on startup from `Seed` configuration:
 
 | Email | Password | Role | Full name |
 | --- | --- | --- | --- |
-| `admin@happywarehouse.com` | `Seed:AdminPassword` | `Admin` | System Administrator |
+| `admin@barizamarket.com` | `Seed:AdminPassword` | `Admin` | System Administrator |
 
 On a fresh database this is the first account, so `Seed:AdminPassword` is
 required. If no administrator exists and no password is configured, startup
