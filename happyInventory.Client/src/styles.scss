@@ -930,3 +930,27 @@ html[dir='rtl'] .icon-login {
     transition-duration: 0.01ms !important;
   }
 }
+[data-theme="dark"] {
+  --bg: #101714;
+  --bg-subtle: #17211e;
+  --surface: #17211e;
+  --surface-muted: #1f2b27;
+  --surface-hover: #202d29;
+  --border: #2b3a35;
+  --border-strong: #3a4d46;
+  --text: #f5f1ea;
+  --text-soft: #d8d0c4;
+  --muted: #a89d8e;
+  --primary: #3fb3a8;
+  --primary-dark: #2f9a90;
+  --primary-soft: #12312e;
+  --accent: #f6b37a;
+  --accent-soft: #3a2a1f;
+  --success: #59b35d;
+  --warning: #d6a04c;
+  --danger: #e06a6a;
+  --info: #6aa6e8;
+  --gradient-primary: linear-gradient(135deg, #3fb3a8 0%, #2563A8 48%, #F5A524 100%);
+  --gradient-navy: linear-gradient(160deg, #064E3B 0%, #095A41 55%, #0B6E4F 100%);
+  --gradient-surface: linear-gradient(180deg, #17211e 0%, #101714 100%);
+}
