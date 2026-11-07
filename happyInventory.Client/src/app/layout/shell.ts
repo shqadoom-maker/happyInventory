@@ -4,7 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../core/services/auth.service';
 import { LanguageCode, LanguageService } from '../core/services/language.service';
-import { BrandMark } from '../shared/brand-mark/brand-mark';
+import { Logo } from '../shared/logo/logo';
 
 interface NavItem {
   path: string;
@@ -28,7 +28,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, BrandMark],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, Logo],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })

@@ -9,7 +9,7 @@
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-brand" routerLink="/shop" (click)="closeMenu()">
-        <app-brand-mark />
+        <app-logo variant="icon" />
         <span class="site-brand-text">
           <strong>{{ 'brand.name' | translate }}</strong>
           <small>{{ 'marketplace.brandSubtitle' | translate }}</small>
@@ -60,6 +60,17 @@
             {{ 'marketplace.nav.register' | translate }}
           </a>
         }
+
+        <button
+          class="theme-toggle"
+          type="button"
+          (click)="toggleTheme()"
+          [attr.aria-label]="theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+        >
+          <span class="material-icons-round" aria-hidden="true">
+            {{ theme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+          </span>
+        </button>
 
         <button
           class="cart-button"
@@ -210,7 +221,7 @@
   <footer class="site-footer">
     <div class="site-footer-inner">
       <div class="footer-brand">
-        <app-brand-mark />
+        <app-logo variant="icon" />
         <div>
           <strong>{{ 'brand.name' | translate }}</strong>
           <p>{{ 'marketplace.footer.tagline' | translate }}</p>

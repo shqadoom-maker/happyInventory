@@ -1,0 +1,28 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+}
+
+.logo-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-text strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text, #1B1F23);
+  letter-spacing: -0.02em;
+}
+
+.logo-dark .logo-text strong {
+  color: #FAF7F2;
+}

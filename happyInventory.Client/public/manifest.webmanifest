@@ -1,0 +1,11 @@
+{
+  "name": "BARIZA Market",
+  "short_name": "BARIZA",
+  "theme_color": "#0B6E4F",
+  "background_color": "#FAF7F2",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

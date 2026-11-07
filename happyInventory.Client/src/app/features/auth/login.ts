@@ -7,11 +7,11 @@ import { errorMessage } from '../../core/error-message';
 import { ApiError } from '../../core/interceptors/api-error.interceptor';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageCode, LanguageService } from '../../core/services/language.service';
-import { BrandMark } from '../../shared/brand-mark/brand-mark';
+import { Logo } from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, BrandMark],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Logo],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

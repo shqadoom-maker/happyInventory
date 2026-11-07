@@ -11,11 +11,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageCode, LanguageService } from '../../core/services/language.service';
-import { BrandMark } from '../../shared/brand-mark/brand-mark';
+import { ThemeService } from '../../core/services/theme.service';
+import { Logo } from '../../shared/logo/logo';
 
 @Component({
   selector: 'app-marketplace-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, BrandMark],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, Logo],
   templateUrl: './marketplace-layout.html',
   styleUrl: './marketplace-layout.scss',
 })
@@ -24,12 +25,14 @@ export class MarketplaceLayout implements OnDestroy {
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly themeService = inject(ThemeService);
 
   protected readonly languages = this.languageService.languages;
   protected readonly currentLanguage = this.languageService.current;
   protected readonly isAuthenticated = this.auth.isAuthenticated;
   protected readonly menuOpen = signal(false);
   protected readonly searchTerm = signal('');
+  protected readonly theme = this.themeService.theme;
   protected readonly currentYear = new Date().getFullYear();
 
   constructor() {
@@ -59,6 +62,10 @@ export class MarketplaceLayout implements OnDestroy {
 
   protected changeLanguage(code: LanguageCode): void {
     void this.languageService.setLanguage(code);
+  }
+
+  protected toggleTheme(): void {
+    this.themeService.toggle();
   }
 
   protected onSearchInput(value: string): void {

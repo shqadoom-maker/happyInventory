@@ -1,10 +1,10 @@
 {
   "brand": {
-    "name": "Happy Inventory",
+    "name": "BARIZA Market",
     "subtitle": "Warehouse management"
   },
   "auth": {
-    "eyebrow": "Happy Company",
+    "eyebrow": "BARIZA Market",
     "title": "Welcome back",
     "subtitle": "Sign in to manage your warehouse efficiently.",
     "username": "Username",
@@ -24,8 +24,8 @@
     "invalidCredentials": "Invalid username or password.",
     "accountDisabled": "Your account is disabled. Please contact support.",
     "accountsManaged": "Accounts are created and managed by an administrator.",
-    "copyright": "© {{year}} Happy Inventory. All rights reserved.",
-    "asideTitle": "Warehouse inventory, in one place.",
+    "copyright": "© {{year}} BARIZA Market. All rights reserved.",
+    "asideTitle": "BARIZA Market administration",
     "asideBody": "Sign in to manage warehouses, check stock and keep the catalogue current across countries and cities.",
     "point1": "JWT-protected API for every request",
     "point2": "One role per user, managed by administrators",
@@ -52,8 +52,8 @@
     "success": "Password changed successfully."
   },
   "shell": {
-    "eyebrow": "Happy Company",
-    "title": "Inventory management",
+    "eyebrow": "BARIZA Market",
+    "title": "Marketplace administration",
     "stack": "SQLite · EF Core 6",
     "api": "API: ASP.NET Core .NET 6",
     "signedInAs": "Signed in as",
@@ -84,7 +84,7 @@
       "menu": "Marketplace menu",
       "home": "Home",
       "catalog": "Catalog",
-      "why": "Why Happy",
+      "why": "Why BARIZA",
       "signIn": "Sign in",
       "register": "Register",
       "cart": "Cart",
@@ -98,7 +98,7 @@
       "closeMenu": "Close menu"
     },
     "home": {
-      "eyebrow": "Happy Marketplace",
+      "eyebrow": "BARIZA Market",
       "title": "Discover products from trusted sellers.",
       "subtitle": "A new marketplace is taking shape on top of the inventory platform you already know. Browse, compare, and shop with confidence.",
       "primaryCta": "Explore the marketplace",
@@ -117,7 +117,7 @@
       "catalogBody": "Search by name, description, or SKU, filter by category and price, and sort the results. Every page is served by the API.",
       "catalogCta": "Browse the catalog",
       "phaseLabel": "Phase 2 catalog",
-      "whyEyebrow": "Why Happy",
+      "whyEyebrow": "Why BARIZA",
       "whyTitle": "Built on a trusted inventory platform",
       "whyBody": "The marketplace starts from the same warehouse and inventory foundation that runs today.",
       "feature1Title": "Verified sellers",
@@ -175,8 +175,8 @@
       "backToShop": "Back to marketplace"
     },
     "footer": {
-      "tagline": "A multi-vendor marketplace built on Happy Inventory.",
-      "rights": "© {{year}} Happy Inventory. All rights reserved.",
+      "tagline": "A multi-vendor marketplace built on BARIZA Market.",
+      "rights": "? {{year}} BARIZA Market. All rights reserved.",
       "staff": "Staff access"
     }
   },
@@ -218,7 +218,7 @@
     "deletedSuccessfully": "Deleted successfully"
   },
   "dashboard": {
-    "eyebrow": "Happy Company",
+    "eyebrow": "BARIZA Market",
     "welcomeEyebrow": "Signed in",
     "welcome": "Welcome back, {{name}}",
     "title": "Multi-country warehouse inventory",
