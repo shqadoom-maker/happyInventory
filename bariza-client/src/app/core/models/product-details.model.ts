@@ -42,6 +42,7 @@ export interface ProductDetails {
   slug: string;
   sku?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
   price: number;
   discountPrice?: number | null;
   categoryId?: number | null;

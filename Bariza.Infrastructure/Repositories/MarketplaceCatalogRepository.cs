@@ -134,6 +134,7 @@ public class MarketplaceCatalogRepository : IMarketplaceCatalogRepository
             .Include(p => p.Images)
             .Include(p => p.Variants)
             .Include(p => p.Specifications)
+            .Include(p => p.WarehouseItems)
             .FirstOrDefaultAsync(p => p.Id == productId, cancellationToken);
 
         if (product is null)
@@ -157,6 +158,7 @@ public class MarketplaceCatalogRepository : IMarketplaceCatalogRepository
             .Include(p => p.Images)
             .Include(p => p.Variants)
             .Include(p => p.Specifications)
+            .Include(p => p.WarehouseItems)
             .FirstOrDefaultAsync(p => p.Slug == slug, cancellationToken);
 
         if (product is null)
@@ -344,6 +346,7 @@ public class MarketplaceCatalogRepository : IMarketplaceCatalogRepository
             Slug = product.Slug,
             Sku = product.Sku,
             Description = product.Description,
+            ImageUrl = product.ImageUrl,
             Price = product.Price,
             DiscountPrice = product.DiscountPrice,
             CategoryId = product.CategoryId,

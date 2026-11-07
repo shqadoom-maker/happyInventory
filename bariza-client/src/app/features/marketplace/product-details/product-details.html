@@ -3,7 +3,7 @@
     <p>{{ 'common.loading' | translate }}</p>
   } @else if (product) {
     <div class="gallery">
-      <img [src]="product.images[selectedImage]?.url || product.relatedProducts[0]?.imageUrl || '/images/marketplace/product-placeholder.svg'" [alt]="product.name" />
+      <img [src]="product.imageUrl || '/images/marketplace/product-placeholder.svg'" [alt]="product.name" />
       <div class="thumbnails">
         @for (image of product.images; track image.id; let i = $index) {
           <button type="button" (click)="selectImage(i)">
