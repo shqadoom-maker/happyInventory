@@ -15,9 +15,9 @@ import { LoginResponse, User } from '../models/user.model';
 import { authInterceptor } from '../interceptors/auth.interceptor';
 import { AuthService } from './auth.service';
 
-const TOKEN_KEY = 'happy-inventory.token';
-const USER_KEY = 'happy-inventory.user';
-const SESSION_KEY = 'happy-inventory.session';
+const TOKEN_KEY = 'bariza-market.token';
+const USER_KEY = 'bariza-market.user';
+const SESSION_KEY = 'bariza-market.session';
 
 const user: User = {
   id: 1,

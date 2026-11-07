@@ -12,7 +12,7 @@ export interface LanguageOption {
   dir: TextDirection;
 }
 
-const STORAGE_KEY = 'happy-inventory.language';
+const STORAGE_KEY = 'bariza-market.language';
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
