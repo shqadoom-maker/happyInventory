@@ -16,8 +16,14 @@ interface NavItem {
 const BASE_NAV_ITEMS: NavItem[] = [
   { path: '/dashboard', labelKey: 'nav.dashboard', icon: 'dashboard', exact: true },
   { path: '/warehouses', labelKey: 'nav.warehouses', icon: 'warehouse', exact: false },
-  { path: '/stock-movements', labelKey: 'nav.stockMovements', icon: 'integration_instructions', exact: false },
+  {
+    path: '/stock-movements',
+    labelKey: 'nav.stockMovements',
+    icon: 'integration_instructions',
+    exact: false,
+  },
   { path: '/locations', labelKey: 'nav.locations', icon: 'location_on', exact: false },
+  { path: '/shop', labelKey: 'nav.marketplace', icon: 'storefront', exact: false },
 ];
 
 @Component({

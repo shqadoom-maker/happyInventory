@@ -17,6 +17,42 @@ namespace HappyInventory.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.36");
 
+            modelBuilder.Entity("HappyInventory.Core.Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive", "SortOrder");
+
+                    b.ToTable("Categories", (string)null);
+                });
+
             modelBuilder.Entity("HappyInventory.Core.Entities.City", b =>
                 {
                     b.Property<int>("Id")
@@ -111,6 +147,79 @@ namespace HappyInventory.Infrastructure.Migrations
                     b.ToTable("InventoryUpdateRecords");
                 });
 
+            modelBuilder.Entity("HappyInventory.Core.Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("DiscountPrice")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SellerProfileId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Sku")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(220)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CreatedUtc");
+
+                    b.HasIndex("SellerProfileId");
+
+                    b.HasIndex("Sku");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("IsPublished", "IsActive", "ApprovalStatus");
+
+                    b.ToTable("Products", (string)null);
+                });
+
             modelBuilder.Entity("HappyInventory.Core.Entities.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
@@ -150,6 +259,45 @@ namespace HappyInventory.Infrastructure.Migrations
                     b.HasIndex("UserId", "RevokedUtc");
 
                     b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.SellerProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("IsApproved", "IsActive");
+
+                    b.ToTable("SellerProfiles", (string)null);
                 });
 
             modelBuilder.Entity("HappyInventory.Core.Entities.SystemLog", b =>
@@ -325,6 +473,9 @@ namespace HappyInventory.Infrastructure.Migrations
                     b.Property<decimal?>("MSRPPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Qty")
                         .IsConcurrencyToken()
                         .HasColumnType("INTEGER");
@@ -337,6 +488,8 @@ namespace HappyInventory.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("Qty");
 
@@ -359,6 +512,24 @@ namespace HappyInventory.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.Product", b =>
+                {
+                    b.HasOne("HappyInventory.Core.Entities.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HappyInventory.Core.Entities.SellerProfile", "SellerProfile")
+                        .WithMany("Products")
+                        .HasForeignKey("SellerProfileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("SellerProfile");
                 });
 
             modelBuilder.Entity("HappyInventory.Core.Entities.RefreshToken", b =>
@@ -393,13 +564,25 @@ namespace HappyInventory.Infrastructure.Migrations
 
             modelBuilder.Entity("HappyInventory.Core.Entities.WarehouseItem", b =>
                 {
+                    b.HasOne("HappyInventory.Core.Entities.Product", "Product")
+                        .WithMany("WarehouseItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("HappyInventory.Core.Entities.Warehouse", "Warehouse")
                         .WithMany("Items")
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Product");
+
                     b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("HappyInventory.Core.Entities.City", b =>
@@ -412,6 +595,16 @@ namespace HappyInventory.Infrastructure.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("Warehouses");
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.Product", b =>
+                {
+                    b.Navigation("WarehouseItems");
+                });
+
+            modelBuilder.Entity("HappyInventory.Core.Entities.SellerProfile", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("HappyInventory.Core.Entities.Warehouse", b =>

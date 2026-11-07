@@ -1,0 +1,17 @@
+<div class="placeholder-page">
+  <section class="placeholder-card">
+    <span class="placeholder-icon material-icons-round" aria-hidden="true">{{ icon() }}</span>
+    <span class="eyebrow">{{ 'marketplace.placeholder.eyebrow' | translate }}</span>
+    <h1>{{ titleKey() | translate }}</h1>
+    <p>{{ bodyKey() | translate }}</p>
+
+    @if (slug()) {
+      <code>{{ slug() }}</code>
+    }
+
+    <a class="btn" [routerLink]="backLink()">
+      <span class="material-icons-round" aria-hidden="true">arrow_back</span>
+      {{ backLabelKey() | translate }}
+    </a>
+  </section>
+</div>

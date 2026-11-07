@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Sofa">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe4e6"/>
+      <stop offset="1" stop-color="#fda4af"/>
+    </linearGradient>
+    <linearGradient id="fabric" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9f1239"/>
+      <stop offset="1" stop-color="#7f1d1d"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="690" cy="110" r="120" fill="#fff" opacity=".28"/>
+  <circle cx="110" cy="510" r="150" fill="#9f1239" opacity=".1"/>
+  <rect x="180" y="250" width="440" height="170" rx="34" fill="url(#fabric)"/>
+  <rect x="140" y="300" width="120" height="160" rx="38" fill="#881337"/>
+  <rect x="540" y="300" width="120" height="160" rx="38" fill="#881337"/>
+  <rect x="215" y="285" width="175" height="95" rx="22" fill="#be123c"/>
+  <rect x="410" y="285" width="175" height="95" rx="22" fill="#be123c"/>
+  <rect x="205" y="408" width="390" height="62" rx="18" fill="#7f1d1d"/>
+  <rect x="220" y="460" width="22" height="46" rx="6" fill="#4c0519"/>
+  <rect x="558" y="460" width="22" height="46" rx="6" fill="#4c0519"/>
+  <circle cx="300" cy="330" r="16" fill="#fecdd3" opacity=".55"/>
+  <circle cx="500" cy="330" r="16" fill="#fecdd3" opacity=".55"/>
+</svg>

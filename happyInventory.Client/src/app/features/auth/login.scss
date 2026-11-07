@@ -127,7 +127,9 @@
   font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .login-lang .lang-btn:hover {
@@ -275,7 +277,9 @@
   font: inherit;
   font-size: 0.92rem;
   outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition),
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
     background var(--transition);
 }
 
@@ -330,7 +334,9 @@
   background: transparent;
   color: #7c8ba1;
   cursor: pointer;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .password-toggle:hover {
@@ -385,7 +391,9 @@
   border-radius: 5px;
   background: #fff;
   color: #fff;
-  transition: background var(--transition), border-color var(--transition),
+  transition:
+    background var(--transition),
+    border-color var(--transition),
     box-shadow var(--transition);
 }
 
@@ -393,7 +401,9 @@
   font-size: 0.95rem;
   opacity: 0;
   transform: scale(0.6);
-  transition: opacity var(--transition), transform var(--transition);
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
 }
 
 .checkbox input:checked + .checkbox-box {
@@ -509,6 +519,26 @@
 .login-note .material-icons-round {
   color: var(--success);
   font-size: 0.98rem;
+}
+
+.login-back {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-back:hover {
+  color: var(--primary-dark);
+}
+
+.login-back .material-icons-round {
+  font-size: 1rem;
 }
 
 .login-copyright {

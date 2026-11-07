@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { errorMessage } from '../../core/error-message';
@@ -11,7 +11,7 @@ import { BrandMark } from '../../shared/brand-mark/brand-mark';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, TranslatePipe, BrandMark],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, BrandMark],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

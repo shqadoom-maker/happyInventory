@@ -3,8 +3,26 @@ import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { rootRedirect } from './core/guards/root-redirect.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: rootRedirect,
+  },
+  {
+    path: 'shop',
+    loadComponent: () =>
+      import('./layout/marketplace-layout/marketplace-layout').then((m) => m.MarketplaceLayout),
+    children: [
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/marketplace/marketplace.routes').then((m) => m.MARKETPLACE_ROUTES),
+      },
+    ],
+  },
   {
     path: 'login',
     title: 'titles.login',
@@ -15,8 +33,7 @@ export const routes: Routes = [
     path: 'change-password',
     title: 'titles.changePassword',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/auth/change-password').then((m) => m.ChangePassword),
+    loadComponent: () => import('./features/auth/change-password').then((m) => m.ChangePassword),
   },
   {
     path: '',
@@ -31,8 +48,7 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         title: 'titles.dashboard',
-        loadComponent: () =>
-          import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
         path: 'warehouses',

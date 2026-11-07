@@ -1,48 +1,47 @@
-/* ==========================================================================
-   Happy Inventory — global design system
-   Warehouse management platform · navy / blue / cyan identity
-   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* BARIZA Market global design system */
 
 :root {
-  /* Brand palette */
-  --navy-950: #040b18;
-  --navy-900: #071426;
-  --navy-800: #0a1c33;
-  --navy-700: #10294a;
-  --navy-600: #163a63;
-  --blue-700: #1e40af;
-  --blue-600: #1d4ed8;
-  --blue-500: #2563eb;
-  --blue-400: #3b82f6;
-  --cyan-500: #06b6d4;
-  --cyan-400: #22d3ee;
+  /* Brand palette — BARIZA Market */
+  --navy-950: #081714;
+  --navy-900: #0c211d;
+  --navy-800: #102b26;
+  --navy-700: #173a34;
+  --navy-600: #1f4d45;
+  --blue-700: #0b5650;
+  --blue-600: #0f6b63;
+  --blue-500: #1f7a8c;
+  --blue-400: #3fb3a8;
+  --cyan-500: #f4a261;
+  --cyan-400: #f6b37a;
 
-  /* Semantic colours */
-  --primary: #1d4ed8;
-  --primary-dark: #1e40af;
-  --primary-soft: #e8f0fe;
-  --accent: #06b6d4;
-  --accent-soft: #e0f7fb;
+  /* Semantic colours — BARIZA Market */
+  --primary: #0f6b63;
+  --primary-dark: #0b5650;
+  --primary-soft: #eaf4f2;
+  --accent: #f4a261;
+  --accent-soft: #fff3e8;
 
-  --bg: #f4f7fc;
-  --bg-subtle: #eef3fa;
+  --bg: #faf7f2;
+  --bg-subtle: #f3eee6;
   --surface: #ffffff;
-  --surface-muted: #f7f9fd;
-  --surface-hover: #f5f9ff;
-  --border: #dde6f2;
-  --border-strong: #c7d4e6;
-  --text: #0b1b33;
-  --text-soft: #33465f;
-  --muted: #64748b;
+  --surface-muted: #f3eee6;
+  --surface-hover: #f5f9f7;
+  --border: #e7dfd3;
+  --border-strong: #d3c7b6;
+  --text: #26201a;
+  --text-soft: #554a3d;
+  --muted: #8f7f6b;
 
-  --success: #0f8a4d;
-  --success-soft: #e7f7ee;
-  --warning: #a85c07;
-  --warning-soft: #fdf1dd;
-  --danger: #d02b2b;
-  --danger-soft: #fdecec;
-  --info: #0369a1;
-  --info-soft: #e6f4fb;
+  --success: #2e7d32;
+  --success-soft: #eaf6ea;
+  --warning: #b7791f;
+  --warning-soft: #fdf3e3;
+  --danger: #c53030;
+  --danger-soft: #fde8e8;
+  --info: #2b6cb0;
+  --info-soft: #e8f0fa;
 
   /* Shape */
   --radius-sm: 8px;
@@ -58,12 +57,12 @@
   --ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #1d4ed8 0%, #2563eb 48%, #0ea5e9 100%);
-  --gradient-navy: linear-gradient(160deg, #071426 0%, #0b1e3a 55%, #10294a 100%);
-  --gradient-surface: linear-gradient(180deg, #ffffff 0%, #f7f9fd 100%);
+  --gradient-primary: linear-gradient(135deg, #0f6b63 0%, #1f7a8c 48%, #f4a261 100%);
+  --gradient-navy: linear-gradient(160deg, #081714 0%, #102b26 55%, #173a34 100%);
+  --gradient-surface: linear-gradient(180deg, #ffffff 0%, #f3eee6 100%);
 
   /* Typography */
-  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Cairo', 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
 
   --transition: 160ms ease;
 }
@@ -80,7 +79,7 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.05), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(15, 107, 99, 0.06), transparent 42%),
     var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -95,12 +94,12 @@ body.menu-open {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(15, 107, 99, 0.18);
   color: var(--text);
 }
 
 :focus-visible {
-  outline: 2px solid var(--blue-500);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 

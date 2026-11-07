@@ -329,7 +329,10 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await DbSeeder.SeedAsync(app.Services, app.Configuration);
+await DbSeeder.SeedAsync(
+    app.Services,
+    app.Configuration,
+    seedMarketplaceCatalog: app.Environment.IsDevelopment());
 
 if (app.Environment.IsDevelopment())
 {

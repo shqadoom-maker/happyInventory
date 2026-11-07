@@ -15,6 +15,9 @@ public class AppDbContext : DbContext
     public DbSet<City> Cities => Set<City>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<WarehouseItem> WarehouseItems => Set<WarehouseItem>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<SellerProfile> SellerProfiles => Set<SellerProfile>();
+    public DbSet<Product> Products => Set<Product>();
     public DbSet<InventoryUpdateRecord> InventoryUpdateRecords => Set<InventoryUpdateRecord>();
     public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

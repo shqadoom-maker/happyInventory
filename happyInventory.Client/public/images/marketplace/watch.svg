@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Smart watch">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ccfbf1"/>
+      <stop offset="1" stop-color="#5eead4"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#115e59"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="680" cy="100" r="120" fill="#fff" opacity=".25"/>
+  <circle cx="120" cy="500" r="140" fill="#0f766e" opacity=".12"/>
+  <rect x="338" y="80" width="124" height="440" rx="48" fill="#134e4a"/>
+  <rect x="260" y="190" width="280" height="220" rx="54" fill="#1e293b"/>
+  <rect x="282" y="212" width="236" height="176" rx="38" fill="url(#face)"/>
+  <circle cx="400" cy="300" r="58" fill="none" stroke="#2dd4bf" stroke-width="12" opacity=".35"/>
+  <path d="M400 252v50l34 20" fill="none" stroke="#5eead4" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="400" cy="300" r="7" fill="#5eead4"/>
+  <rect x="572" y="270" width="18" height="58" rx="9" fill="#0f766e"/>
+</svg>

@@ -1,0 +1,232 @@
+<div class="marketplace">
+  <div
+    class="menu-backdrop"
+    [class.visible]="menuOpen()"
+    (click)="closeMenu()"
+    aria-hidden="true"
+  ></div>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" routerLink="/shop" (click)="closeMenu()">
+        <app-brand-mark />
+        <span class="site-brand-text">
+          <strong>{{ 'brand.name' | translate }}</strong>
+          <small>{{ 'marketplace.brandSubtitle' | translate }}</small>
+        </span>
+      </a>
+
+      <form class="site-search" role="search" (submit)="submitSearch($event)">
+        <span class="material-icons-round" aria-hidden="true">search</span>
+        <input
+          type="search"
+          [value]="searchTerm()"
+          (input)="onSearchInput($any($event.target).value)"
+          [attr.placeholder]="'marketplace.nav.searchPlaceholder' | translate"
+          [attr.aria-label]="'marketplace.nav.searchPlaceholder' | translate"
+        />
+        <button type="submit" [attr.aria-label]="'marketplace.nav.search' | translate">
+          <span class="material-icons-round" aria-hidden="true">arrow_forward</span>
+        </button>
+      </form>
+
+      <div class="site-actions">
+        <div class="site-lang" role="group" [attr.aria-label]="'language.label' | translate">
+          <span class="material-icons-round" aria-hidden="true">language</span>
+          @for (language of languages; track language.code) {
+            <button
+              type="button"
+              class="lang-btn"
+              [class.active]="currentLanguage() === language.code"
+              [attr.aria-pressed]="currentLanguage() === language.code"
+              (click)="changeLanguage(language.code)"
+            >
+              {{ language.label }}
+            </button>
+          }
+        </div>
+
+        @if (isAuthenticated()) {
+          <a class="btn small header-cta" routerLink="/dashboard">
+            <span class="material-icons-round" aria-hidden="true">dashboard</span>
+            {{ 'marketplace.nav.dashboard' | translate }}
+          </a>
+        } @else {
+          <a class="header-link header-cta" routerLink="/login">
+            <span class="material-icons-round" aria-hidden="true">login</span>
+            {{ 'marketplace.nav.signIn' | translate }}
+          </a>
+          <a class="header-link header-register" routerLink="/shop/register">
+            {{ 'marketplace.nav.register' | translate }}
+          </a>
+        }
+
+        <button
+          class="cart-button"
+          type="button"
+          disabled
+          [attr.aria-label]="'marketplace.nav.cartSoon' | translate"
+          [attr.title]="'marketplace.nav.cartSoon' | translate"
+        >
+          <span class="material-icons-round" aria-hidden="true">shopping_bag</span>
+          <span class="cart-badge">0</span>
+        </button>
+
+        <button
+          class="menu-toggle"
+          type="button"
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen()"
+          aria-controls="marketplace-drawer"
+          [attr.aria-label]="
+            (menuOpen() ? 'marketplace.nav.closeMenu' : 'marketplace.nav.openMenu') | translate
+          "
+        >
+          <span class="material-icons-round" aria-hidden="true">
+            {{ menuOpen() ? 'close' : 'menu' }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="site-nav-row">
+      <nav class="desktop-nav" [attr.aria-label]="'marketplace.nav.primary' | translate">
+        <a
+          routerLink="/shop"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          {{ 'marketplace.nav.home' | translate }}
+        </a>
+        <a routerLink="/shop/products" routerLinkActive="active" (click)="closeMenu()">
+          {{ 'marketplace.nav.catalog' | translate }}
+        </a>
+        <a routerLink="/shop" fragment="why" (click)="closeMenu()">
+          {{ 'marketplace.nav.why' | translate }}
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <aside
+    id="marketplace-drawer"
+    class="mobile-drawer"
+    [class.open]="menuOpen()"
+    [attr.aria-hidden]="!menuOpen()"
+    [attr.inert]="menuOpen() ? null : ''"
+  >
+    <div class="drawer-head">
+      <span class="drawer-title">{{ 'marketplace.nav.menu' | translate }}</span>
+      <button
+        class="drawer-close"
+        type="button"
+        (click)="closeMenu()"
+        [attr.aria-label]="'marketplace.nav.closeMenu' | translate"
+      >
+        <span class="material-icons-round" aria-hidden="true">close</span>
+      </button>
+    </div>
+
+    <form class="drawer-search" role="search" (submit)="submitSearch($event)">
+      <span class="material-icons-round" aria-hidden="true">search</span>
+      <input
+        type="search"
+        [value]="searchTerm()"
+        (input)="onSearchInput($any($event.target).value)"
+        [attr.placeholder]="'marketplace.nav.searchPlaceholder' | translate"
+        [attr.aria-label]="'marketplace.nav.searchPlaceholder' | translate"
+      />
+    </form>
+
+    <nav class="drawer-nav" [attr.aria-label]="'marketplace.nav.primary' | translate">
+      <a
+        routerLink="/shop"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        <span class="material-icons-round" aria-hidden="true">storefront</span>
+        {{ 'marketplace.nav.home' | translate }}
+      </a>
+      <a routerLink="/shop/products" routerLinkActive="active" (click)="closeMenu()">
+        <span class="material-icons-round" aria-hidden="true">grid_view</span>
+        {{ 'marketplace.nav.catalog' | translate }}
+      </a>
+      <a routerLink="/shop" fragment="why" (click)="closeMenu()">
+        <span class="material-icons-round" aria-hidden="true">verified</span>
+        {{ 'marketplace.nav.why' | translate }}
+      </a>
+    </nav>
+
+    <div class="drawer-footer">
+      <div class="drawer-lang" role="group" [attr.aria-label]="'language.label' | translate">
+        <span class="material-icons-round" aria-hidden="true">language</span>
+        @for (language of languages; track language.code) {
+          <button
+            type="button"
+            class="lang-btn"
+            [class.active]="currentLanguage() === language.code"
+            [attr.aria-pressed]="currentLanguage() === language.code"
+            (click)="changeLanguage(language.code)"
+          >
+            {{ language.label }}
+          </button>
+        }
+      </div>
+
+      @if (isAuthenticated()) {
+        <a class="btn drawer-cta" routerLink="/dashboard" (click)="closeMenu()">
+          <span class="material-icons-round" aria-hidden="true">dashboard</span>
+          {{ 'marketplace.nav.dashboard' | translate }}
+        </a>
+      } @else {
+        <a class="btn drawer-cta" routerLink="/login" (click)="closeMenu()">
+          <span class="material-icons-round" aria-hidden="true">login</span>
+          {{ 'marketplace.nav.signIn' | translate }}
+        </a>
+        <a class="drawer-secondary-link" routerLink="/shop/register" (click)="closeMenu()">
+          {{ 'marketplace.nav.register' | translate }}
+        </a>
+      }
+
+      <button
+        class="drawer-cart"
+        type="button"
+        disabled
+        [attr.aria-label]="'marketplace.nav.cartSoon' | translate"
+      >
+        <span class="material-icons-round" aria-hidden="true">shopping_bag</span>
+        {{ 'marketplace.nav.cart' | translate }}
+        <span class="cart-badge">0</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="site-main">
+    <router-outlet />
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">
+        <app-brand-mark />
+        <div>
+          <strong>{{ 'brand.name' | translate }}</strong>
+          <p>{{ 'marketplace.footer.tagline' | translate }}</p>
+        </div>
+      </div>
+
+      <nav class="footer-links" [attr.aria-label]="'marketplace.nav.footer' | translate">
+        <a routerLink="/shop">{{ 'marketplace.nav.home' | translate }}</a>
+        <a routerLink="/shop/products">{{ 'marketplace.nav.catalog' | translate }}</a>
+        <a routerLink="/shop" fragment="why">{{ 'marketplace.nav.why' | translate }}</a>
+        <a routerLink="/login">{{ 'marketplace.footer.staff' | translate }}</a>
+      </nav>
+    </div>
+
+    <p class="footer-copy">
+      {{ 'marketplace.footer.rights' | translate: { year: currentYear } }}
+    </p>
+  </footer>
+</div>

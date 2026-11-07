@@ -1,0 +1,110 @@
+<div class="marketplace-home">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">{{ 'marketplace.home.eyebrow' | translate }}</span>
+      <h1>{{ 'marketplace.home.title' | translate }}</h1>
+      <p class="hero-subtitle">{{ 'marketplace.home.subtitle' | translate }}</p>
+
+      <div class="hero-actions">
+        <a class="btn" routerLink="/shop/products">
+          <span class="material-icons-round" aria-hidden="true">storefront</span>
+          {{ 'marketplace.home.primaryCta' | translate }}
+        </a>
+        <a class="btn secondary" routerLink="/login">
+          <span class="material-icons-round" aria-hidden="true">login</span>
+          {{ 'marketplace.home.secondaryCta' | translate }}
+        </a>
+      </div>
+
+      <ul class="hero-points">
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'marketplace.home.point1' | translate }}
+        </li>
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'marketplace.home.point2' | translate }}
+        </li>
+        <li>
+          <span class="material-icons-round" aria-hidden="true">check_circle</span>
+          {{ 'marketplace.home.point3' | translate }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="visual-glow visual-glow-a"></div>
+      <div class="visual-glow visual-glow-b"></div>
+
+      <article class="visual-card visual-card-main">
+        <span class="visual-icon material-icons-round">storefront</span>
+        <span class="visual-label">{{ 'marketplace.home.previewLabel' | translate }}</span>
+        <strong>{{ 'marketplace.home.previewTitle' | translate }}</strong>
+        <p>{{ 'marketplace.home.previewBody' | translate }}</p>
+        <span class="visual-badge">{{ 'marketplace.home.previewBadge' | translate }}</span>
+      </article>
+
+      <article class="visual-card visual-card-mini visual-card-top">
+        <span class="material-icons-round">verified</span>
+        <span>{{ 'marketplace.home.point1' | translate }}</span>
+      </article>
+
+      <article class="visual-card visual-card-mini visual-card-bottom">
+        <span class="material-icons-round">inventory_2</span>
+        <span>{{ 'marketplace.home.point2' | translate }}</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="section catalog-section" id="catalog">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">{{ 'marketplace.home.catalogEyebrow' | translate }}</span>
+        <h2>{{ 'marketplace.home.catalogTitle' | translate }}</h2>
+      </div>
+      <span class="phase-badge">{{ 'marketplace.home.phaseLabel' | translate }}</span>
+    </div>
+
+    <article class="coming-card">
+      <span class="coming-icon material-icons-round" aria-hidden="true">grid_view</span>
+      <div class="coming-copy">
+        <h3>{{ 'marketplace.home.catalogCardTitle' | translate }}</h3>
+        <p>{{ 'marketplace.home.catalogBody' | translate }}</p>
+      </div>
+      <a class="btn" routerLink="/shop/products">
+        <span class="material-icons-round" aria-hidden="true">arrow_forward</span>
+        {{ 'marketplace.home.catalogCta' | translate }}
+      </a>
+    </article>
+  </section>
+
+  <section class="section why-section" id="why">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">{{ 'marketplace.home.whyEyebrow' | translate }}</span>
+        <h2>{{ 'marketplace.home.whyTitle' | translate }}</h2>
+        <p>{{ 'marketplace.home.whyBody' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature-card">
+        <span class="feature-icon material-icons-round" aria-hidden="true">verified_user</span>
+        <h3>{{ 'marketplace.home.feature1Title' | translate }}</h3>
+        <p>{{ 'marketplace.home.feature1Body' | translate }}</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon material-icons-round" aria-hidden="true">inventory_2</span>
+        <h3>{{ 'marketplace.home.feature2Title' | translate }}</h3>
+        <p>{{ 'marketplace.home.feature2Body' | translate }}</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon material-icons-round" aria-hidden="true">lock</span>
+        <h3>{{ 'marketplace.home.feature3Title' | translate }}</h3>
+        <p>{{ 'marketplace.home.feature3Body' | translate }}</p>
+      </article>
+    </div>
+  </section>
+</div>

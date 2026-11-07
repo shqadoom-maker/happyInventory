@@ -12,10 +12,16 @@ public class WarehouseItemConfiguration : IEntityTypeConfiguration<WarehouseItem
         builder.HasIndex(item => item.WarehouseId);
         builder.HasIndex(item => item.SKUCode);
         builder.HasIndex(item => item.Qty);
+        builder.HasIndex(item => item.ProductId);
 
         builder.HasOne(item => item.Warehouse)
             .WithMany(warehouse => warehouse.Items)
             .HasForeignKey(item => item.WarehouseId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(item => item.Product)
+            .WithMany(product => product.WarehouseItems)
+            .HasForeignKey(item => item.ProductId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Desk lamp">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fef9c3"/>
+      <stop offset="1" stop-color="#fde047"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="680" cy="100" r="120" fill="#fff" opacity=".35"/>
+  <circle cx="120" cy="510" r="150" fill="#ca8a04" opacity=".12"/>
+  <rect x="300" y="480" width="200" height="24" rx="12" fill="#334155"/>
+  <path d="M400 480V300c0-54 44-98 98-98" fill="none" stroke="#475569" stroke-width="18" stroke-linecap="round"/>
+  <path d="M450 202l96-34 50 104-96 34z" fill="#1e293b"/>
+  <path d="M462 226l64-22 32 66-64 22z" fill="#fef08a"/>
+  <circle cx="400" cy="300" r="18" fill="#64748b"/>
+  <path d="M430 340l110 84 44-58-110-84z" fill="#fef08a" opacity=".28"/>
+</svg>

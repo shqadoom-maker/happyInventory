@@ -1,0 +1,305 @@
+<div class="catalog-page">
+  <section class="catalog-hero">
+    <div class="catalog-hero-copy">
+      <span class="eyebrow">{{ 'marketplace.products.eyebrow' | translate }}</span>
+      <h1>{{ 'marketplace.products.title' | translate }}</h1>
+      <p>{{ 'marketplace.products.subtitle' | translate }}</p>
+    </div>
+    <div class="catalog-hero-stat" aria-live="polite">
+      <strong>{{ totalCount() }}</strong>
+      <span>{{ 'marketplace.products.productsFound' | translate }}</span>
+    </div>
+  </section>
+
+  <div class="catalog-layout">
+    <aside class="filter-panel" [attr.aria-label]="'marketplace.products.filters' | translate">
+      <div class="filter-panel-head">
+        <div>
+          <span class="eyebrow">{{ 'marketplace.products.refine' | translate }}</span>
+          <h2>{{ 'marketplace.products.filters' | translate }}</h2>
+        </div>
+        <button
+          type="button"
+          class="link clear-filters"
+          [disabled]="!hasFilters()"
+          (click)="clearFilters()"
+        >
+          {{ 'marketplace.products.clear' | translate }}
+        </button>
+      </div>
+
+      <div class="filter-group">
+        <h3>{{ 'marketplace.products.categories' | translate }}</h3>
+        <div class="category-list">
+          <button
+            type="button"
+            class="category-pill"
+            [class.active]="categoryId() === null"
+            (click)="selectCategory(null)"
+          >
+            <span>{{ 'marketplace.products.allCategories' | translate }}</span>
+          </button>
+          @for (category of categories(); track category.id) {
+            <button
+              type="button"
+              class="category-pill"
+              [class.active]="categoryId() === category.id"
+              (click)="selectCategory(category.id)"
+            >
+              <span>{{ category.name }}</span>
+              <span class="category-count">{{ category.productCount }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h3>{{ 'marketplace.products.price' | translate }}</h3>
+        <div class="price-fields">
+          <label class="price-field">
+            <span>{{ 'marketplace.products.minPrice' | translate }}</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              [value]="minPriceInput()"
+              (change)="onMinPriceChange($any($event.target).value)"
+            />
+          </label>
+          <label class="price-field">
+            <span>{{ 'marketplace.products.maxPrice' | translate }}</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              [value]="maxPriceInput()"
+              (change)="onMaxPriceChange($any($event.target).value)"
+            />
+          </label>
+        </div>
+        @if (filterError()) {
+          <p class="field-error" role="alert">{{ filterError() }}</p>
+        }
+      </div>
+
+      <div class="filter-group">
+        <label class="select-field" for="catalog-sort">
+          <span>{{ 'marketplace.products.sort.label' | translate }}</span>
+          <select
+            id="catalog-sort"
+            [value]="sortBy()"
+            (change)="onSortChange($any($event.target).value)"
+          >
+            <option value="newest">{{ 'marketplace.products.sort.newest' | translate }}</option>
+            <option value="priceAsc">{{ 'marketplace.products.sort.priceAsc' | translate }}</option>
+            <option value="priceDesc">
+              {{ 'marketplace.products.sort.priceDesc' | translate }}
+            </option>
+            <option value="nameAsc">{{ 'marketplace.products.sort.nameAsc' | translate }}</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="filter-group">
+        <label class="select-field" for="catalog-page-size">
+          <span>{{ 'marketplace.products.perPage' | translate }}</span>
+          <select
+            id="catalog-page-size"
+            [value]="pageSize()"
+            (change)="onPageSizeChange($any($event.target).value)"
+          >
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </aside>
+
+    <section class="catalog-results" aria-live="polite">
+      <div class="results-toolbar">
+        <form class="catalog-search" (submit)="submitSearch($event)">
+          <span class="material-icons-round" aria-hidden="true">search</span>
+          <input
+            type="search"
+            [value]="searchInput()"
+            (input)="onSearchInput($any($event.target).value)"
+            [attr.placeholder]="'marketplace.products.searchPlaceholder' | translate"
+            [attr.aria-label]="'marketplace.products.searchPlaceholder' | translate"
+          />
+          <button type="submit" class="btn small">
+            {{ 'common.search' | translate }}
+          </button>
+        </form>
+
+        <div class="results-meta">
+          <span class="result-count">
+            {{ 'marketplace.products.resultCount' | translate: { count: totalCount() } }}
+          </span>
+          @if (activeCategory(); as category) {
+            <span class="active-filter">
+              <span class="material-icons-round" aria-hidden="true">filter_alt</span>
+              {{ category.name }}
+            </span>
+          }
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="state-card error-state" role="alert">
+          <span class="state-icon material-icons-round" aria-hidden="true">cloud_off</span>
+          <h2>{{ 'marketplace.products.errorTitle' | translate }}</h2>
+          <p>{{ error() }}</p>
+          <button type="button" class="btn" (click)="retry()">
+            <span class="material-icons-round" aria-hidden="true">refresh</span>
+            {{ 'common.refresh' | translate }}
+          </button>
+        </div>
+      } @else if (loading()) {
+        <div class="loading-state" role="status" [attr.aria-label]="'common.loading' | translate">
+          <div class="loading-bar"></div>
+          <div class="product-grid skeleton-grid" aria-hidden="true">
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <article class="product-card skeleton-card">
+                <div class="skeleton-media"></div>
+                <div class="skeleton-line skeleton-line-wide"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line skeleton-line-short"></div>
+              </article>
+            }
+          </div>
+        </div>
+      } @else if (products().length === 0) {
+        <div class="state-card empty-state">
+          <span class="state-icon material-icons-round" aria-hidden="true">
+            {{ hasFilters() ? 'search_off' : 'inventory_2' }}
+          </span>
+          @if (hasFilters()) {
+            <h2>{{ 'marketplace.products.noResultsTitle' | translate }}</h2>
+            <p>{{ 'marketplace.products.noResultsBody' | translate }}</p>
+            <button type="button" class="btn secondary" (click)="clearFilters()">
+              {{ 'marketplace.products.clear' | translate }}
+            </button>
+          } @else {
+            <h2>{{ 'marketplace.products.emptyTitle' | translate }}</h2>
+            <p>{{ 'marketplace.products.emptyBody' | translate }}</p>
+          }
+        </div>
+      } @else {
+        <div class="product-grid">
+          @for (product of products(); track product.id) {
+            <article class="product-card">
+              <a
+                class="product-media"
+                [routerLink]="['/shop/products', product.slug]"
+                [attr.aria-label]="product.name"
+              >
+                @if (product.imageUrl) {
+                  <img
+                    [src]="product.imageUrl"
+                    [alt]="product.name"
+                    loading="lazy"
+                    (error)="onImageError($event)"
+                  />
+                } @else {
+                  <div class="product-media-fallback">
+                    <span class="material-icons-round" aria-hidden="true">image</span>
+                  </div>
+                }
+
+                @if (discountPercent(product) > 0) {
+                  <span class="discount-badge">-{{ discountPercent(product) }}%</span>
+                }
+
+                <span
+                  class="availability-badge"
+                  [class.available]="product.isAvailable"
+                  [class.unavailable]="!product.isAvailable"
+                >
+                  {{ (product.isAvailable ? 'marketplace.products.inStock' : 'marketplace.products.outOfStock') | translate }}
+                </span>
+              </a>
+
+              <div class="product-body">
+                <span class="product-category">{{ product.categoryName }}</span>
+                <h2>
+                  <a [routerLink]="['/shop/products', product.slug]">{{ product.name }}</a>
+                </h2>
+
+                @if (product.sellerName) {
+                  <p class="product-seller">
+                    <span class="material-icons-round" aria-hidden="true">storefront</span>
+                    {{ 'marketplace.products.soldBy' | translate: { seller: product.sellerName } }}
+                  </p>
+                }
+
+                <div class="product-footer">
+                  <div class="product-price">
+                    @if (product.discountPrice != null) {
+                      <span class="price current">
+                        {{ product.discountPrice | number: '1.2-2' }}
+                      </span>
+                      <span class="price original">{{ product.price | number: '1.2-2' }}</span>
+                    } @else {
+                      <span class="price current">{{ product.price | number: '1.2-2' }}</span>
+                    }
+                    <span class="currency">{{ 'marketplace.products.currency' | translate }}</span>
+                  </div>
+
+                  <span
+                    class="availability-text"
+                    [class.available]="product.isAvailable"
+                    [class.unavailable]="!product.isAvailable"
+                  >
+                    <span class="material-icons-round" aria-hidden="true">
+                      {{ product.isAvailable ? 'check_circle' : 'remove_circle' }}
+                    </span>
+                    {{ (product.isAvailable ? 'marketplace.products.inStock' : 'marketplace.products.outOfStock') | translate }}
+                  </span>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination" [attr.aria-label]="'marketplace.products.pagination' | translate">
+            <button
+              type="button"
+              class="btn secondary small"
+              [disabled]="pageNumber() <= 1"
+              (click)="previousPage()"
+            >
+              <span class="material-icons-round icon-back" aria-hidden="true">arrow_back</span>
+              {{ 'common.previous' | translate }}
+            </button>
+
+            <span class="page-info">
+              {{
+                'common.pageOf'
+                  | translate
+                    : {
+                        page: pageNumber(),
+                        totalPages: totalPages(),
+                        totalCount: totalCount(),
+                      }
+              }}
+            </span>
+
+            <button
+              type="button"
+              class="btn secondary small"
+              [disabled]="pageNumber() >= totalPages()"
+              (click)="nextPage()"
+            >
+              {{ 'common.next' | translate }}
+              <span class="material-icons-round" aria-hidden="true">arrow_forward</span>
+            </button>
+          </nav>
+        }
+      }
+    </section>
+  </div>
+</div>

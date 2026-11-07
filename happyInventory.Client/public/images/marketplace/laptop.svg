@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Laptop">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dbeafe"/>
+      <stop offset="1" stop-color="#93c5fd"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="690" cy="90" r="120" fill="#fff" opacity=".22"/>
+  <circle cx="90" cy="520" r="150" fill="#1d4ed8" opacity=".12"/>
+  <rect x="190" y="140" width="420" height="270" rx="22" fill="#1e293b"/>
+  <rect x="212" y="162" width="376" height="220" rx="10" fill="url(#screen)"/>
+  <circle cx="400" cy="272" r="44" fill="#38bdf8" opacity=".2"/>
+  <path d="M370 296l34-38 26 26 24-18 38 30z" fill="#7dd3fc"/>
+  <path d="M150 418h500l38 48H112z" fill="#cbd5e1"/>
+  <path d="M150 418h500l10 13H140z" fill="#e2e8f0"/>
+  <rect x="348" y="438" width="104" height="10" rx="5" fill="#94a3b8"/>
+</svg>

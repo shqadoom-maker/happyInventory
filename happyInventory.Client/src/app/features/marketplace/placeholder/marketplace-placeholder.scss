@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.placeholder-page {
+  display: grid;
+  place-items: center;
+  min-height: 62vh;
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: clamp(34px, 6vw, 78px) clamp(18px, 4vw, 40px);
+}
+
+.placeholder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(620px, 100%);
+  padding: clamp(28px, 5vw, 52px);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.13), transparent 38%),
+    radial-gradient(circle at 90% 100%, rgba(37, 99, 235, 0.12), transparent 44%),
+    var(--surface);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.placeholder-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 18px;
+  border-radius: 22px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 2.2rem;
+}
+
+.placeholder-card h1 {
+  max-width: 20ch;
+  margin: 12px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.placeholder-card p {
+  max-width: 52ch;
+  margin: 14px 0 22px;
+  color: var(--text-soft);
+  font-size: 0.94rem;
+}
+
+.placeholder-card code {
+  margin-bottom: 22px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: var(--surface-hover);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+:host-context(html[dir='rtl']) .placeholder-card .material-icons-round {
+  transform: scaleX(-1);
+}

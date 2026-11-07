@@ -5,10 +5,14 @@ Web API (N-tier), Angular 22, EF Core 6 and SQLite.
 
 ## What is implemented
 
-- JWT authentication with rotating refresh tokens in an HttpOnly cookie and a
-  login-first Angular layout.
+- JWT authentication with rotating refresh tokens in an HttpOnly cookie, a
+  separate public marketplace layout at `/shop`, and a protected staff shell.
 - Role-based users management (`Admin`, `Management`, `Auditor`), managed inside
   the app (there is no public registration).
+- Public marketplace foundation with a guest entry point, public navigation,
+  language switching and English/Arabic RTL support, plus the Phase 2 public
+  catalog with server-side search, filtering, sorting, pagination, anonymous API
+  endpoints, and the Angular catalog page. See `docs/MARKETPLACE.md`.
 - Dashboard with summary cards, warehouse inventory counts, and top/bottom item
   charts.
 - Countries, cities, warehouses and warehouse-item APIs with their Angular

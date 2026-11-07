@@ -55,6 +55,10 @@ public static class DependencyInjection
         services.AddScoped<SystemLogRepository>();
         services.AddScoped<ISystemLogRepository>(provider => provider.GetRequiredService<SystemLogRepository>());
 
+        services.AddScoped<MarketplaceCatalogRepository>();
+        services.AddScoped<IMarketplaceCatalogRepository>(provider =>
+            provider.GetRequiredService<MarketplaceCatalogRepository>());
+
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
 
