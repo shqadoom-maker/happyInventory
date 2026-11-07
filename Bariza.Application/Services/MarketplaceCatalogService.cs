@@ -63,11 +63,51 @@ public class MarketplaceCatalogService : IMarketplaceCatalogService
         };
     }
 
-    public Task<IReadOnlyList<MarketplaceCategoryDto>> GetCategoriesAsync(
-        CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<MarketplaceCategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
+        _catalog.GetCategoriesAsync(cancellationToken);
+
+    public async Task<ProductDetailsDto?> GetProductDetailsAsync(int productId, CancellationToken cancellationToken = default)
     {
-        return _catalog.GetCategoriesAsync(cancellationToken);
+        var details = await _catalog.GetProductDetailsAsync(productId, cancellationToken);
+        if (details is null)
+        {
+            return null;
+        }
+
+        details.RelatedProducts = await _catalog.GetRelatedProductsAsync(productId, cancellationToken);
+        return details;
     }
+
+    public Task<ProductDetailsDto?> GetProductDetailsBySlugAsync(string slug, CancellationToken cancellationToken = default) =>
+        _catalog.GetProductDetailsBySlugAsync(slug, cancellationToken);
+
+    public Task<IReadOnlyList<MarketplaceProductDto>> GetRelatedProductsAsync(int productId, CancellationToken cancellationToken = default) =>
+        _catalog.GetRelatedProductsAsync(productId, cancellationToken);
+
+    public Task<IReadOnlyList<ProductReviewDto>> GetReviewsAsync(int productId, int page, int pageSize, CancellationToken cancellationToken = default) =>
+        _catalog.GetReviewsAsync(productId, page, pageSize, cancellationToken);
+
+    public Task<ReviewSummaryDto> GetReviewSummaryAsync(int productId, CancellationToken cancellationToken = default) =>
+        _catalog.GetReviewSummaryAsync(productId, cancellationToken);
+
+    public async Task AddReviewAsync(int userId, int productId, int rating, string? comment, CancellationToken cancellationToken = default)
+    {
+        if (rating < 1 || rating > 5)
+        {
+            throw new ValidationException("Rating must be between 1 and 5.");
+        }
+
+        await _catalog.AddReviewAsync(userId, productId, rating, comment, cancellationToken);
+    }
+
+    public Task<IReadOnlyList<WishlistItemDto>> GetWishlistAsync(int userId, CancellationToken cancellationToken = default) =>
+        _catalog.GetWishlistAsync(userId, cancellationToken);
+
+    public Task AddToWishlistAsync(int userId, int productId, CancellationToken cancellationToken = default) =>
+        _catalog.AddToWishlistAsync(userId, productId, cancellationToken);
+
+    public Task RemoveFromWishlistAsync(int userId, int productId, CancellationToken cancellationToken = default) =>
+        _catalog.RemoveFromWishlistAsync(userId, productId, cancellationToken);
 
     private static MarketplaceProductSort ParseSort(string? sortBy)
     {

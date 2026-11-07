@@ -1,0 +1,44 @@
+<div class="product-details-page">
+  @if (loading) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (product) {
+    <div class="gallery">
+      <img [src]="product.images[selectedImage]?.url || product.relatedProducts[0]?.imageUrl || '/images/marketplace/product-placeholder.svg'" [alt]="product.name" />
+      <div class="thumbnails">
+        @for (image of product.images; track image.id; let i = $index) {
+          <button type="button" (click)="selectImage(i)">
+            <img [src]="image.url" [alt]="product.name" />
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="details">
+      <h1>{{ product.name }}</h1>
+      <p>{{ product.description }}</p>
+      <strong>{{ product.discountPrice ?? product.price | number: '1.2-2' }}</strong>
+      @if (product.discountPrice) {
+        <span class="original">{{ product.price | number: '1.2-2' }}</span>
+      }
+      <p>{{ product.categoryName }}</p>
+      <p>{{ product.sellerName }}</p>
+      <p>{{ product.isAvailable ? 'In stock' : 'Out of stock' }}</p>
+    </div>
+
+    <section class="specifications">
+      <h2>Specifications</h2>
+      @for (spec of product.specifications; track spec.id) {
+        <div>{{ spec.key }}: {{ spec.value }}</div>
+      }
+    </section>
+
+    <section class="related">
+      <h2>Related products</h2>
+      @for (item of product.relatedProducts; track item.id) {
+        <a [routerLink]="['/shop/products', item.slug]">{{ item.name }}</a>
+      }
+    </section>
+  } @else {
+    <p>Product not found.</p>
+  }
+</div>

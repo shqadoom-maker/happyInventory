@@ -53,4 +53,12 @@ public class Product
     public DateTime? UpdatedUtc { get; set; }
 
     public ICollection<WarehouseItem> WarehouseItems { get; set; } = new List<WarehouseItem>();
+
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
+    public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+
+    public ICollection<ProductSpecification> Specifications { get; set; } = new List<ProductSpecification>();
+
+    public ICollection<ProductReview> Reviews { get; set; } = new List<ProductReview>();
 }

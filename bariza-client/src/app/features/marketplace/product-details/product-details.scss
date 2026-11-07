@@ -1,0 +1,8 @@
+:host { display: block; }
+.product-details-page { width: min(1200px, 100%); margin: 0 auto; padding: 2rem 1rem; display: grid; gap: 2rem; }
+.gallery img { width: 100%; border-radius: 12px; }
+.thumbnails { display: flex; gap: .5rem; margin-top: .5rem; }
+.thumbnails button { border: 0; background: transparent; cursor: pointer; }
+.thumbnails img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
+.original { text-decoration: line-through; margin-inline-start: .5rem; color: var(--muted); }
+@media (min-width: 900px) { .product-details-page { grid-template-columns: 1fr 1fr; } }

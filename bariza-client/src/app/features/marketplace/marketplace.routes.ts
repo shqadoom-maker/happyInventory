@@ -21,15 +21,8 @@ export const MARKETPLACE_ROUTES: Routes = [
   {
     path: 'products/:slug',
     title: 'titles.productDetails',
-    data: {
-      titleKey: 'marketplace.placeholder.productDetailsTitle',
-      bodyKey: 'marketplace.placeholder.productDetailsBody',
-      icon: 'inventory_2',
-      backLink: '/shop/products',
-      backLabelKey: 'marketplace.placeholder.backToCatalog',
-    },
     loadComponent: () =>
-      import('./placeholder/marketplace-placeholder').then((m) => m.MarketplacePlaceholder),
+      import('./product-details/product-details').then((m) => m.ProductDetailsPage),
   },
   {
     path: 'register',

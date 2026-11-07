@@ -18,6 +18,11 @@ public class AppDbContext : DbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<SellerProfile> SellerProfiles => Set<SellerProfile>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<ProductSpecification> ProductSpecifications => Set<ProductSpecification>();
+    public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
     public DbSet<InventoryUpdateRecord> InventoryUpdateRecords => Set<InventoryUpdateRecord>();
     public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
