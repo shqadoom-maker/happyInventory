@@ -1,0 +1,23 @@
+<div class="seller-orders-page">
+  <h1>{{ 'marketplace.sellerOrders.title' | translate }}</h1>
+
+  @if (loading) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (orders.length === 0) {
+    <p>{{ 'marketplace.sellerOrders.empty' | translate }}</p>
+  } @else {
+    @for (order of orders; track order.id) {
+      <article class="seller-order-card">
+        <h2>{{ order.orderNumber }}</h2>
+        <p>{{ order.customerName }}</p>
+        <p>{{ order.totalAmount | number: '1.2-2' }}</p>
+        <p>{{ order.status }}</p>
+        <button (click)="updateStatus(order, 'Confirmed')">{{ 'marketplace.sellerOrders.confirm' | translate }}</button>
+        <button (click)="updateStatus(order, 'Processing')">{{ 'marketplace.sellerOrders.process' | translate }}</button>
+        <button (click)="updateStatus(order, 'Shipped')">{{ 'marketplace.sellerOrders.ship' | translate }}</button>
+        <button (click)="updateStatus(order, 'Delivered')">{{ 'marketplace.sellerOrders.deliver' | translate }}</button>
+        <button (click)="updateStatus(order, 'Rejected')">{{ 'marketplace.sellerOrders.reject' | translate }}</button>
+      </article>
+    }
+  }
+</div>

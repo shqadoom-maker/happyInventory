@@ -1,0 +1,10 @@
+<div class="confirmation-page">
+  <h1>{{ 'marketplace.orders.confirmationTitle' | translate }}</h1>
+  @if (order) {
+    <p>{{ 'marketplace.orders.orderNumber' | translate }}: {{ order.orderNumber }}</p>
+    <p>{{ 'marketplace.orders.total' | translate }}: {{ order.totalAmount | number: '1.2-2' }}</p>
+    <a class="btn" routerLink="/shop/orders">{{ 'marketplace.orders.myOrders' | translate }}</a>
+  } @else {
+    <p>{{ 'common.loading' | translate }}</p>
+  }
+</div>

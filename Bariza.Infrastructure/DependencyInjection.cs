@@ -59,6 +59,15 @@ public static class DependencyInjection
         services.AddScoped<IMarketplaceCatalogRepository>(provider =>
             provider.GetRequiredService<MarketplaceCatalogRepository>());
 
+        services.AddScoped<CartRepository>();
+        services.AddScoped<ICartRepository>(provider => provider.GetRequiredService<CartRepository>());
+        services.AddScoped<ProductRepository>();
+        services.AddScoped<IProductRepository>(provider => provider.GetRequiredService<ProductRepository>());
+        services.AddScoped<OrderRepository>();
+        services.AddScoped<IOrderRepository>(provider => provider.GetRequiredService<OrderRepository>());
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<UnitOfWork>());
+
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenService, TokenService>();
 

@@ -178,6 +178,40 @@
       "tagline": "A multi-vendor marketplace built on BARIZA Market.",
       "rights": "? {{year}} BARIZA Market. All rights reserved.",
       "staff": "Staff access"
+    },
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty.",
+      "continueShopping": "Continue shopping",
+      "total": "Total",
+      "checkout": "Checkout"
+    },
+    "checkout": {
+      "title": "Checkout",
+      "fullName": "Full name",
+      "phone": "Phone number",
+      "country": "Country",
+      "city": "City",
+      "address": "Address",
+      "total": "Total",
+      "placeOrder": "Place order"
+    },
+    "orders": {
+      "confirmationTitle": "Order confirmed",
+      "orderNumber": "Order number",
+      "total": "Total",
+      "myOrders": "My orders",
+      "orderDetails": "Order details",
+      "empty": "No orders yet."
+    },
+    "sellerOrders": {
+      "title": "Seller orders",
+      "empty": "No seller orders.",
+      "confirm": "Confirm",
+      "process": "Processing",
+      "ship": "Ship",
+      "deliver": "Deliver",
+      "reject": "Reject"
     }
   },
   "titles": {
@@ -192,7 +226,13 @@
     "stockMovements": "eCommerce Integration",
     "locations": "Locations",
     "users": "Users",
-    "systemLogs": "System logs"
+    "systemLogs": "System logs",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "myOrders": "My orders",
+    "orderDetails": "Order details",
+    "orderConfirmation": "Order confirmation",
+    "sellerOrders": "Seller orders"
   },
   "common": {
     "refresh": "Refresh",

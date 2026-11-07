@@ -18,6 +18,8 @@ public static class DependencyInjection
         services.AddScoped<IInventoryUpdateService, InventoryUpdateService>();
         services.AddScoped<ISystemLogService, SystemLogService>();
         services.AddScoped<IMarketplaceCatalogService, MarketplaceCatalogService>();
+        services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }

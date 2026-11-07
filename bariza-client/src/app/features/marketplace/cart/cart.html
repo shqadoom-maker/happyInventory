@@ -1,0 +1,33 @@
+<div class="cart-page">
+  <h1>{{ 'marketplace.cart.title' | translate }}</h1>
+
+  @if (cartService.loading()) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (cartService.cart().items.length === 0) {
+    <div class="empty-state">
+      <p>{{ 'marketplace.cart.empty' | translate }}</p>
+      <a class="btn" routerLink="/shop/products">{{ 'marketplace.cart.continueShopping' | translate }}</a>
+    </div>
+  } @else {
+    <div class="cart-list">
+      @for (item of cartService.cart().items; track item.id) {
+        <article class="cart-item">
+          <img [src]="item.imageUrl || '/images/marketplace/product-placeholder.svg'" [alt]="item.productName" />
+          <div class="cart-item-info">
+            <h2>{{ item.productName }}</h2>
+            <span>{{ item.sellerName }}</span>
+            <span>{{ item.unitPrice | number: '1.2-2' }}</span>
+          </div>
+          <input type="number" min="1" [value]="item.quantity" (change)="updateQuantity(item.id, +$any($event.target).value)" />
+          <strong>{{ item.subtotal | number: '1.2-2' }}</strong>
+          <button type="button" (click)="remove(item.id)">{{ 'common.delete' | translate }}</button>
+        </article>
+      }
+    </div>
+
+    <div class="cart-summary">
+      <strong>{{ 'marketplace.cart.total' | translate }}: {{ cartService.cart().totalAmount | number: '1.2-2' }}</strong>
+      <button class="btn" (click)="checkout()">{{ 'marketplace.cart.checkout' | translate }}</button>
+    </div>
+  }
+</div>

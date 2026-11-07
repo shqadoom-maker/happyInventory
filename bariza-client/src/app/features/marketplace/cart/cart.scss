@@ -1,0 +1,9 @@
+:host { display: block; }
+.cart-page { width: min(1000px, 100%); margin: 0 auto; padding: 2rem 1rem; }
+.cart-list { display: grid; gap: 1rem; }
+.cart-item { display: grid; grid-template-columns: 80px 1fr 80px 100px 80px; gap: 1rem; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.cart-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+.cart-item-info { display: grid; gap: .25rem; }
+.cart-summary { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+.empty-state { text-align: center; padding: 2rem; }
+@media (max-width: 700px) { .cart-item { grid-template-columns: 1fr; } }

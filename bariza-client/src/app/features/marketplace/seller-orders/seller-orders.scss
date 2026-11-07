@@ -1,0 +1,4 @@
+:host { display: block; }
+.seller-orders-page { width: min(900px, 100%); margin: 0 auto; padding: 2rem 1rem; }
+.seller-order-card { padding: 1rem; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1rem; background: var(--surface); }
+button { margin-inline-end: .5rem; margin-top: .5rem; padding: .5rem .75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }

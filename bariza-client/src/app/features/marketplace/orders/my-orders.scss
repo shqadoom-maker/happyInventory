@@ -1,0 +1,3 @@
+:host { display: block; }
+.orders-page { width: min(900px, 100%); margin: 0 auto; padding: 2rem 1rem; }
+.order-card { display: flex; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1rem; background: var(--surface); }

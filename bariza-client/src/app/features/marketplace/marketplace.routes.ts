@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from '../../core/guards/auth.guard';
+
 /**
  * Public marketplace routes. Product details and registration are explicit
  * placeholders in Phase 2; the catalog itself is fully implemented.
@@ -41,6 +43,41 @@ export const MARKETPLACE_ROUTES: Routes = [
     },
     loadComponent: () =>
       import('./placeholder/marketplace-placeholder').then((m) => m.MarketplacePlaceholder),
+  },
+  {
+    path: 'cart',
+    title: 'titles.cart',
+    loadComponent: () => import('./cart/cart').then((m) => m.CartPage),
+  },
+  {
+    path: 'checkout',
+    title: 'titles.checkout',
+    canActivate: [authGuard],
+    loadComponent: () => import('./checkout/checkout').then((m) => m.CheckoutPage),
+  },
+  {
+    path: 'orders',
+    title: 'titles.myOrders',
+    canActivate: [authGuard],
+    loadComponent: () => import('./orders/my-orders').then((m) => m.MyOrdersPage),
+  },
+  {
+    path: 'orders/:id',
+    title: 'titles.orderDetails',
+    canActivate: [authGuard],
+    loadComponent: () => import('./orders/order-details').then((m) => m.OrderDetailsPage),
+  },
+  {
+    path: 'order-confirmation/:id',
+    title: 'titles.orderConfirmation',
+    canActivate: [authGuard],
+    loadComponent: () => import('./orders/order-confirmation').then((m) => m.OrderConfirmationPage),
+  },
+  {
+    path: 'seller/orders',
+    title: 'titles.sellerOrders',
+    canActivate: [authGuard],
+    loadComponent: () => import('./seller-orders/seller-orders').then((m) => m.SellerOrdersPage),
   },
   {
     path: '**',

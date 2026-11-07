@@ -1,0 +1,18 @@
+<div class="orders-page">
+  <h1>{{ 'marketplace.orders.myOrders' | translate }}</h1>
+
+  @if (loading) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (orders.length === 0) {
+    <p>{{ 'marketplace.orders.empty' | translate }}</p>
+  } @else {
+    @for (order of orders; track order.id) {
+      <article class="order-card">
+        <a [routerLink]="['/shop/orders', order.id]">{{ order.orderNumber }}</a>
+        <span>{{ order.createdUtc | date }}</span>
+        <span>{{ order.totalAmount | number: '1.2-2' }}</span>
+        <span>{{ order.status }}</span>
+      </article>
+    }
+  }
+</div>

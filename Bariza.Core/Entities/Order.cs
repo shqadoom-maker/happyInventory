@@ -96,6 +96,8 @@ public class SellerOrder
 
     public DateTime? UpdatedUtc { get; set; }
 
+    public bool StockRestored { get; set; }
+
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }
 

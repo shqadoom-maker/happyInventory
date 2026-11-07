@@ -1,0 +1,30 @@
+<div class="checkout-page">
+  <h1>{{ 'marketplace.checkout.title' | translate }}</h1>
+
+  <form (ngSubmit)="submit()">
+    <label>{{ 'marketplace.checkout.fullName' | translate }}</label>
+    <input [(ngModel)]="shipping.fullName" name="fullName" required />
+
+    <label>{{ 'marketplace.checkout.phone' | translate }}</label>
+    <input [(ngModel)]="shipping.phone" name="phone" required />
+
+    <label>{{ 'marketplace.checkout.country' | translate }}</label>
+    <input [(ngModel)]="shipping.country" name="country" required />
+
+    <label>{{ 'marketplace.checkout.city' | translate }}</label>
+    <input [(ngModel)]="shipping.city" name="city" required />
+
+    <label>{{ 'marketplace.checkout.address' | translate }}</label>
+    <textarea [(ngModel)]="shipping.address" name="address" required></textarea>
+
+    <div class="summary">
+      <strong>{{ 'marketplace.checkout.total' | translate }}: {{ cartService.cart().totalAmount | number: '1.2-2' }}</strong>
+    </div>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <button class="btn" type="submit" [disabled]="submitting">{{ 'marketplace.checkout.placeOrder' | translate }}</button>
+  </form>
+</div>
