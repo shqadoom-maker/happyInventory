@@ -179,6 +179,22 @@
   animation: login-card-in 0.5s ease both;
 }
 
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .login-card h1,
+[data-theme="dark"] .login-card h2,
+[data-theme="dark"] .login-card p,
+[data-theme="dark"] .login-card label,
+[data-theme="dark"] .login-card .form-field span {
+  color: #1B1F23;
+}
+
+[data-theme="dark"] .login-card input,
+[data-theme="dark"] .login-card textarea,
+[data-theme="dark"] .login-card select {
+  color: #1B1F23;
+  background: #fff;
+}
+
 @keyframes login-card-in {
   from {
     opacity: 0;
