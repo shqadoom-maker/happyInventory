@@ -73,6 +73,24 @@ export const MARKETPLACE_ROUTES: Routes = [
     loadComponent: () => import('./seller-orders/seller-orders').then((m) => m.SellerOrdersPage),
   },
   {
+    path: 'seller/products',
+    title: 'Seller products',
+    canActivate: [authGuard],
+    loadComponent: () => import('./seller-products/seller-products').then((m) => m.SellerProductsPage),
+  },
+  {
+    path: 'seller/products/new',
+    title: 'Add product',
+    canActivate: [authGuard],
+    loadComponent: () => import('./seller-products/seller-product-form').then((m) => m.SellerProductFormPage),
+  },
+  {
+    path: 'seller/products/:id/edit',
+    title: 'Edit product',
+    canActivate: [authGuard],
+    loadComponent: () => import('./seller-products/seller-product-form').then((m) => m.SellerProductFormPage),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

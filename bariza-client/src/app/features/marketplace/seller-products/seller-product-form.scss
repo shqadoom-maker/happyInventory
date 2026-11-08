@@ -1,0 +1,6 @@
+:host { display: block; }
+.product-form-page { width: min(700px, 100%); margin: 0 auto; padding: 2rem 1rem; }
+form { display: grid; gap: 1rem; }
+label { font-weight: 600; }
+input, textarea, select { padding: .75rem; border: 1px solid var(--border); border-radius: 10px; font: inherit; background: var(--surface); color: var(--text); }
+.btn { padding: .75rem 1rem; background: var(--primary); color: #fff; border-radius: 10px; border: 0; cursor: pointer; }

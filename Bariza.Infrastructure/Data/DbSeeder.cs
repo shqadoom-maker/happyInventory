@@ -37,7 +37,7 @@ public static class DbSeeder
 
         if (seedMarketplaceCatalog)
         {
-            await SeedMarketplaceCatalogAsync(db, logger);
+            await SeedMarketplaceCatalogAsync(db, hasher, logger);
         }
     }
 
@@ -148,7 +148,7 @@ public static class DbSeeder
             UserRoles.Auditor);
     }
 
-    private static async Task SeedMarketplaceCatalogAsync(AppDbContext db, ILogger logger)
+    private static async Task SeedMarketplaceCatalogAsync(AppDbContext db, IPasswordHasher hasher, ILogger logger)
     {
         // Demo catalog data is only used by the Development host. It is skipped
         // as soon as a product exists, so a developer's edits are never reset.
@@ -380,6 +380,21 @@ public static class DbSeeder
         db.Categories.AddRange(electronics, home, fashion, sports);
         db.SellerProfiles.AddRange(novaTech, casa, urban, pendingSeller);
         db.Products.AddRange(products);
+
+        var sellerUser = new User
+        {
+            Username = "seller@barizamarket.com",
+            NormalizedUsername = "SELLER@BARIZAMARKET.COM",
+            FullName = "Nova Tech Seller",
+            PasswordHash = hasher.Hash("SellerPassword123!"),
+            Role = UserRoles.Seller,
+            IsActive = true,
+            CreatedUtc = now,
+        };
+        db.Users.Add(sellerUser);
+        await db.SaveChangesAsync();
+
+        novaTech.UserId = sellerUser.Id;
 
         var warehouse = await db.Warehouses
             .OrderBy(item => item.Id)

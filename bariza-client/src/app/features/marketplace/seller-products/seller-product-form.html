@@ -1,0 +1,46 @@
+<div class="product-form-page">
+  <h1>{{ productId ? 'Edit product' : 'Add product' }}</h1>
+
+  <form (ngSubmit)="submit()">
+    <label>Name</label>
+    <input [(ngModel)]="model.name" name="name" required />
+
+    <label>Slug</label>
+    <input [(ngModel)]="model.slug" name="slug" />
+
+    <label>Description</label>
+    <textarea [(ngModel)]="model.description" name="description"></textarea>
+
+    <label>SKU</label>
+    <input [(ngModel)]="model.sku" name="sku" />
+
+    <label>Price</label>
+    <input type="number" [(ngModel)]="model.price" name="price" required />
+
+    <label>Discount price</label>
+    <input type="number" [(ngModel)]="model.discountPrice" name="discountPrice" />
+
+    <label>Image URL</label>
+    <input [(ngModel)]="model.imageUrl" name="imageUrl" />
+
+    <label>Category</label>
+    <select [(ngModel)]="model.categoryId" name="categoryId" required>
+      @for (category of categories; track category.id) {
+        <option [value]="category.id">{{ category.name }}</option>
+      }
+    </select>
+
+    <label>
+      <input type="checkbox" [(ngModel)]="model.isPublished" name="isPublished" />
+      Published
+    </label>
+
+    <label>
+      <input type="checkbox" [(ngModel)]="model.isActive" name="isActive" />
+      Active
+    </label>
+
+    <button class="btn" type="submit" [disabled]="saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+    <a routerLink="/shop/seller/products">Cancel</a>
+  </form>
+</div>
