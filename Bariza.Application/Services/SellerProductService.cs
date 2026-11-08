@@ -135,11 +135,23 @@ public class SellerProductService : ISellerProductService
     private async Task<SellerProfile> GetSellerProfileAsync(int userId, CancellationToken cancellationToken)
     {
         var seller = await _repo.GetSellerProfileByUserIdAsync(userId, cancellationToken);
-        if (seller is null)
+        if (seller is not null)
         {
-            throw new AuthenticationException("Seller profile not found.", "seller_profile_not_found");
+            return seller;
         }
 
+        seller = new SellerProfile
+        {
+            UserId = userId,
+            StoreName = $"Seller {userId}",
+            Slug = $"seller-{userId}",
+            IsApproved = true,
+            IsActive = true,
+            CreatedUtc = DateTime.UtcNow,
+        };
+
+        await _repo.AddSellerProfileAsync(seller, cancellationToken);
+        await _repo.SaveChangesAsync(cancellationToken);
         return seller;
     }
 

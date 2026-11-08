@@ -179,18 +179,18 @@
   animation: login-card-in 0.5s ease both;
 }
 
-[data-theme="dark"] .login-card,
-[data-theme="dark"] .login-card h1,
-[data-theme="dark"] .login-card h2,
-[data-theme="dark"] .login-card p,
-[data-theme="dark"] .login-card label,
-[data-theme="dark"] .login-card .form-field span {
+:host-context([data-theme="dark"]) .login-card,
+:host-context([data-theme="dark"]) .login-card h1,
+:host-context([data-theme="dark"]) .login-card h2,
+:host-context([data-theme="dark"]) .login-card p,
+:host-context([data-theme="dark"]) .login-card label,
+:host-context([data-theme="dark"]) .login-card .form-field span {
   color: #1B1F23;
 }
 
-[data-theme="dark"] .login-card input,
-[data-theme="dark"] .login-card textarea,
-[data-theme="dark"] .login-card select {
+:host-context([data-theme="dark"]) .login-card input,
+:host-context([data-theme="dark"]) .login-card textarea,
+:host-context([data-theme="dark"]) .login-card select {
   color: #1B1F23;
   background: #fff;
 }
@@ -307,7 +307,7 @@
   color: #8F7F6B;
 }
 
-[data-theme="dark"] .input-shell input::placeholder {
+:host-context([data-theme="dark"]) .input-shell input::placeholder {
   color: #6F6150;
 }
 

@@ -17,6 +17,9 @@ public class SellerProductRepository : ISellerProductRepository
     public Task<SellerProfile?> GetSellerProfileByUserIdAsync(int userId, CancellationToken cancellationToken = default) =>
         _db.SellerProfiles.FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
 
+    public Task AddSellerProfileAsync(SellerProfile seller, CancellationToken cancellationToken = default) =>
+        _db.SellerProfiles.AddAsync(seller, cancellationToken).AsTask();
+
     public async Task<IReadOnlyList<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
         await _db.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder).ThenBy(c => c.Name).ToListAsync(cancellationToken);
 

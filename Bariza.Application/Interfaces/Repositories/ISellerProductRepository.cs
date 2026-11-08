@@ -5,6 +5,7 @@ namespace Bariza.Application.Interfaces.Repositories;
 public interface ISellerProductRepository
 {
     Task<SellerProfile?> GetSellerProfileByUserIdAsync(int userId, CancellationToken cancellationToken = default);
+    Task AddSellerProfileAsync(SellerProfile seller, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Product>> GetProductsAsync(int sellerProfileId, CancellationToken cancellationToken = default);
     Task<Product?> GetProductAsync(int sellerProfileId, int productId, CancellationToken cancellationToken = default);
