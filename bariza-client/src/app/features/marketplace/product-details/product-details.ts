@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { gsap } from 'gsap';
 
 import { MarketplaceProductService } from '../../../core/services/marketplace-product.service';
 import { ShoppingCartService } from '../../../core/services/shopping-cart.service';
@@ -13,7 +14,7 @@ import { ProductDetails } from '../../../core/models/product-details.model';
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })
-export class ProductDetailsPage implements OnInit {
+export class ProductDetailsPage implements OnInit, AfterViewInit {
   private readonly route = inject(ActivatedRoute);
   private readonly catalog = inject(MarketplaceProductService);
   private readonly cart = inject(ShoppingCartService);
@@ -62,6 +63,21 @@ export class ProductDetailsPage implements OnInit {
       this.adding = false;
       this.cdr.detectChanges();
     }
+  }
+
+  ngAfterViewInit(): void {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+      return;
+    }
+
+    gsap.from('.product-details-page > *', {
+      y: 18,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: 'power2.out',
+      clearProps: 'all',
+    });
   }
 
   selectImage(index: number): void {

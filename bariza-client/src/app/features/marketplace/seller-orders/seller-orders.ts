@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, AfterViewInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { gsap } from 'gsap';
 
 import { OrderApiService } from '../../../core/services/order-api.service';
 import { SellerOrder, UpdateOrderStatusRequest } from '../../../core/models/order.model';
@@ -11,7 +12,7 @@ import { SellerOrder, UpdateOrderStatusRequest } from '../../../core/models/orde
   templateUrl: './seller-orders.html',
   styleUrl: './seller-orders.scss',
 })
-export class SellerOrdersPage implements OnInit {
+export class SellerOrdersPage implements OnInit, AfterViewInit {
   private readonly orderApi = inject(OrderApiService);
   orders: SellerOrder[] = [];
   loading = true;
@@ -32,6 +33,21 @@ export class SellerOrdersPage implements OnInit {
     const request: UpdateOrderStatusRequest = { status };
     this.orderApi.updateSellerOrderStatus(order.id, request).subscribe(() => {
       order.status = status;
+    });
+  }
+
+  ngAfterViewInit(): void {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+      return;
+    }
+
+    gsap.from('.seller-order-card', {
+      y: 16,
+      opacity: 0,
+      duration: 0.4,
+      stagger: 0.06,
+      ease: 'power2.out',
+      clearProps: 'all',
     });
   }
 }
