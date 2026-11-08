@@ -184,7 +184,8 @@
       "empty": "Your cart is empty.",
       "continueShopping": "Continue shopping",
       "total": "Total",
-      "checkout": "Checkout"
+      "checkout": "Checkout",
+      "remove": "Remove"
     },
     "checkout": {
       "title": "Checkout",

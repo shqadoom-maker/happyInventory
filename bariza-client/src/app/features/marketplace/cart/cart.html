@@ -20,7 +20,7 @@
           </div>
           <input type="number" min="1" [value]="item.quantity" (change)="updateQuantity(item.id, +$any($event.target).value)" />
           <strong>{{ item.subtotal | number: '1.2-2' }}</strong>
-          <button type="button" (click)="remove(item.id)">{{ 'common.delete' | translate }}</button>
+          <button type="button" class="btn secondary small" (click)="remove(item.id)">{{ 'marketplace.cart.remove' | translate }}</button>
         </article>
       }
     </div>

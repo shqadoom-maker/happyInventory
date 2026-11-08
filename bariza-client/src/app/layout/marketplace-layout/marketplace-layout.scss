@@ -42,6 +42,11 @@
   backdrop-filter: blur(16px) saturate(140%);
 }
 
+[data-theme="dark"] .site-header {
+  background: rgba(6, 12, 10, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
 .site-header-inner {
   display: flex;
   align-items: center;
