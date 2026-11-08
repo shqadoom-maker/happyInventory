@@ -27,5 +27,14 @@ public interface IOrderRepository
     Task<Order?> GetOrderByCheckoutReferenceAsync(int userId, string checkoutReference, CancellationToken cancellationToken = default);
     Task<SellerOrder?> GetSellerOrderAsync(int userId, int sellerOrderId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<SellerOrder>> GetSellerOrdersAsync(int userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<SellerOrder>> GetAdminSellerOrdersAsync(CancellationToken cancellationToken = default);
+    Task<SellerOrder?> GetAdminSellerOrderAsync(int sellerOrderId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Order>> GetAdminOrdersAsync(CancellationToken cancellationToken = default);
+    Task<Order?> GetAdminOrderAsync(int orderId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ShippingAddress>> GetAddressesAsync(int userId, CancellationToken cancellationToken = default);
+    Task<ShippingAddress?> GetAddressAsync(int userId, int addressId, CancellationToken cancellationToken = default);
+    Task AddAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default);
+    Task UpdateAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default);
+    Task DeleteAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

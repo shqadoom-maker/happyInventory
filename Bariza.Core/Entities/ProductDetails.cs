@@ -95,3 +95,22 @@ public class WishlistItem
 
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 }
+
+public class OrderStatusHistory
+{
+    public int Id { get; set; }
+
+    public int SellerOrderId { get; set; }
+
+    public SellerOrder? SellerOrder { get; set; }
+
+    public OrderStatus PreviousStatus { get; set; }
+
+    public OrderStatus NewStatus { get; set; }
+
+    public string? ChangedBy { get; set; }
+
+    public string? Notes { get; set; }
+
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+}

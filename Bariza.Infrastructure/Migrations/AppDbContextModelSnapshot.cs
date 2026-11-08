@@ -225,7 +225,16 @@ namespace Bariza.Infrastructure.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ShippingAddressId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("ShippingAmount")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
@@ -271,6 +280,9 @@ namespace Bariza.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ProductVariantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
@@ -295,6 +307,39 @@ namespace Bariza.Infrastructure.Migrations
                     b.HasIndex("WarehouseItemId");
 
                     b.ToTable("OrderItems", (string)null);
+                });
+
+            modelBuilder.Entity("Bariza.Core.Entities.OrderStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ChangedBy")
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PreviousStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SellerOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SellerOrderId");
+
+                    b.ToTable("OrderStatusHistories", (string)null);
                 });
 
             modelBuilder.Entity("Bariza.Core.Entities.Product", b =>
@@ -549,6 +594,9 @@ namespace Bariza.Infrastructure.Migrations
                     b.Property<int>("SellerProfileId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("ShippingAmount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -625,6 +673,14 @@ namespace Bariza.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Area")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuildingNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -633,6 +689,10 @@ namespace Bariza.Infrastructure.Migrations
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeliveryInstructions")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FullName")
@@ -968,6 +1028,17 @@ namespace Bariza.Infrastructure.Migrations
                     b.Navigation("SellerOrder");
 
                     b.Navigation("WarehouseItem");
+                });
+
+            modelBuilder.Entity("Bariza.Core.Entities.OrderStatusHistory", b =>
+                {
+                    b.HasOne("Bariza.Core.Entities.SellerOrder", "SellerOrder")
+                        .WithMany()
+                        .HasForeignKey("SellerOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SellerOrder");
                 });
 
             modelBuilder.Entity("Bariza.Core.Entities.Product", b =>

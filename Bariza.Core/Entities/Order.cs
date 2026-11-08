@@ -14,6 +14,19 @@ public enum OrderStatus
     Rejected = 6,
 }
 
+public enum PaymentMethod
+{
+    CashOnDelivery = 0,
+    OnlinePayment = 1,
+}
+
+public enum PaymentStatus
+{
+    Pending = 0,
+    Paid = 1,
+    Failed = 2,
+}
+
 public class ShippingAddress
 {
     public int Id { get; set; }
@@ -34,9 +47,18 @@ public class ShippingAddress
     [MaxLength(100)]
     public string City { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string? Area { get; set; }
+
     [Required]
     [MaxLength(500)]
     public string Address { get; set; } = string.Empty;
+
+    [MaxLength(50)]
+    public string? BuildingNumber { get; set; }
+
+    [MaxLength(500)]
+    public string? DeliveryInstructions { get; set; }
 
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }
@@ -63,8 +85,15 @@ public class Order
 
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
+    public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.CashOnDelivery;
+
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal ShippingAmount { get; set; }
 
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
@@ -92,6 +121,9 @@ public class SellerOrder
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; set; }
 
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal ShippingAmount { get; set; }
+
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedUtc { get; set; }
@@ -116,6 +148,8 @@ public class OrderItem
     public int? WarehouseItemId { get; set; }
 
     public WarehouseItem? WarehouseItem { get; set; }
+
+    public int? ProductVariantId { get; set; }
 
     [Required]
     [MaxLength(200)]
@@ -155,11 +189,11 @@ public class CartItem
 
     public int ProductId { get; set; }
 
+    public Product? Product { get; set; }
+
     public int? ProductVariantId { get; set; }
 
     public ProductVariant? ProductVariant { get; set; }
-
-    public Product? Product { get; set; }
 
     public int Quantity { get; set; }
 

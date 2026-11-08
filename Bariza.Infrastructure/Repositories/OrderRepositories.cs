@@ -128,6 +128,62 @@ public class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
+
+    public async Task<IReadOnlyList<Order>> GetAdminOrdersAsync(CancellationToken cancellationToken = default) =>
+        await _db.Orders
+            .AsNoTracking()
+            .Include(o => o.User)
+            .Include(o => o.SellerOrders)
+            .OrderByDescending(o => o.CreatedUtc)
+            .ToListAsync(cancellationToken);
+
+    public async Task<Order?> GetAdminOrderAsync(int orderId, CancellationToken cancellationToken = default) =>
+        await _db.Orders
+            .AsNoTracking()
+            .Include(o => o.ShippingAddress)
+            .Include(o => o.User)
+            .Include(o => o.SellerOrders).ThenInclude(s => s.SellerProfile)
+            .Include(o => o.SellerOrders).ThenInclude(s => s.Items)
+            .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+
+    public async Task<SellerOrder?> GetAdminSellerOrderAsync(int sellerOrderId, CancellationToken cancellationToken = default) =>
+        await _db.SellerOrders
+            .AsNoTracking()
+            .Include(s => s.Order).ThenInclude(o => o.ShippingAddress)
+            .Include(s => s.Order).ThenInclude(o => o.User)
+            .Include(s => s.SellerProfile)
+            .Include(s => s.Items)
+            .FirstOrDefaultAsync(s => s.Id == sellerOrderId, cancellationToken);
+
+    public async Task<IReadOnlyList<SellerOrder>> GetAdminSellerOrdersAsync(CancellationToken cancellationToken = default) =>
+        await _db.SellerOrders
+            .AsNoTracking()
+            .Include(s => s.Order).ThenInclude(o => o.User)
+            .Include(s => s.SellerProfile)
+            .Include(s => s.Items)
+            .OrderByDescending(s => s.CreatedUtc)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<ShippingAddress>> GetAddressesAsync(int userId, CancellationToken cancellationToken = default) =>
+        await _db.ShippingAddresses.Where(a => a.Orders.Any(o => o.UserId == userId)).ToListAsync(cancellationToken);
+
+    public async Task<ShippingAddress?> GetAddressAsync(int userId, int addressId, CancellationToken cancellationToken = default) =>
+        await _db.ShippingAddresses.FirstOrDefaultAsync(a => a.Id == addressId && a.Orders.Any(o => o.UserId == userId), cancellationToken);
+
+    public Task AddAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default) =>
+        _db.ShippingAddresses.AddAsync(address, cancellationToken).AsTask();
+
+    public Task UpdateAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default)
+    {
+        _db.ShippingAddresses.Update(address);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAddressAsync(ShippingAddress address, CancellationToken cancellationToken = default)
+    {
+        _db.ShippingAddresses.Remove(address);
+        return Task.CompletedTask;
+    }
     public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
         _db.SaveChangesAsync(cancellationToken);
 }

@@ -271,6 +271,67 @@ public class OrderService : IOrderService
         }
     }
 
+    public async Task<IReadOnlyList<ShippingAddressDto>> GetAddressesAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var addresses = await _orders.GetAddressesAsync(userId, cancellationToken);
+        return addresses.Select(MapAddress).ToList();
+    }
+
+    public async Task<ShippingAddressDto> CreateAddressAsync(int userId, ShippingAddressRequest request, CancellationToken cancellationToken = default)
+    {
+        ValidateShipping(request);
+        var address = new ShippingAddress
+        {
+            FullName = request.FullName.Trim(),
+            Phone = request.Phone.Trim(),
+            Country = request.Country.Trim(),
+            City = request.City.Trim(),
+            Area = request.Area?.Trim(),
+            Address = request.Address.Trim(),
+            BuildingNumber = request.BuildingNumber?.Trim(),
+            DeliveryInstructions = request.DeliveryInstructions?.Trim(),
+        };
+
+        await _orders.AddAddressAsync(address, cancellationToken);
+        await _orders.SaveChangesAsync(cancellationToken);
+        return MapAddress(address);
+    }
+
+    public async Task<ShippingAddressDto> UpdateAddressAsync(int userId, int addressId, ShippingAddressRequest request, CancellationToken cancellationToken = default)
+    {
+        ValidateShipping(request);
+        var address = await _orders.GetAddressAsync(userId, addressId, cancellationToken);
+        if (address is null)
+        {
+            throw new NotFoundException("The requested address was not found.");
+        }
+
+        address.FullName = request.FullName.Trim();
+        address.Phone = request.Phone.Trim();
+        address.Country = request.Country.Trim();
+        address.City = request.City.Trim();
+        address.Area = request.Area?.Trim();
+        address.Address = request.Address.Trim();
+        address.BuildingNumber = request.BuildingNumber?.Trim();
+        address.DeliveryInstructions = request.DeliveryInstructions?.Trim();
+
+        await _orders.UpdateAddressAsync(address, cancellationToken);
+        await _orders.SaveChangesAsync(cancellationToken);
+        return MapAddress(address);
+    }
+
+    public async Task DeleteAddressAsync(int userId, int addressId, CancellationToken cancellationToken = default)
+    {
+        var address = await _orders.GetAddressAsync(userId, addressId, cancellationToken);
+        if (address is null)
+        {
+            throw new NotFoundException("The requested address was not found.");
+        }
+
+        await _orders.DeleteAddressAsync(address, cancellationToken);
+        await _orders.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<SellerOrderDto>> GetSellerOrdersAsync(int userId, CancellationToken cancellationToken = default)
     {
         var sellerOrders = await _orders.GetSellerOrdersAsync(userId, cancellationToken);
@@ -476,4 +537,70 @@ public class OrderService : IOrderService
                 .ToList(),
         };
     }
+
+    public async Task<IReadOnlyList<OrderDto>> GetAdminOrdersAsync(CancellationToken cancellationToken = default)
+    {
+        var orders = await _orders.GetAdminOrdersAsync(cancellationToken);
+        var result = new List<OrderDto>();
+        foreach (var order in orders)
+        {
+            var full = await _orders.GetCustomerOrderAsync(order.UserId, order.Id, cancellationToken);
+            result.Add(MapOrder(full ?? order));
+        }
+        return result;
+    }
+
+    public async Task<OrderDto> GetAdminOrderAsync(int orderId, CancellationToken cancellationToken = default)
+    {
+        var order = await _orders.GetAdminOrderAsync(orderId, cancellationToken);
+        if (order is null)
+        {
+            throw new NotFoundException("The requested order was not found.");
+        }
+
+        return MapOrder(order);
+    }
+
+    public async Task<SellerOrderDto> GetAdminSellerOrderAsync(int sellerOrderId, CancellationToken cancellationToken = default)
+    {
+        var sellerOrder = await _orders.GetAdminSellerOrderAsync(sellerOrderId, cancellationToken);
+        if (sellerOrder is null)
+        {
+            throw new NotFoundException("The requested seller order was not found.");
+        }
+
+        return MapSellerOrder(sellerOrder);
+    }
+
+    public async Task UpdateAdminSellerOrderStatusAsync(int sellerOrderId, OrderStatus status, CancellationToken cancellationToken = default)
+    {
+        var sellerOrder = await _orders.GetAdminSellerOrderAsync(sellerOrderId, cancellationToken);
+        if (sellerOrder is null)
+        {
+            throw new NotFoundException("The requested seller order was not found.");
+        }
+
+        if (!IsValidTransition(sellerOrder.Status, status))
+        {
+            throw new ValidationException($"Invalid status transition from {sellerOrder.Status} to {status}.");
+        }
+
+        sellerOrder.Status = status;
+        sellerOrder.UpdatedUtc = DateTime.UtcNow;
+        await _orders.SaveChangesAsync(cancellationToken);
+    }
+
+    private static ShippingAddressDto MapAddress(ShippingAddress address) => new()
+    {
+        Id = address.Id,
+        FullName = address.FullName,
+        Phone = address.Phone,
+        Country = address.Country,
+        City = address.City,
+        Area = address.Area,
+        Address = address.Address,
+        BuildingNumber = address.BuildingNumber,
+        DeliveryInstructions = address.DeliveryInstructions,
+    };
+
 }

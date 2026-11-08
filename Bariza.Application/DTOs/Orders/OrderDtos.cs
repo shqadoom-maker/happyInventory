@@ -1,5 +1,7 @@
 using Bariza.Core.Entities;
 
+using Bariza.Core.Entities;
+
 namespace Bariza.Application.DTOs.Orders;
 
 public class CartItemDto
@@ -43,7 +45,11 @@ public class ShippingAddressRequest
     public string Phone { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
+    public string? Area { get; set; }
     public string Address { get; set; } = string.Empty;
+    public string? BuildingNumber { get; set; }
+    public string? DeliveryInstructions { get; set; }
+    public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.CashOnDelivery;
 }
 
 public class ShippingAddressDto
@@ -53,7 +59,10 @@ public class ShippingAddressDto
     public string Phone { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
+    public string? Area { get; set; }
     public string Address { get; set; } = string.Empty;
+    public string? BuildingNumber { get; set; }
+    public string? DeliveryInstructions { get; set; }
 }
 
 public class OrderItemDto
@@ -76,6 +85,7 @@ public class SellerOrderDto
     public string SellerStoreName { get; set; } = string.Empty;
     public OrderStatus Status { get; set; }
     public decimal TotalAmount { get; set; }
+    public decimal ShippingAmount { get; set; }
     public DateTime CreatedUtc { get; set; }
     public IReadOnlyList<OrderItemDto> Items { get; set; } = Array.Empty<OrderItemDto>();
     public ShippingAddressDto ShippingAddress { get; set; } = new();
@@ -88,7 +98,10 @@ public class OrderDto
     public string OrderNumber { get; set; } = string.Empty;
     public string CheckoutReference { get; set; } = string.Empty;
     public OrderStatus Status { get; set; }
+    public PaymentMethod PaymentMethod { get; set; }
+    public PaymentStatus PaymentStatus { get; set; }
     public decimal TotalAmount { get; set; }
+    public decimal ShippingAmount { get; set; }
     public DateTime CreatedUtc { get; set; }
     public ShippingAddressDto ShippingAddress { get; set; } = new();
     public IReadOnlyList<SellerOrderDto> SellerOrders { get; set; } = Array.Empty<SellerOrderDto>();

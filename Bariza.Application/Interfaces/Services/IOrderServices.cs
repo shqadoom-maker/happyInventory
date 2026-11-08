@@ -19,7 +19,16 @@ public interface IOrderService
     Task<OrderDto> GetOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
     Task CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SellerOrderDto>> GetSellerOrdersAsync(int userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ShippingAddressDto>> GetAddressesAsync(int userId, CancellationToken cancellationToken = default);
+    Task<ShippingAddressDto> CreateAddressAsync(int userId, ShippingAddressRequest request, CancellationToken cancellationToken = default);
+    Task<ShippingAddressDto> UpdateAddressAsync(int userId, int addressId, ShippingAddressRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAddressAsync(int userId, int addressId, CancellationToken cancellationToken = default);
     Task<SellerOrderDto> GetSellerOrderAsync(int userId, int sellerOrderId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<SellerOrderDto>> GetSellerOrdersAsync(int userId, CancellationToken cancellationToken = default);
     Task UpdateSellerOrderStatusAsync(int userId, int sellerOrderId, OrderStatus status, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<OrderDto>> GetAdminOrdersAsync(CancellationToken cancellationToken = default);
+    Task<OrderDto> GetAdminOrderAsync(int orderId, CancellationToken cancellationToken = default);
+    Task<SellerOrderDto> GetAdminSellerOrderAsync(int sellerOrderId, CancellationToken cancellationToken = default);
+    Task UpdateAdminSellerOrderStatusAsync(int sellerOrderId, OrderStatus status, CancellationToken cancellationToken = default);
 }

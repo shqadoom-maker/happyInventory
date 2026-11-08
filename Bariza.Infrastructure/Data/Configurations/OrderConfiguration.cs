@@ -16,7 +16,10 @@ public class ShippingAddressConfiguration : IEntityTypeConfiguration<ShippingAdd
         builder.Property(address => address.Phone).HasMaxLength(30).IsRequired();
         builder.Property(address => address.Country).HasMaxLength(100).IsRequired();
         builder.Property(address => address.City).HasMaxLength(100).IsRequired();
+        builder.Property(address => address.Area).HasMaxLength(100);
         builder.Property(address => address.Address).HasMaxLength(500).IsRequired();
+        builder.Property(address => address.BuildingNumber).HasMaxLength(50);
+        builder.Property(address => address.DeliveryInstructions).HasMaxLength(500);
     }
 }
 
@@ -30,6 +33,9 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.OrderNumber).HasMaxLength(40).IsRequired();
         builder.Property(order => order.CheckoutReference).HasMaxLength(60).IsRequired();
         builder.Property(order => order.TotalAmount).HasConversion(MoneyConverter()).HasColumnType("INTEGER").IsRequired();
+        builder.Property(order => order.PaymentMethod).IsRequired();
+        builder.Property(order => order.PaymentStatus).IsRequired();
+        builder.Property(order => order.ShippingAmount).HasConversion(MoneyConverter()).HasColumnType("INTEGER").IsRequired();
         builder.Property(order => order.CreatedUtc).IsRequired();
         builder.Property(order => order.UpdatedUtc);
 
@@ -62,6 +68,7 @@ public class SellerOrderConfiguration : IEntityTypeConfiguration<SellerOrder>
         builder.HasKey(order => order.Id);
 
         builder.Property(order => order.TotalAmount).HasConversion(MoneyConverter()).HasColumnType("INTEGER").IsRequired();
+        builder.Property(order => order.ShippingAmount).HasConversion(MoneyConverter()).HasColumnType("INTEGER").IsRequired();
         builder.Property(order => order.CreatedUtc).IsRequired();
         builder.Property(order => order.UpdatedUtc);
 
@@ -165,5 +172,22 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
             .WithMany()
             .HasForeignKey(item => item.ProductVariantId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+
+public class OrderStatusHistoryConfiguration : IEntityTypeConfiguration<OrderStatusHistory>
+{
+    public void Configure(EntityTypeBuilder<OrderStatusHistory> builder)
+    {
+        builder.ToTable("OrderStatusHistories");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.PreviousStatus).IsRequired();
+        builder.Property(x => x.NewStatus).IsRequired();
+        builder.Property(x => x.ChangedBy).HasMaxLength(150);
+        builder.Property(x => x.Notes).HasMaxLength(500);
+        builder.Property(x => x.CreatedUtc).IsRequired();
+        builder.HasIndex(x => x.SellerOrderId);
+        builder.HasOne(x => x.SellerOrder).WithMany().HasForeignKey(x => x.SellerOrderId).OnDelete(DeleteBehavior.Cascade);
     }
 }
