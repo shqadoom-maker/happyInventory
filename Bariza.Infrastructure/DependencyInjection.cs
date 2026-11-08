@@ -59,6 +59,9 @@ public static class DependencyInjection
         services.AddScoped<IMarketplaceCatalogRepository>(provider =>
             provider.GetRequiredService<MarketplaceCatalogRepository>());
 
+        services.AddScoped<SellerProductRepository>();
+        services.AddScoped<ISellerProductRepository>(provider => provider.GetRequiredService<SellerProductRepository>());
+
         services.AddScoped<CartRepository>();
         services.AddScoped<ICartRepository>(provider => provider.GetRequiredService<CartRepository>());
         services.AddScoped<ProductRepository>();
