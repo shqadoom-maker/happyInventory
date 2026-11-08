@@ -307,6 +307,10 @@
   color: #8F7F6B;
 }
 
+[data-theme="dark"] .input-shell input::placeholder {
+  color: #6F6150;
+}
+
 .input-shell input:hover {
   border-color: #D5EFE3;
 }
