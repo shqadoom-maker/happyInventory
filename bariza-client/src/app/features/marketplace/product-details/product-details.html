@@ -23,6 +23,9 @@
       <p>{{ product.categoryName }}</p>
       <p>{{ product.sellerName }}</p>
       <p>{{ product.isAvailable ? 'In stock' : 'Out of stock' }}</p>
+      <button class="btn" type="button" [disabled]="!product.isAvailable || adding" (click)="addToCart()">
+        {{ adding ? 'Adding...' : 'Add to cart' }}
+      </button>
     </div>
 
     <section class="specifications">

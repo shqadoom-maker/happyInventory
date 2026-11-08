@@ -72,16 +72,10 @@
           </span>
         </button>
 
-        <button
-          class="cart-button"
-          type="button"
-          disabled
-          [attr.aria-label]="'marketplace.nav.cartSoon' | translate"
-          [attr.title]="'marketplace.nav.cartSoon' | translate"
-        >
+        <a class="cart-button" routerLink="/shop/cart" [attr.aria-label]="'Cart'">
           <span class="material-icons-round" aria-hidden="true">shopping_bag</span>
-          <span class="cart-badge">0</span>
-        </button>
+          <span class="cart-badge">{{ cartCount() }}</span>
+        </a>
 
         <button
           class="menu-toggle"

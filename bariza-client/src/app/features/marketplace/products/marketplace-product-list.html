@@ -259,6 +259,15 @@
                     {{ (product.isAvailable ? 'marketplace.products.inStock' : 'marketplace.products.outOfStock') | translate }}
                   </span>
                 </div>
+
+                <button
+                  type="button"
+                  class="btn small"
+                  [disabled]="!product.isAvailable"
+                  (click)="addToCart(product)"
+                >
+                  Add to cart
+                </button>
               </div>
             </article>
           }

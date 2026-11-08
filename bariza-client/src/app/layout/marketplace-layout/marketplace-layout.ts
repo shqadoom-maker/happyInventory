@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, inject, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
@@ -11,6 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageCode, LanguageService } from '../../core/services/language.service';
+import { ShoppingCartService } from '../../core/services/shopping-cart.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { Logo } from '../../shared/logo/logo';
 
@@ -20,12 +21,13 @@ import { Logo } from '../../shared/logo/logo';
   templateUrl: './marketplace-layout.html',
   styleUrl: './marketplace-layout.scss',
 })
-export class MarketplaceLayout implements OnDestroy {
+export class MarketplaceLayout implements OnInit, OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly themeService = inject(ThemeService);
+  private readonly cartService = inject(ShoppingCartService);
 
   protected readonly languages = this.languageService.languages;
   protected readonly currentLanguage = this.languageService.current;
@@ -33,12 +35,17 @@ export class MarketplaceLayout implements OnDestroy {
   protected readonly menuOpen = signal(false);
   protected readonly searchTerm = signal('');
   protected readonly theme = this.themeService.theme;
+  protected readonly cartCount = () => this.cartService.cart().items.reduce((sum, item) => sum + item.quantity, 0);
   protected readonly currentYear = new Date().getFullYear();
 
   constructor() {
     this.route.queryParamMap
       .pipe(takeUntilDestroyed())
       .subscribe((params) => this.searchTerm.set(params.get('search') ?? ''));
+  }
+
+  ngOnInit(): void {
+    void this.cartService.load();
   }
 
   ngOnDestroy(): void {

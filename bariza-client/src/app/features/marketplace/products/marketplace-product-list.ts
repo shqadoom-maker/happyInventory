@@ -23,6 +23,7 @@ import {
   MarketplaceSort,
 } from '../../../core/models/marketplace.model';
 import { MarketplaceProductService } from '../../../core/services/marketplace-product.service';
+import { ShoppingCartService } from '../../../core/services/shopping-cart.service';
 
 const DEFAULT_PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -35,6 +36,7 @@ const SEARCH_DEBOUNCE_MS = 350;
 })
 export class MarketplaceProductList implements OnInit {
   private readonly catalog = inject(MarketplaceProductService);
+  private readonly cart = inject(ShoppingCartService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
@@ -251,6 +253,20 @@ export class MarketplaceProductList implements OnInit {
 
   protected retry(): void {
     this.retryRequests.next();
+  }
+
+  protected async addToCart(product: MarketplaceProduct): Promise<void> {
+    if (!product.isAvailable) {
+      return;
+    }
+
+    await this.cart.addItem(
+      product.id,
+      product.name,
+      product.imageUrl ?? null,
+      product.discountPrice ?? product.price,
+      product.sellerName ?? null,
+    );
   }
 
   protected onImageError(event: Event): void {
