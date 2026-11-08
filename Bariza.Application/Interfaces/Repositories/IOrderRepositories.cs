@@ -15,6 +15,7 @@ public interface ICartRepository
 public interface IProductRepository
 {
     Task<Product?> GetPublishedProductAsync(int productId, CancellationToken cancellationToken = default);
+    Task<ProductVariant?> GetVariantAsync(int variantId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<WarehouseItem>> GetStockAsync(int productId, CancellationToken cancellationToken = default);
 }
 

@@ -10,6 +10,9 @@ export type OrderStatus =
 export interface CartItem {
   id: number;
   productId: number;
+  productVariantId?: number | null;
+  variantName?: string | null;
+  variantValue?: string | null;
   productName: string;
   imageUrl?: string | null;
   unitPrice: number;
@@ -27,6 +30,7 @@ export interface Cart {
 
 export interface AddCartItemRequest {
   productId: number;
+  productVariantId?: number | null;
   quantity: number;
 }
 

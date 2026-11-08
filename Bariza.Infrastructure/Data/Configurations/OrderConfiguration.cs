@@ -149,7 +149,7 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
         builder.Property(item => item.CreatedUtc).IsRequired();
         builder.Property(item => item.UpdatedUtc);
 
-        builder.HasIndex(item => new { item.CartId, item.ProductId }).IsUnique();
+        builder.HasIndex(item => new { item.CartId, item.ProductId, item.ProductVariantId }).IsUnique();
 
         builder.HasOne(item => item.Cart)
             .WithMany(cart => cart.Items)
@@ -159,6 +159,11 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
         builder.HasOne(item => item.Product)
             .WithMany()
             .HasForeignKey(item => item.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(item => item.ProductVariant)
+            .WithMany()
+            .HasForeignKey(item => item.ProductVariantId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

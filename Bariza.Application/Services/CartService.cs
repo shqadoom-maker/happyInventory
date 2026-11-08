@@ -3,6 +3,7 @@ using Bariza.Application.DTOs.Orders;
 using Bariza.Application.Interfaces.Repositories;
 using Bariza.Application.Interfaces.Services;
 using Bariza.Core.Entities;
+using Bariza.Core.Enums;
 
 namespace Bariza.Application.Services;
 
@@ -42,16 +43,45 @@ public class CartService : ICartService
             throw new ValidationException("Quantity must be greater than zero.");
         }
 
-        var product = await _products.GetPublishedProductAsync(request.ProductId, cancellationToken);
-        if (product is null)
+        var product = request.ProductVariantId.HasValue
+            ? (await _products.GetVariantAsync(request.ProductVariantId.Value, cancellationToken))?.Product
+            : await _products.GetPublishedProductAsync(request.ProductId, cancellationToken);
+
+        if (product is null || !product.IsPublished || !product.IsActive || product.ApprovalStatus != ProductApprovalStatus.Approved)
         {
             throw new NotFoundException("The requested product was not found.");
+        }
+
+        ProductVariant? variant = null;
+        if (request.ProductVariantId.HasValue)
+        {
+            variant = await _products.GetVariantAsync(request.ProductVariantId.Value, cancellationToken);
+            if (variant is null || variant.ProductId != product.Id)
+            {
+                throw new NotFoundException("The requested variant was not found.");
+            }
+
+            if (variant.Stock < request.Quantity)
+            {
+                throw new ConflictException($"Insufficient stock for the selected variant. Available quantity is {variant.Stock}.");
+            }
+        }
+        else
+        {
+            var stock = await _products.GetStockAsync(product.Id, cancellationToken);
+            var available = stock.Sum(w => w.Qty);
+            if (available < request.Quantity)
+            {
+                throw new ConflictException($"Insufficient stock for '{product.Name}'. Available quantity is {available}.");
+            }
         }
 
         var cart = await _carts.GetByUserIdAsync(userId, cancellationToken)
             ?? await _carts.CreateAsync(userId, cancellationToken);
 
-        var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+        var item = cart.Items.FirstOrDefault(i =>
+            i.ProductId == request.ProductId &&
+            i.ProductVariantId == request.ProductVariantId);
 
         if (item is null)
         {
@@ -59,6 +89,7 @@ public class CartService : ICartService
             {
                 CartId = cart.Id,
                 ProductId = request.ProductId,
+                ProductVariantId = request.ProductVariantId,
                 Quantity = request.Quantity,
                 CreatedUtc = DateTime.UtcNow,
             }, cancellationToken);
@@ -125,11 +156,7 @@ public class CartService : ICartService
             return;
         }
 
-        foreach (var item in cart.Items.ToList())
-        {
-            await _carts.RemoveItemAsync(item, cancellationToken);
-        }
-
+        await _carts.ClearAsync(cart.Id, cancellationToken);
         cart.Items.Clear();
         cart.UpdatedUtc = DateTime.UtcNow;
         await _carts.SaveChangesAsync(cancellationToken);
@@ -153,27 +180,36 @@ public class CartService : ICartService
             stock[id] = items.Sum(w => w.Qty);
         }
 
-        var dtoItems = cart.Items
-            .OrderBy(i => i.Id)
-            .Select(i =>
-            {
-                products.TryGetValue(i.ProductId, out var product);
-                var unitPrice = product?.DiscountPrice ?? product?.Price ?? 0m;
+        var dtoItems = new List<CartItemDto>();
 
-                return new CartItemDto
-                {
-                    Id = i.Id,
-                    ProductId = i.ProductId,
-                    ProductName = product?.Name ?? string.Empty,
-                    ImageUrl = product?.ImageUrl,
-                    UnitPrice = unitPrice,
-                    Quantity = i.Quantity,
-                    Subtotal = unitPrice * i.Quantity,
-                    SellerName = product?.SellerProfile?.StoreName,
-                    IsAvailable = stock.TryGetValue(i.ProductId, out var qty) && qty >= i.Quantity,
-                };
-            })
-            .ToList();
+        foreach (var i in cart.Items.OrderBy(i => i.Id))
+        {
+            products.TryGetValue(i.ProductId, out var product);
+            ProductVariant? variant = null;
+
+            if (i.ProductVariantId.HasValue)
+            {
+                variant = await _products.GetVariantAsync(i.ProductVariantId.Value, cancellationToken);
+            }
+
+            var unitPrice = variant?.PriceOverride ?? product?.DiscountPrice ?? product?.Price ?? 0m;
+
+            dtoItems.Add(new CartItemDto
+            {
+                Id = i.Id,
+                ProductId = i.ProductId,
+                ProductVariantId = i.ProductVariantId,
+                ProductName = product?.Name ?? string.Empty,
+                VariantName = variant?.Name,
+                VariantValue = variant?.Value,
+                ImageUrl = product?.ImageUrl,
+                UnitPrice = unitPrice,
+                Quantity = i.Quantity,
+                Subtotal = unitPrice * i.Quantity,
+                SellerName = product?.SellerProfile?.StoreName,
+                IsAvailable = stock.TryGetValue(i.ProductId, out var qty) && qty >= i.Quantity,
+            });
+        }
 
         return new CartDto
         {

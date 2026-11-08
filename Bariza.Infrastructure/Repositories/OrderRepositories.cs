@@ -55,6 +55,11 @@ public class ProductRepository : IProductRepository
             .Include(p => p.SellerProfile)
             .FirstOrDefaultAsync(p => p.Id == productId && p.IsPublished && p.IsActive && p.ApprovalStatus == ProductApprovalStatus.Approved, cancellationToken);
 
+    public Task<ProductVariant?> GetVariantAsync(int variantId, CancellationToken cancellationToken = default) =>
+        _db.ProductVariants
+            .Include(v => v.Product).ThenInclude(p => p.SellerProfile)
+            .FirstOrDefaultAsync(v => v.Id == variantId && v.IsActive, cancellationToken);
+
     public async Task<IReadOnlyList<WarehouseItem>> GetStockAsync(int productId, CancellationToken cancellationToken = default) =>
         await _db.WarehouseItems
             .Include(w => w.Warehouse)
