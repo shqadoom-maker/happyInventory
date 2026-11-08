@@ -39,7 +39,7 @@
   left: -140px;
   width: 560px;
   height: 560px;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.45), transparent 70%);
+  background: radial-gradient(circle, rgba(245, 165, 36, 0.45), transparent 70%);
 }
 
 .scene-glow-b {
@@ -47,7 +47,7 @@
   bottom: -240px;
   width: 680px;
   height: 680px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.55), transparent 70%);
+  background: radial-gradient(circle, rgba(11, 110, 79, 0.55), transparent 70%);
 }
 
 .scene-vignette {
@@ -60,7 +60,7 @@
       rgba(4, 11, 24, 0.58) 58%,
       rgba(4, 11, 24, 0.9) 100%
     ),
-    linear-gradient(180deg, rgba(4, 11, 24, 0.55) 0%, rgba(4, 11, 24, 0.28) 100%);
+    linear-gradient(180deg, rgba(6, 78, 59, 0.55) 0%, rgba(6, 78, 59, 0.28) 100%);
 }
 
 /* --------------------------------------------------------------------------
@@ -81,7 +81,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  color: #f8fafc;
+  color: #F5F1EA;
 }
 
 .login-brand-text {
@@ -96,7 +96,7 @@
 }
 
 .login-brand-text small {
-  color: #8fa6c2;
+  color: #A89D8E;
   font-size: 0.72rem;
 }
 
@@ -122,7 +122,7 @@
   border: none;
   border-radius: var(--radius-pill);
   background: transparent;
-  color: #cbd5e1;
+  color: #D8D0C4;
   font: inherit;
   font-size: 0.76rem;
   font-weight: 600;
@@ -144,7 +144,7 @@
 }
 
 .login-lang .lang-btn:focus-visible {
-  outline: 2px solid #E8F0FA;
+  outline: 2px solid #D5EFE3;
   outline-offset: 1px;
 }
 
@@ -455,7 +455,7 @@
   align-items: flex-start;
   margin: 0 0 16px;
   padding: 10px 12px;
-  border: 1px solid #E8F0FA;
+  border: 1px solid #D5EFE3;
   border-radius: 10px;
   background: var(--info-soft);
   color: var(--info);
