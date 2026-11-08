@@ -3,6 +3,7 @@ import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { gsap } from 'gsap';
 import {
   Subject,
   catchError,
@@ -149,6 +150,19 @@ export class MarketplaceProductList implements OnInit {
           this.totalPages.set(page.totalPages);
           this.pageNumber.set(page.pageNumber);
           this.pageSize.set(page.pageSize);
+
+          if (!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+            requestAnimationFrame(() => {
+              gsap.from('.product-card', {
+                y: 16,
+                opacity: 0,
+                duration: 0.45,
+                stagger: 0.05,
+                ease: 'power2.out',
+                clearProps: 'all',
+              });
+            });
+          }
         }
       });
   }
