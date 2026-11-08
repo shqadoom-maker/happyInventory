@@ -152,8 +152,8 @@
   margin-top: auto;
   padding: 6px 11px;
   border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--info);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -289,8 +289,8 @@
 
 .coming-badge {
   margin-inline-start: auto;
-  background: var(--accent-soft);
-  color: var(--info);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .feature-grid {
@@ -313,8 +313,8 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--info);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 1.3rem;
 }
 
